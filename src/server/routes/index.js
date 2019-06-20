@@ -5,5 +5,11 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
+router.get("/privacy_policy", (req, res, next) => {
+  res.render('privacy_policy', {})
+});
+router.get("/terms_of_service", (req, res, next) => {
+  res.render('terms_of_service', {})
+});
 
 module.exports = router;

@@ -3,6 +3,8 @@ var router = express.Router();
 const firestoreFactory = require("../environments/firestore_factory");
 const firestore = firestoreFactory();
 
+let tokenVerifier = require("../middlewares/verify_token");
+
 router.post('/login', function(req, res, next) {
     let {email, password} = req.body;
     if (!!email && !!password) {
@@ -25,7 +27,7 @@ router.post('/login', function(req, res, next) {
     }
 });
 router.post("/register", (req, res, next) => {
-    let {email, password} = req.body;
+    let {email, password, sex, height, weight, target_weight} = req.body;
     if (!!email && !!password) {
         let userRef = db.collection('users').doc(email);
         let getDoc = userRef.get()
@@ -33,6 +35,10 @@ router.post("/register", (req, res, next) => {
                 if (!doc.exists) {
                     let docRef = firestore.collection("users").doc(email);
                     docRef.set({
+                        sex : sex,
+                        height : height,
+                        weight : weight,
+                        target_weight : target_weight,
                         password: password
                     }).then(result => {
                         res.send({status: "OK"});
@@ -51,11 +57,50 @@ router.post("/register", (req, res, next) => {
     }
 
 });
-router.post("/googleSignIn", (req, res, next) => {
 
+router.post("/profile", tokenVerifier, (req, res, next) => {
+    let {sex, height, weight, target_weight} = req.body;
+
+});
+
+router.get("/profile", tokenVerifier, (req, res, next) => {
+    let {email} = req.token_data;
+    if (!!email) {
+        let userRef = db.collection('users').doc(email);
+        let getDoc = userRef.get()
+            .then(doc => {
+                if (!doc.exists) {
+                    const data = doc.data();
+                    data.password = "";
+                    res.send({status : "error", data : data});
+                } else {
+                    res.send({status : "error", token : "Not found"});
+                }
+            })
+            .catch(err => {
+                console.log('Error getting document', err);
+                res.send({status : "error", message : "Unexpected error"});
+            });
+
+    } else {
+        res.send({status : "error", message : "Invalid email"});
+    }
+});
+
+
+router.post("/googleSignIn", (req, res, next) => {
+    let {google_id_token} = req.body;
+    if (!!google_id_token) {
+        //TODO : verify with google
+        //TODO : determine should register or login
+    } else {
+
+    }
 });
 router.post('/facebookSignIn', (req, res, next) => {
 
 });
+
+router.post('/')
 
 module.exports = router;

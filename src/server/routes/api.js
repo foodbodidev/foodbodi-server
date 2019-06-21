@@ -3,6 +3,7 @@ var router = express.Router();
 const firestoreFactory = require("../environments/firestore_factory");
 const firestore = firestoreFactory();
 var tokenHandler = require("../utils/token");
+let {hash} = require("../utils/password");
 
 let tokenVerifier = require("../middlewares/verify_token");
 const {OAuth2Client} = require('google-auth-library');
@@ -32,9 +33,15 @@ router.post('/login', function(req, res, next) {
                 if (!doc.exists) {
                     res.send({status : "error", message : "User not found"});
                 } else {
-                    //TODO : check password
-                    console.info("User login " + JSON.stringify(doc.data()));
-                    res.send({status : "OK", token : tokenHandler.createToken({email : doc.id})});
+                    const hashPassword = hash(password);
+                    const savedHash = doc.data().password;
+                    if (hashPassword === savedHash) {
+                        console.info("User login " + JSON.stringify(doc.data()));
+                        res.send({status: "OK", token: tokenHandler.createToken({email: doc.id})});
+                    } else {
+                        console.warn("Wrong password : " + email + "-" + password);
+                        res.send({status : "Unauthorized", message : "Wrong password"});
+                    }
                 }
             })
             .catch(err => {
@@ -59,7 +66,7 @@ router.post("/register", (req, res, next) => {
                         height : height,
                         weight : weight,
                         target_weight : target_weight,
-                        password: password,
+                        password: hash(password),
                         email : email
                     }).then(result => {
                         res.send({status: "OK"});
@@ -110,7 +117,7 @@ router.get("/profile", tokenVerifier, (req, res, next) => {
         let userRef = firestore.collection('users').doc(email);
         let getDoc = userRef.get()
             .then(doc => {
-                if (!doc.exists) {
+                if (doc.exists) {
                     const data = doc.data();
                     data.password = "";
                     res.send({status : "error", data : data});

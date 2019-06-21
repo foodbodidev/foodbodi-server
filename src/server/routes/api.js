@@ -2,23 +2,43 @@ var express = require('express');
 var router = express.Router();
 const firestoreFactory = require("../environments/firestore_factory");
 const firestore = firestoreFactory();
+var tokenHandler = require("../utils/token");
 
 let tokenVerifier = require("../middlewares/verify_token");
+const {OAuth2Client} = require('google-auth-library');
+const iOS_CLIENT_ID = "513844011252-2qlodmja1av20n55vro79uv0jc5vj3ck.apps.googleusercontent.com";
+const WEB_CLIENT_ID = "513844011252-0220ffhr75mivnrv0jub2ue1kkkgckfr.apps.googleusercontent.com";
+const client = new OAuth2Client(iOS_CLIENT_ID);
+
+async function verify(token) {
+    console.info("Verify google token " + token);
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: [iOS_CLIENT_ID, WEB_CLIENT_ID]
+    });
+    const payload = ticket.getPayload();
+    console.info("Google account " + JSON.stringify(payload));
+    return payload;
+}
+
+//TODO : will refactor later, now write it fast to test the cloud
 
 router.post('/login', function(req, res, next) {
     let {email, password} = req.body;
     if (!!email && !!password) {
-        let userRef = db.collection('users').doc(email);
+        let userRef = firestore.collection('users').doc(email);
         let getDoc = userRef.get()
             .then(doc => {
                 if (!doc.exists) {
                     res.send({status : "error", message : "User not found"});
                 } else {
-                    res.send({status : "OK", token : "generetedtoken"});
+                    //TODO : check password
+                    console.info("User login " + JSON.stringify(doc.data()));
+                    res.send({status : "OK", token : tokenHandler.createToken({email : doc.id})});
                 }
             })
             .catch(err => {
-                console.log('Error getting document', err);
+                console.error('Error getting document', err);
                 res.send({status : "error", message : "Unexpected error"});
             });
 
@@ -29,17 +49,18 @@ router.post('/login', function(req, res, next) {
 router.post("/register", (req, res, next) => {
     let {email, password, sex, height, weight, target_weight} = req.body;
     if (!!email && !!password) {
-        let userRef = db.collection('users').doc(email);
+        let userRef = firestore.collection('users').doc(email);
         let getDoc = userRef.get()
             .then(doc => {
                 if (!doc.exists) {
                     let docRef = firestore.collection("users").doc(email);
                     docRef.set({
-                        sex : sex,
+                        sex : sex || "MALE",
                         height : height,
                         weight : weight,
                         target_weight : target_weight,
-                        password: password
+                        password: password,
+                        email : email
                     }).then(result => {
                         res.send({status: "OK"});
                     });
@@ -48,7 +69,7 @@ router.post("/register", (req, res, next) => {
                 }
             })
             .catch(err => {
-                console.log('Error getting document', err);
+                console.error('Error getting document', err);
                 res.send({status : "error", message : "Unexpected error"});
             });
 
@@ -59,14 +80,34 @@ router.post("/register", (req, res, next) => {
 });
 
 router.post("/profile", tokenVerifier, (req, res, next) => {
-    let {sex, height, weight, target_weight} = req.body;
+    const {email} = req.token_data;
+    if (!!email) {
+        let userRef = firestore.collection('users').doc(email);
+        let getDoc = userRef.get()
+            .then(doc => {
+                if (!doc.exists) {
+                    res.send({status : "error", message : "User not found"});
+                } else {
+                    let data = doc.data();
+                    delete data.password;
+                    res.send(data);
+                }
+            })
+            .catch(err => {
+                console.error('Error getting document', err);
+                res.send({status : "error", message : "Unexpected error"});
+            });
+
+    } else {
+        res.send({status : "error", message : "Invalid email or password"});
+    }
 
 });
 
 router.get("/profile", tokenVerifier, (req, res, next) => {
     let {email} = req.token_data;
     if (!!email) {
-        let userRef = db.collection('users').doc(email);
+        let userRef = firestore.collection('users').doc(email);
         let getDoc = userRef.get()
             .then(doc => {
                 if (!doc.exists) {
@@ -78,7 +119,7 @@ router.get("/profile", tokenVerifier, (req, res, next) => {
                 }
             })
             .catch(err => {
-                console.log('Error getting document', err);
+                console.error('Error getting document', err);
                 res.send({status : "error", message : "Unexpected error"});
             });
 
@@ -91,16 +132,42 @@ router.get("/profile", tokenVerifier, (req, res, next) => {
 router.post("/googleSignIn", (req, res, next) => {
     let {google_id_token} = req.body;
     if (!!google_id_token) {
-        //TODO : verify with google
-        //TODO : determine should register or login
-    } else {
+        const google_account_info = verify(google_id_token);
+        google_account_info.then(result => {
+            const email = result.email;
+            if (email) {
+                let userRef = firestore.collection('users').doc(email);
+                let getDoc = userRef.get()
+                    .then(doc => {
+                        if (!doc.exists) {
+                            let docRef = firestore.collection("users").doc(email);
+                            userRef.set({
+                                need_password : false
+                            }).then(result => {
+                                res.send({status: "OK", token : tokenHandler.createToken({email : email})});
+                            });
+                        } else {
+                            res.send({status : "OK", token : tokenHandler.createToken({email : doc.id})})
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error getting document', err);
+                        res.send({status : "error", message : "Unexpected error"});
+                    });
+            } else {
+                res.send({status : "error", message : "Email is null"});
+            }
+        }).catch(error => {
+            console.error(error);
+            res.send({status : "error", message : "Unexpected error while googleSignIn"})
+        });
 
+    } else {
+        res.send({status : "error", message : "Missing google if token"});
     }
 });
 router.post('/facebookSignIn', (req, res, next) => {
-
+    res.send({message : "Coming soon"});
 });
-
-router.post('/')
 
 module.exports = router;

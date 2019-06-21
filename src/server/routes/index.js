@@ -11,5 +11,8 @@ router.get("/privacy_policy", (req, res, next) => {
 router.get("/terms_of_service", (req, res, next) => {
   res.render('terms_of_service', {})
 });
+router.get("/login", (req, res, next) => {
+  res.render('login')
+});
 
 module.exports = router;

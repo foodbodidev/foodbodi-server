@@ -1,8 +1,14 @@
 var MD5 = require("crypto-js/md5");
-var base64 = require("crypto-js/base64");
+var {verifyToken} = require("../utils/token");
 module.exports = (req, res, next) => {
-    const token = req.header("token");
+    const token = req.header("token") || "";
     //TODO : implement token verifier
-    req.token_data = {};
-    next();
+    if (verifyToken(token)) {
+        req.token_data = {
+            email : token
+        };
+        next();
+    } else {
+        res.send({status : "Unauthorized"})
+    }
 };

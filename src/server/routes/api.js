@@ -1,11 +1,17 @@
 var express = require('express');
 var router = express.Router();
+
 const firestoreFactory = require("../environments/firestore_factory");
 const firestore = firestoreFactory();
+
+var Facebook = require('facebook-node-sdk');
+var facebook = new Facebook({ appID: '789884858079669', secret: 'YOUR_APP_SECRET' });
+
 var tokenHandler = require("../utils/token");
 let {hash} = require("../utils/password");
 
 let tokenVerifier = require("../middlewares/verify_token");
+
 const {OAuth2Client} = require('google-auth-library');
 const iOS_CLIENT_ID = "513844011252-2qlodmja1av20n55vro79uv0jc5vj3ck.apps.googleusercontent.com";
 const WEB_CLIENT_ID = "513844011252-0220ffhr75mivnrv0jub2ue1kkkgckfr.apps.googleusercontent.com";
@@ -120,7 +126,7 @@ router.get("/profile", tokenVerifier, (req, res, next) => {
                 if (doc.exists) {
                     const data = doc.data();
                     data.password = "";
-                    res.send({status : "error", data : data});
+                    res.send({status : "OK", data : data});
                 } else {
                     res.send({status : "error", token : "Not found"});
                 }

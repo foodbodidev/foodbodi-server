@@ -5,6 +5,7 @@ html(lang="en")
          script(src="https://apis.google.com/js/platform.js" async="" defer="")
        body
          .g-signin2(data-onsuccess="onSignIn" data-theme="dark")
+         fb:login-button(scope='public_profile,email' onlogin='checkLoginState();')
          script.
            function onSignIn(googleUser) {
            // Useful data for your client-side scripts:
@@ -27,4 +28,28 @@ html(lang="en")
            var payload = {google_id_token : id_token};
            xhr.send(JSON.stringify(payload));
            }
-    
+       script.
+           window.fbAsyncInit = function() {
+               FB.init({
+                   appId: '789884858079669',
+                   cookie: true,
+                   xfbml: true,
+                   version: 'v3.3'
+               });
+
+               FB.AppEvents.logPageView();
+
+           };
+
+           (function(d, s, id){
+               var js, fjs = d.getElementsByTagName(s)[0];
+               if (d.getElementById(id)) {return;}
+               js = d.createElement(s); js.id = id;
+               js.src = "https://connect.facebook.net/en_US/sdk.js";
+               fjs.parentNode.insertBefore(js, fjs);
+           }(document, 'script', 'facebook-jssdk'));
+           function checkLoginState() {
+               FB.getLoginStatus(function (response) {
+
+               });
+           }

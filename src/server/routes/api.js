@@ -93,26 +93,35 @@ router.post("/register", (req, res, next) => {
 });
 
 router.post("/profile", tokenVerifier, (req, res, next) => {
-    const {email} = req.token_data;
-    if (!!email) {
-        let userRef = firestore.collection('users').doc(email);
-        let getDoc = userRef.get()
-            .then(doc => {
-                if (!doc.exists) {
-                    res.send({status : "error", message : "User not found"});
-                } else {
-                    let data = doc.data();
-                    delete data.password;
-                    res.send(data);
-                }
-            })
-            .catch(err => {
-                console.error('Error getting document', err);
-                res.send({status : "error", message : "Unexpected error"});
-            });
-
+    let update_data = req.body;
+    if (update_data.email || update_data.password) {
+        res.send({status : "error", message : "Can not update field"});
     } else {
-        res.send({status : "error", message : "Invalid email or password"});
+        const {email} = req.token_data;
+        if (!!email) {
+            let userRef = firestore.collection('users').doc(email);
+            let getDoc = userRef.get()
+                .then(doc => {
+                    if (!doc.exists) {
+                        res.send({status: "error", message: "User not found"});
+                    } else {
+                        userRef.set(update_data)
+                            .then(result => {
+                                res.send({status : "OK"});
+                            })
+                            .catch(error => {
+                                res.send({status: "error", message: "Unexpected error when updating data"});
+                            })
+                    }
+                })
+                .catch(err => {
+                    console.error('Error getting document', err);
+                    res.send({status: "error", message: "Unexpected error"});
+                });
+
+        } else {
+            res.send({status: "error", message: "Invalid email or password"});
+        }
     }
 
 });
@@ -125,7 +134,7 @@ router.get("/profile", tokenVerifier, (req, res, next) => {
             .then(doc => {
                 if (doc.exists) {
                     const data = doc.data();
-                    data.password = "";
+                    delete data.password;
                     res.send({status : "OK", data : data});
                 } else {
                     res.send({status : "error", token : "Not found"});

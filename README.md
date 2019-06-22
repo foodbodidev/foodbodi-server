@@ -1,10 +1,19 @@
 # foodbodi-server
 ## Flows
 #### Login by email & password
+1. Register new user by POST /api/register
+2. Login by POST /api/login, if success, server returns a token
+3. Token is base64 encrypted, include it in http headers with header_name "token" for another api requests
 #### Login by Google Sign In
+1. User logins by GoogleSignIn button
+2. Use the token returned from Google, send to POST /api/googleSignIn
+3. If email of user is not exists, server will create new account.
+4. Server will return a token encrypted by base64, include it in http headers with header_name "token" for another api requests
+- After get a token from google
 #### Login by Facebook Sign In
+- Implementing...
 #### User info
-#### Add restaurant / foodtruck
+#### Add restaurant / food_truck
 #### Get nearby & track locations
 #### Chat 
 ## Collections
@@ -57,6 +66,12 @@
     target_weight : (optional),
 }
 ```
+- Output (if success)
+```$xslt
+{
+    status : "OK",
+}
+```
 ### POST /api/login
 - Input
 ```$xslt
@@ -65,7 +80,7 @@
     password : String (non-hashed, required) ,
 }
 ```
-- Output
+- Output (if success)
 ```$xslt
 {
     status : "OK",
@@ -80,7 +95,7 @@
     google_id_token : String (token obtained after Google Sign In process)
 }
 ```
-- Output
+- Output (if success)
 ```$xslt
 {
     status : "OK",

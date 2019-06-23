@@ -62,10 +62,18 @@ Not implement yet
    
 ```
 ## APIs
-Every response has status field. Status can be
-- OK
-- error
-- Unauthorized
+Every response has status field. Status value can be
+- "OK"
+- "error".
+Example
+```$xslt
+{status : "error", message : "Unexpected error while facebookSignIn"}
+```
+- 'Unauthorized"
+Example
+```$xslt
+{status :"Unauthorized", message : "Missing access token or userID"}
+```
 ### POST /api/register
 - Input
 ```$xslt

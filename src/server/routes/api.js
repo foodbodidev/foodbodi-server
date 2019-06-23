@@ -16,6 +16,9 @@ const client = new OAuth2Client(iOS_CLIENT_ID);
 
 const axios = require('axios');
 
+const ErrorHandler = require("../utils/response_handler");
+const ErrorCodes = require("../utils/error_codes");
+
 let createUserInfo = (input) => {
     let {sex, height, weight, target_weight, age, first_name, last_name} = input;
     return {
@@ -49,7 +52,7 @@ router.post('/login', function(req, res, next) {
         let getDoc = userRef.get()
             .then(doc => {
                 if (!doc.exists) {
-                    res.send({status : "error", message : "User not found"});
+                    ErrorHandler.error(res, ErrorCodes.USER_NOT_FOUND, "User not found");
                 } else {
                     const hashPassword = hash(password);
                     const savedHash = doc.data().password;
@@ -57,22 +60,23 @@ router.post('/login', function(req, res, next) {
                     delete data.password;
                     if (hashPassword === savedHash) {
                         console.info("User login " + JSON.stringify(doc.data()));
-                        res.send({status: "OK",
-                            data : data,
-                            token: tokenHandler.createToken({email: doc.id})});
+                        ErrorHandler.success(res, {
+                            user : data,
+                            token : tokenHandler.createToken({email: doc.id})
+                        });
                     } else {
                         console.warn("Wrong password : " + email + "-" + password);
-                        res.send({status : "Unauthorized", message : "Wrong password"});
+                        ErrorHandler.error(res, ErrorCodes.UNAUTHORIZED, "Wrong password");
                     }
                 }
             })
             .catch(err => {
                 console.error('Error getting document', err);
-                res.send({status : "error", message : "Unexpected error"});
+                ErrorHandler.error(res, ErrorCodes.LOGIN_EXCEPTION, "Login fail");
             });
 
     } else {
-        res.send({status : "error", message : "Invalid email or password"});
+        ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Invalid email or password");
     }
 });
 router.post("/register", (req, res, next) => {
@@ -94,19 +98,19 @@ router.post("/register", (req, res, next) => {
                         first_name : first_name || "",
                         last_name : last_name || ""
                     }).then(result => {
-                        res.send({status: "OK"});
+                        ErrorHandler.success(res, {});
                     });
                 } else {
-                    res.send({status : "error", message : "User already exists"})
+                    ErrorHandler.error(res, ErrorCodes.USER_EXISTS, "User already exists");
                 }
             })
             .catch(err => {
                 console.error('Error getting document', err);
-                res.send({status : "error", message : "Unexpected error"});
+                ErrorHandler.error(res, ErrorCodes.ERROR, "Register fail");
             });
 
     } else {
-        res.send({status : "error", message : "Invalid email or password"});
+        ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Invalid email or password");
     }
 
 });
@@ -114,7 +118,7 @@ router.post("/register", (req, res, next) => {
 router.post("/profile", tokenVerifier, (req, res, next) => {
     let update_data = req.body;
     if (update_data.email || update_data.password) {
-        res.send({status : "error", message : "Can not update field"});
+        ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Can not update fields");
     } else {
         const {email} = req.token_data;
         if (!!email) {
@@ -122,24 +126,24 @@ router.post("/profile", tokenVerifier, (req, res, next) => {
             let getDoc = userRef.get()
                 .then(doc => {
                     if (!doc.exists) {
-                        res.send({status: "error", message: "User not found"});
+                        ErrorHandler.error(res, ErrorCodes.USER_NOT_FOUND, "User not found");
                     } else {
                         userRef.update(update_data)
                             .then(result => {
-                                res.send({status : "OK"});
+                                ErrorHandler.success(res, {});
                             })
                             .catch(error => {
-                                res.send({status: "error", message: "Unexpected error when updating data"});
+                                ErrorHandler.error(res, ErrorCodes.UPDATE_FAIL, "Update user fail");
                             })
                     }
                 })
                 .catch(err => {
                     console.error('Error getting document', err);
-                    res.send({status: "error", message: "Unexpected error"});
+                    ErrorHandler.error(res, ErrorCodes.GET_FAIL, "Get user fail");
                 });
 
         } else {
-            res.send({status: "error", message: "Invalid email or password"});
+            ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Token is invalid");
         }
     }
 
@@ -154,18 +158,18 @@ router.get("/profile", tokenVerifier, (req, res, next) => {
                 if (doc.exists) {
                     const data = doc.data();
                     delete data.password;
-                    res.send({status : "OK", data : data});
+                    ErrorHandler.success(res, data);
                 } else {
-                    res.send({status : "error", token : "Not found"});
+                    ErrorHandler.error(res, ErrorCodes.USER_NOT_FOUND, "User not found");
                 }
             })
             .catch(err => {
                 console.error('Error getting document', err);
-                res.send({status : "error", message : "Unexpected error"});
+                ErrorHandler.error(res, ErrorCodes.GET_FAIL, "Get user fail");
             });
 
     } else {
-        res.send({status : "error", message : "Invalid email"});
+        ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Token is invalid");
     }
 });
 
@@ -185,30 +189,33 @@ router.post("/googleSignIn", (req, res, next) => {
                             let userInfo = createUserInfo(req.body);
                             userInfo.need_password = false;
                             userRef.set(userInfo).then(result => {
-                                res.send({status: "OK", token : tokenHandler.createToken({email : email})});
+                                ErrorHandler.success(res, {
+                                    token : tokenHandler.createToken({email : email})
+                                });
                             });
                         } else {
                             let data = doc.data;
                             delete data.password;
-                            res.send({status : "OK",
+                            ErrorHandler.success(res, {
                                 data : data,
-                                token : tokenHandler.createToken({email : doc.id})})
+                                token : tokenHandler.createToken({email : doc.id})
+                            });
                         }
                     })
                     .catch(err => {
                         console.error('Error getting document', err);
-                        res.send({status : "error", message : "Unexpected error"});
+                        ErrorHandler.error(res, ErrorCodes.GET_FAIL, "Get user fail");
                     });
             } else {
-                res.send({status : "error", message : "Email is null"});
+                ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Can not get email from google");
             }
         }).catch(error => {
             console.error(error);
-            res.send({status : "error", message : "Unexpected error while googleSignIn"})
+            ErrorHandler.error(res, ErrorCodes.GOOGLE_LOGIN_FAIL, "Unexpected error while googleSignIn");
         });
 
     } else {
-        res.send({status : "error", message : "Missing google if token"});
+        ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing google_id_token");
     }
 });
 router.post('/facebookSignIn', (req, res, next) => {
@@ -228,30 +235,32 @@ router.post('/facebookSignIn', (req, res, next) => {
                                let userInfo = createUserInfo(req.body);
                                userInfo.need_password = false;
                                userRef.set(userInfo).then(result => {
-                                   res.send({status: "OK",
-                                       token : tokenHandler.createToken({email : json.email})});
+                                   ErrorHandler.success(res, {
+                                       token : tokenHandler.createToken({email : json.email})
+                                   });
                                });
                            } else {
                                let data = doc.data;
                                delete data.password;
-                               res.send({status : "OK",
+                               ErrorHandler.success(res, {
                                    data : data,
-                                   token : tokenHandler.createToken({email : doc.id})})
+                                   token : tokenHandler.createToken({email : doc.id})
+                               });
                            }
                        }).catch(error => {
-                           res.send({status : "error", message : "Can not get document"})
+                           ErrorHandler.error(res, ErrorCodes.GET_FAIL, "Can not get user");
                        })
 
                } else {
-                   res.send({status : "error", fb_message : json})
+                   ErrorHandler.error(res, ErrorCodes.FACEBOOK_LOGIN_FAIL, "Missing email");
                }
             }).catch(error => {
                 console.warn(JSON.stringify(error));
-                res.send({status : "error", message : "Unexpected error while facebookSignIn"})
+                ErrorHandler.error(res, ErrorCodes.FACEBOOK_LOGIN_FAIL, "Unexpected error while facebookSignIn");
 
         });
     } else {
-        res.send({status :"Unauthorized", message : "Missing access token or userID"});
+        ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing facebook_access_token or user_id");
     }
 });
 

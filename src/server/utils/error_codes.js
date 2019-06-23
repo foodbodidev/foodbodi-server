@@ -1,0 +1,18 @@
+module.exports = {
+    SUCCESS : 200,
+    ERROR : 500,
+    LOGIN_EXCEPTION : 501,
+    UPDATE_FAIL : 502,
+    GET_FAIL : 503,
+
+    UNAUTHORIZED : 300,
+    USER_NOT_FOUND : 301,
+    USER_EXISTS : 302,
+
+    WRONG_FORMAT : 400,
+
+    GOOGLE_LOGIN_FAIL : 600,
+
+    FACEBOOK_LOGIN_FAIL : 650,
+
+};

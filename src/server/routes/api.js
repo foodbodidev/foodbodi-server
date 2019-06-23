@@ -105,7 +105,7 @@ router.post("/profile", tokenVerifier, (req, res, next) => {
                     if (!doc.exists) {
                         res.send({status: "error", message: "User not found"});
                     } else {
-                        userRef.set(update_data)
+                        userRef.update(update_data)
                             .then(result => {
                                 res.send({status : "OK"});
                             })

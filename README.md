@@ -7,17 +7,23 @@
 #### Login by Google Sign In
 1. User logins by GoogleSignIn button
 2. Use the token returned from Google, send to POST /api/googleSignIn
-3. If email of user is not exists, server will create new account.
-4. Server will return a token encrypted by base64, include it in http headers with header_name "token" for another api requests
+3. If email of user is not exists, server will create new account with field need_password = false.
+4. Server will return a token encrypted by base64, include it in http headers with header_name "token" for another api requests.
 #### Login by Facebook Sign In
 1. User logins by GoogleSignIn button
 2. Use the token returned from Google, send to POST /api/facebookSignIn
-3. If email of user is not exists, server will create new account.
-4. Server will return a token encrypted by base64, include it in http headers with header_name "token" for another api requests
+3. If email of user is not exists, server will create new account with field need_password = false.
+4. Server will return a token encrypted by base64, include it in http headers with header_name "token" for another api requests.
 #### User info
+- User data is included in reponses from login apis as name "data"
+- Can obtain from GET /api/profile (require token)
+- To update profile, use POST /api/profile (require token)
 #### Add restaurant / food_truck
+Implementing...
 #### Get nearby & track locations
+Not implement yet
 #### Chat 
+Not implement yet
 ## Collections
 ### User
 - Collection Name : users <br>

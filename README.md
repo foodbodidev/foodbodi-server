@@ -7,12 +7,12 @@
 #### Login by Google Sign In
 1. User logins by GoogleSignIn button
 2. Use the token returned from Google, send to POST /api/googleSignIn
-3. If email of user is not exists, server will create new account with field need_password = false.
+3. If email of user is not exists, server will create new account with field need_password = false and user's data in the request.
 4. Server will return a token encrypted by base64, include it in http headers with header_name "token" for another api requests.
 #### Login by Facebook Sign In
 1. User logins by GoogleSignIn button
 2. Use the token returned from Google, send to POST /api/facebookSignIn
-3. If email of user is not exists, server will create new account with field need_password = false.
+3. If email of user is not exists, server will create new account with field need_password = false and user's data in the request.
 4. Server will return a token encrypted by base64, include it in http headers with header_name "token" for another api requests.
 #### User info
 - User data is included in reponses from login apis as name "data"
@@ -62,6 +62,10 @@ Not implement yet
    
 ```
 ## APIs
+Every response has status field. Status can be
+- OK
+- error
+- Unauthorized
 ### POST /api/register
 - Input
 ```$xslt

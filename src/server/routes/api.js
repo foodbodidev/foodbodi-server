@@ -16,6 +16,19 @@ const client = new OAuth2Client(iOS_CLIENT_ID);
 
 const axios = require('axios');
 
+let createUserInfo = (input) => {
+    let {sex, height, weight, target_weight, age, first_name, last_name} = input;
+    return {
+        age : age || 18,
+        sex : sex || "MALE",
+        height : height || 0,
+        weight : weight || 0,
+        target_weight : target_weight || 0,
+        first_name : first_name || "",
+        last_name : last_name || ""
+    }
+};
+
 async function verify(token) {
     console.info("Verify google token " + token);
     const ticket = await client.verifyIdToken({
@@ -63,7 +76,7 @@ router.post('/login', function(req, res, next) {
     }
 });
 router.post("/register", (req, res, next) => {
-    let {email, password, sex, height, weight, target_weight} = req.body;
+    let {email, password, sex, height, weight, target_weight, age, first_name, last_name} = req.body;
     if (!!email && !!password) {
         let userRef = firestore.collection('users').doc(email);
         let getDoc = userRef.get()
@@ -71,12 +84,15 @@ router.post("/register", (req, res, next) => {
                 if (!doc.exists) {
                     let docRef = firestore.collection("users").doc(email);
                     docRef.set({
+                        age : age || 18,
                         sex : sex || "MALE",
                         height : height || 0,
                         weight : weight || 0,
                         target_weight : target_weight || 0,
                         password: hash(password),
-                        email : email
+                        email : email,
+                        first_name : first_name || "",
+                        last_name : last_name || ""
                     }).then(result => {
                         res.send({status: "OK"});
                     });
@@ -166,9 +182,9 @@ router.post("/googleSignIn", (req, res, next) => {
                     .then(doc => {
                         if (!doc.exists) {
                             let docRef = firestore.collection("users").doc(email);
-                            userRef.set({
-                                need_password : false
-                            }).then(result => {
+                            let userInfo = createUserInfo(req.body);
+                            userInfo.need_password = false;
+                            userRef.set(userInfo).then(result => {
                                 res.send({status: "OK", token : tokenHandler.createToken({email : email})});
                             });
                         } else {
@@ -196,6 +212,7 @@ router.post("/googleSignIn", (req, res, next) => {
     }
 });
 router.post('/facebookSignIn', (req, res, next) => {
+    let {sex, height, weight, target_weight, age, first_name, last_name} = req.body;
     let {facebook_access_token, user_id} = req.body;
     if (!!facebook_access_token && !!user_id) {
         const url = "https://graph.facebook.com/" + user_id + "?fields=name,email&access_token=" + facebook_access_token;
@@ -208,9 +225,9 @@ router.post('/facebookSignIn', (req, res, next) => {
                        .then(doc => {
                            if (!doc.exists) {
                                let docRef = firestore.collection("users").doc(json.email);
-                               userRef.set({
-                                   need_password : false
-                               }).then(result => {
+                               let userInfo = createUserInfo(req.body);
+                               userInfo.need_password = false;
+                               userRef.set(userInfo).then(result => {
                                    res.send({status: "OK",
                                        token : tokenHandler.createToken({email : json.email})});
                                });

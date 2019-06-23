@@ -133,13 +133,13 @@ router.post("/profile", tokenVerifier, (req, res, next) => {
                                 ErrorHandler.success(res, {});
                             })
                             .catch(error => {
-                                ErrorHandler.error(res, ErrorCodes.UPDATE_FAIL, "Update user fail");
+                                ErrorHandler.error(res, ErrorCodes.FIRESTORE_UPDATE_FAIL, "Update user fail");
                             })
                     }
                 })
                 .catch(err => {
                     console.error('Error getting document', err);
-                    ErrorHandler.error(res, ErrorCodes.GET_FAIL, "Get user fail");
+                    ErrorHandler.error(res, ErrorCodes.FIRESTORE_GET_FAIL, "Get user fail");
                 });
 
         } else {
@@ -165,7 +165,7 @@ router.get("/profile", tokenVerifier, (req, res, next) => {
             })
             .catch(err => {
                 console.error('Error getting document', err);
-                ErrorHandler.error(res, ErrorCodes.GET_FAIL, "Get user fail");
+                ErrorHandler.error(res, ErrorCodes.FIRESTORE_GET_FAIL, "Get user fail");
             });
 
     } else {
@@ -204,7 +204,7 @@ router.post("/googleSignIn", (req, res, next) => {
                     })
                     .catch(err => {
                         console.error('Error getting document', err);
-                        ErrorHandler.error(res, ErrorCodes.GET_FAIL, "Get user fail");
+                        ErrorHandler.error(res, ErrorCodes.FIRESTORE_GET_FAIL, "Get user fail");
                     });
             } else {
                 ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Can not get email from google");
@@ -248,7 +248,7 @@ router.post('/facebookSignIn', (req, res, next) => {
                                });
                            }
                        }).catch(error => {
-                           ErrorHandler.error(res, ErrorCodes.GET_FAIL, "Can not get user");
+                           ErrorHandler.error(res, ErrorCodes.FIRESTORE_GET_FAIL, "Can not get user");
                        })
 
                } else {

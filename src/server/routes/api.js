@@ -4,9 +4,6 @@ var router = express.Router();
 const firestoreFactory = require("../environments/firestore_factory");
 const firestore = firestoreFactory();
 
-var Facebook = require('facebook-node-sdk');
-var facebook = new Facebook({ appID: '789884858079669', secret: 'YOUR_APP_SECRET' });
-
 var tokenHandler = require("../utils/token");
 let {hash} = require("../utils/password");
 
@@ -16,6 +13,8 @@ const {OAuth2Client} = require('google-auth-library');
 const iOS_CLIENT_ID = "513844011252-2qlodmja1av20n55vro79uv0jc5vj3ck.apps.googleusercontent.com";
 const WEB_CLIENT_ID = "513844011252-0220ffhr75mivnrv0jub2ue1kkkgckfr.apps.googleusercontent.com";
 const client = new OAuth2Client(iOS_CLIENT_ID);
+
+const axios = require('axios');
 
 async function verify(token) {
     console.info("Verify google token " + token);
@@ -41,9 +40,13 @@ router.post('/login', function(req, res, next) {
                 } else {
                     const hashPassword = hash(password);
                     const savedHash = doc.data().password;
+                    const data = doc.data();
+                    delete data.password;
                     if (hashPassword === savedHash) {
                         console.info("User login " + JSON.stringify(doc.data()));
-                        res.send({status: "OK", token: tokenHandler.createToken({email: doc.id})});
+                        res.send({status: "OK",
+                            data : data,
+                            token: tokenHandler.createToken({email: doc.id})});
                     } else {
                         console.warn("Wrong password : " + email + "-" + password);
                         res.send({status : "Unauthorized", message : "Wrong password"});
@@ -69,9 +72,9 @@ router.post("/register", (req, res, next) => {
                     let docRef = firestore.collection("users").doc(email);
                     docRef.set({
                         sex : sex || "MALE",
-                        height : height,
-                        weight : weight,
-                        target_weight : target_weight,
+                        height : height || 0,
+                        weight : weight || 0,
+                        target_weight : target_weight || 0,
                         password: hash(password),
                         email : email
                     }).then(result => {
@@ -169,7 +172,11 @@ router.post("/googleSignIn", (req, res, next) => {
                                 res.send({status: "OK", token : tokenHandler.createToken({email : email})});
                             });
                         } else {
-                            res.send({status : "OK", token : tokenHandler.createToken({email : doc.id})})
+                            let data = doc.data;
+                            delete data.password;
+                            res.send({status : "OK",
+                                data : data,
+                                token : tokenHandler.createToken({email : doc.id})})
                         }
                     })
                     .catch(err => {
@@ -189,7 +196,46 @@ router.post("/googleSignIn", (req, res, next) => {
     }
 });
 router.post('/facebookSignIn', (req, res, next) => {
-    res.send({message : "Coming soon"});
+    let {facebook_access_token, user_id} = req.body;
+    if (!!facebook_access_token && !!user_id) {
+        const url = "https://graph.facebook.com/" + user_id + "?fields=name,email&access_token=" + facebook_access_token;
+        axios.get(url)
+            .then(response => {
+               const json = response.data;
+               if (json && json.email) {
+                   let userRef = firestore.collection('users').doc(json.email);
+                   let getDoc = userRef.get()
+                       .then(doc => {
+                           if (!doc.exists) {
+                               let docRef = firestore.collection("users").doc(json.email);
+                               userRef.set({
+                                   need_password : false
+                               }).then(result => {
+                                   res.send({status: "OK",
+                                       token : tokenHandler.createToken({email : json.email})});
+                               });
+                           } else {
+                               let data = doc.data;
+                               delete data.password;
+                               res.send({status : "OK",
+                                   data : data,
+                                   token : tokenHandler.createToken({email : doc.id})})
+                           }
+                       }).catch(error => {
+                           res.send({status : "error", message : "Can not get document"})
+                       })
+
+               } else {
+                   res.send({status : "error", fb_message : json})
+               }
+            }).catch(error => {
+                console.warn(JSON.stringify(error));
+                res.send({status : "error", message : "Unexpected error while facebookSignIn"})
+
+        });
+    } else {
+        res.send({status :"Unauthorized", message : "Missing access token or userID"});
+    }
 });
 
 module.exports = router;

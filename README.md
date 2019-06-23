@@ -9,9 +9,11 @@
 2. Use the token returned from Google, send to POST /api/googleSignIn
 3. If email of user is not exists, server will create new account.
 4. Server will return a token encrypted by base64, include it in http headers with header_name "token" for another api requests
-- After get a token from google
 #### Login by Facebook Sign In
-- Implementing...
+1. User logins by GoogleSignIn button
+2. Use the token returned from Google, send to POST /api/facebookSignIn
+3. If email of user is not exists, server will create new account.
+4. Server will return a token encrypted by base64, include it in http headers with header_name "token" for another api requests
 #### User info
 #### Add restaurant / food_truck
 #### Get nearby & track locations
@@ -84,7 +86,8 @@
 ```$xslt
 {
     status : "OK",
-    token : String
+    token : String,
+    data : user data as json
 }
 ```
 ### POST /api/googleSignIn
@@ -99,10 +102,27 @@
 ```$xslt
 {
     status : "OK",
-    token : String
+    token : String,
+    data : user's data if user already exist
 }
 ```
 ### POST /api/facebookSignIn
+- Create new account if needed 
+- Input
+```$xslt
+{
+    facebook_access_token : String (token obtained after Fave Sign In process)
+    user_id : String (obtained after Fave Sign In process)
+}
+```
+- Output (if success)
+```$xslt
+{
+    status : "OK",
+    token : String,
+    data : user's data if user already exist
+}
+```
 ### GET /api/profile
 - Extract user data by token
 - Require token in header

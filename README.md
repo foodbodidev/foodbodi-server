@@ -62,18 +62,29 @@ Not implement yet
    
 ```
 ## APIs
-Every response has status field. Status value can be
-- "OK"
-- "error".
-Example
-```$xslt
-{status : "error", message : "Unexpected error while facebookSignIn"}
+Every response has status field & data field. 
+- Status value can be
 ```
-- 'Unauthorized"
-Example
-```$xslt
-{status :"Unauthorized", message : "Missing access token or userID"}
+module.exports = {
+       SUCCESS : 0,
+       ERROR : 500,
+       LOGIN_EXCEPTION : 501,
+       FIRESTORE_UPDATE_FAIL : 502,
+       FIRESTORE_GET_FAIL : 503,
+   
+       UNAUTHORIZED : 300,
+       USER_NOT_FOUND : 301,
+       USER_EXISTS : 302,
+   
+       WRONG_FORMAT : 400,
+   
+       GOOGLE_LOGIN_FAIL : 600,
+   
+       FACEBOOK_LOGIN_FAIL : 650,
+   
+   };
 ```
+- Data field is what you expect in the API, based on each API
 ### POST /api/register
 - Input
 ```$xslt
@@ -84,6 +95,9 @@ Example
     height : Number (optional),
     weight : Number (optional),
     target_weight : (optional),
+    age : Number,
+    first_name : String,
+    last_name : String
 }
 ```
 - Output (if success)
@@ -103,9 +117,12 @@ Example
 - Output (if success)
 ```$xslt
 {
-    status : "OK",
+    status_code : 0,
     token : String,
-    data : user data as json
+    data : {
+        user : {..User data},
+        token : access token to be included in header
+    }
 }
 ```
 ### POST /api/googleSignIn
@@ -113,15 +130,18 @@ Example
 - Input
 ```$xslt
 {
-    google_id_token : String (token obtained after Google Sign In process)
+    google_id_token : String (token obtained after Google Sign In process),
+    ...User data (except email & password)
 }
 ```
 - Output (if success)
 ```$xslt
 {
-    status : "OK",
-    token : String,
-    data : user's data if user already exist
+    status : 0,
+    data : {
+        user : ...User data,
+        token : String
+    }
 }
 ```
 ### POST /api/facebookSignIn
@@ -130,15 +150,18 @@ Example
 ```$xslt
 {
     facebook_access_token : String (token obtained after Fave Sign In process)
-    user_id : String (obtained after Fave Sign In process)
+    user_id : String (obtained after Fave Sign In process),
+    ...User data (except email & password)
 }
 ```
 - Output (if success)
 ```$xslt
 {
-    status : "OK",
-    token : String,
-    data : user's data if user already exist
+    status : 0,
+    data : {
+                user : ...User data,
+                token : String
+            }
 }
 ```
 ### GET /api/profile

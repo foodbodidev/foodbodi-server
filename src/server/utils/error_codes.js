@@ -1,6 +1,6 @@
 module.exports = {
-    SUCCESS : 200,
-    ERROR : 500, //General error
+    SUCCESS : 0,
+    ERROR : 500,
     LOGIN_EXCEPTION : 501,
     FIRESTORE_UPDATE_FAIL : 502,
     FIRESTORE_GET_FAIL : 503,

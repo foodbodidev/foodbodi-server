@@ -3,14 +3,15 @@ const ErrorHandler = require("../utils/response_handler");
 const ErrorCodes = require("../utils/error_codes");
 const firestoreFactory = require("../environments/firestore_factory");
 const firestore = firestoreFactory();
-const firebase = require('firebase-admin');
+let Restaurant = require("../models/restaurant");
+let validator = require("validator");
 
 exports.create = (req, res, next) => {
     let val = validation.checkReq({
         type: { type: String, required: true },
         name: { type: String, required: true },
         location: { type: Object, required: true }
-    }, req.body)
+    }, req.body);
 
     if (validation.isObject(val.wrong)) {
         return ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, val.wrong);
@@ -23,47 +24,45 @@ exports.create = (req, res, next) => {
     if (val.right.location.longitude && typeof val.right.location.longitude != "number") {
         return ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "longitude must be number");
     }
-    let doc = val.right.location.toString()
+    let doc = val.right.location.toString();
     val.right.location = new firebase.firestore.GeoPoint(val.right.location.latitude, val.right.location.longitude)
-    
-    let restaurantC = firestore.collection('restaurants').doc(doc);
-    let getDoc = restaurantC.get()
+
+    const restaurant = new Restaurant(req.body);
+    let restaurantRef = firestore.collection().add(restaurant.toJSON())
         .then(doc => {
-            if (!doc.exists) {
-                let docRef = firestore.collection("restaurants").doc(doc);
-                    docRef.set(val.right).then(result => {
-                        ErrorHandler.success(res, {});
-                    });
-                } else {
-                    // ErrorHandler.error(res, ErrorCodes.USER_EXISTS, "User already exists");
-                }
-            })
-            .catch(err => {
-                ErrorHandler.error(res, ErrorCodes.ERROR, "Create restaurant fail");
-            });
-}
+            const created = new Restaurant(doc.data(), doc.id);
+            ErrorHandler.success(res, created.toJSON());
+        })
+        .catch(error => {
+            console.log(error);
+            ErrorHandler.error(res, ErrorCodes.RESTAURANT_CREATE_FAIL, "Can not create restaurant");
+        })
 
-exports.reads = (req, res, next) => {
-    let latitude = req.query.latitude
-    let longitude = req.query.longitude
-    let distance = req.query.distance
+};
 
-    let doc = {latitude: latitude, longitude: longitude}.toString()
+exports.get = (req, res, next) => {
+    let {id} = req.params;
+    if (id) {
+        let ref = firestore.collection("restaurant").doc(id);
+        ref.get().then(doc => {
+            if (doc.exists) {
+                const restaurant = new Restaurant(doc.data());
+                ErrorHandler.success(res, {
+                    restaurant : restaurant.toJSON()
+                });
+            } else {
+                ErrorHandler.error(res, ErrorCodes.RESTAURANT_NOT_FOUND, "Can not found restaurant " + id);
+            }
+        })
+    } else {
+        ErrorHandler.error(res, ErrorCodes.ERROR, "Missing id");
+    }
+};
 
-    // ~1 mile of lat and lon in degrees
-    // let lat = 0.0144927536231884
-    // let lon = 0.0181818181818182
+exports.update = (req, res, next) => {
 
-    // let lowerLat = latitude - (lat * distance)
-    // let lowerLon = longitude - (lon * distance)
+};
 
-    // let greaterLat = latitude + (lat * distance)
-    // let greaterLon = longitude + (lon * distance)
+exports.delete = (req, res, next) => {
 
-    // let lesserGeopoint = new firebase.firestore.GeoPoint(lowerLat, lowerLon);
-    // let greaterGeopoint = new firebase.firestore.GeoPoint(greaterLat, greaterLon);
-
-    // let docRef = firestore.collection("locations")
-    // let query = docRef.get("location", isGreaterThan: lesserGeopoint).whereField("location", isLessThan: greaterGeopoint)
-
-}
+};

@@ -30,6 +30,9 @@ Not implement yet
 - Format : <br>
 ```
 {
+    first_name : String,
+    last_name : String,
+    
     email : String ,
     password : String (hashed),
     sex : String ("MALE"/ "FEMALE"),

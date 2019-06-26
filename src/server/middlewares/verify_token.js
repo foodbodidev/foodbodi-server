@@ -1,4 +1,6 @@
 var {verifyToken} = require("../utils/token");
+let ErrorHandler = require("../utils/response_handler");
+let ErrorCodes = require("../utils/error_codes");
 module.exports = (req, res, next) => {
     const token = req.header("token") || "";
     const tokenData = verifyToken(token);
@@ -6,6 +8,6 @@ module.exports = (req, res, next) => {
         req.token_data = tokenData;
         next();
     } else {
-        res.send({status : "Unauthorized"})
+        ErrorHandler.error(res, ErrorCodes.UNAUTHORIZED, "Token is invalid");
     }
 };

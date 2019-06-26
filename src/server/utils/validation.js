@@ -6,10 +6,6 @@ exports.isStringnotEmpty = (str) => {
     return typeof str == 'string' && str !== '' ? true : false
 }
 
-exports.isObjectId = (str) => {
-    return __mongoose.Types.ObjectId.isValid(str) ? true : false
-}
-
 exports.isNumber = (num) => {
     return typeof num == 'number' && !isNaN(num) ? true : false
 }

@@ -55,14 +55,43 @@ exports.get = (req, res, next) => {
             }
         })
     } else {
-        ErrorHandler.error(res, ErrorCodes.ERROR, "Missing id");
+        ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing id");
     }
 };
 
 exports.update = (req, res, next) => {
+    let {id} = req.params;
+    if (id) {
+        const update_data = new Restaurant(req.body);
+        let ref = firestore.collection(Restaurant.prototype.collectionName()).doc(id);
+        ref.update(update_data).then(doc => {
+                const restaurant = new Restaurant(doc.data(), doc.id);
+                ErrorHandler.success(res, {
+                    restaurant : restaurant.toJSON()
+                });
+
+        }).catch(error => {
+            console.log(error);
+            ErrorHandler.error(res, ErrorCodes.RESTAURANT_NOT_FOUND, "Can not update restaurant " + id);
+        });
+    } else {
+        ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing id");
+    }
 
 };
 
 exports.delete = (req, res, next) => {
+    let {id} = req.params;
+    if (id) {
+        firestore.collection(Restaurant.prototype.collectionName()).doc(id).delete()
+            .then(res => {
+                ErrorHandler.success(res, {})
+            })
+            .catch(error => {
+                ErrorHandler.error(res, ErrorCodes.ERROR, "Can not delete restaurant");
+            })
 
+    } else {
+        ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing id");
+    }
 };

@@ -55,14 +55,17 @@ Restaurant.prototype.type = (value) => {
 };
 
 Restaurant.prototype.toJSON = () => {
-    return {
-        id : this._id,
+    let result = {
         name : this._name,
         creator : this._creator,
         address : this._address,
         lat : this._lat,
         lng: this._lng
+    };
+    if (this._id) {
+        result.id = this._id
     }
+    return result;
 };
 
 Restaurant.prototype.collectionName = () => {

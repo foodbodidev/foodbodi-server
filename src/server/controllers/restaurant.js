@@ -28,7 +28,7 @@ exports.create = (req, res, next) => {
     val.right.location = new firebase.firestore.GeoPoint(val.right.location.latitude, val.right.location.longitude)
 
     const restaurant = new Restaurant(req.body);
-    let restaurantRef = firestore.collection().add(restaurant.toJSON())
+    let restaurantRef = firestore.collection(restaurant.collectionName()).add(restaurant.toJSON())
         .then(doc => {
             const created = new Restaurant(doc.data(), doc.id);
             ErrorHandler.success(res, created.toJSON());
@@ -43,7 +43,7 @@ exports.create = (req, res, next) => {
 exports.get = (req, res, next) => {
     let {id} = req.params;
     if (id) {
-        let ref = firestore.collection("restaurant").doc(id);
+        let ref = firestore.collection(Restaurant.prototype.collectionName()).doc(id);
         ref.get().then(doc => {
             if (doc.exists) {
                 const restaurant = new Restaurant(doc.data());

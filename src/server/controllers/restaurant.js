@@ -10,13 +10,14 @@ exports.create = (req, res, next) => {
     let val = validation.checkReq({
         type: { type: String, required: true },
         name: { type: String, required: true },
-        location: { type: Object, required: true }
+        //location: { type: Object, required: true }
     }, req.body);
 
     if (validation.isObject(val.wrong)) {
         return ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, val.wrong);
     }
 
+    /*
     if (val.right.location.latitude && typeof val.right.location.latitude != "number") {
         return ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "latitude must be number");
     }
@@ -24,8 +25,9 @@ exports.create = (req, res, next) => {
     if (val.right.location.longitude && typeof val.right.location.longitude != "number") {
         return ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "longitude must be number");
     }
-    let doc = val.right.location.toString();
-    val.right.location = new firebase.firestore.GeoPoint(val.right.location.latitude, val.right.location.longitude)
+
+    let doc = val.right.location.toString();*/
+    //val.right.location = new firebase.firestore.GeoPoint(val.right.location.latitude, val.right.location.longitude)
 
     const restaurant = new Restaurant(req.body);
     let restaurantRef = firestore.collection(restaurant.collectionName()).add(restaurant.toJSON())
@@ -46,13 +48,16 @@ exports.get = (req, res, next) => {
         let ref = firestore.collection(Restaurant.prototype.collectionName()).doc(id);
         ref.get().then(doc => {
             if (doc.exists) {
-                const restaurant = new Restaurant(doc.data());
+                const restaurant = new Restaurant(doc.data(), doc.id);
                 ErrorHandler.success(res, {
                     restaurant : restaurant.toJSON()
                 });
             } else {
                 ErrorHandler.error(res, ErrorCodes.RESTAURANT_NOT_FOUND, "Can not found restaurant " + id);
             }
+        }).catch(error=> {
+            console.log(error);
+            ErrorHandler.error(res, ErrorCodes.ERROR, "Can not get restaurant");
         })
     } else {
         ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing id");
@@ -88,6 +93,7 @@ exports.delete = (req, res, next) => {
                 ErrorHandler.success(res, {})
             })
             .catch(error => {
+                console.log(error);
                 ErrorHandler.error(res, ErrorCodes.ERROR, "Can not delete restaurant");
             })
 

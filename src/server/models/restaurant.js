@@ -11,7 +11,7 @@ function Restaurant(input, id) {
     }
 }
 
-Restaurant.prototype.name = (value) => {
+Restaurant.prototype.name = function(value) {
     if (value) {
         this._name = value;
     }
@@ -19,7 +19,7 @@ Restaurant.prototype.name = (value) => {
 
 };
 
-Restaurant.prototype.address = (value) => {
+Restaurant.prototype.address = function(value) {
     if (value) {
         this._address = value;
     }
@@ -28,7 +28,7 @@ Restaurant.prototype.address = (value) => {
 };
 
 
-Restaurant.prototype.creator = (value) => {
+Restaurant.prototype.creator = function(value) {
     if (value) {
         this._creator = value;
     }
@@ -36,7 +36,7 @@ Restaurant.prototype.creator = (value) => {
 
 };
 
-Restaurant.prototype.location = (lat, lng) => {
+Restaurant.prototype.location = function(lat, lng)  {
     if (!!lat && !!lng) {
         this._lat = lat;
         this._lng = lng;
@@ -47,14 +47,14 @@ Restaurant.prototype.location = (lat, lng) => {
     }
 };
 
-Restaurant.prototype.type = (value) => {
+Restaurant.prototype.type = function(value) {
     if (value) {
         this._type = value;
     }
     return this._type;
 };
 
-Restaurant.prototype.toJSON = () => {
+Restaurant.prototype.toJSON = function() {
     let result = {
         name : this._name,
         creator : this._creator,
@@ -68,7 +68,7 @@ Restaurant.prototype.toJSON = () => {
     return result;
 };
 
-Restaurant.prototype.collectionName = () => {
+Restaurant.prototype.collectionName = function() {
     return "restaurants";
 };
 

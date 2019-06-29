@@ -30,6 +30,8 @@ exports.create = (req, res, next) => {
     //val.right.location = new firebase.firestore.GeoPoint(val.right.location.latitude, val.right.location.longitude)
 
     const restaurant = new Restaurant(req.body);
+    const creator = req.token_data.email;
+    restaurant.creator(creator);
     let restaurantRef = firestore.collection(restaurant.collectionName()).add(restaurant.toJSON())
         .then(doc => {
             restaurant.id(doc.id);
@@ -57,7 +59,7 @@ exports.get = (req, res, next) => {
             }
         }).catch(error=> {
             console.log(error);
-            ErrorHandler.error(res, ErrorCodes.ERROR, "Can not get restaurant");
+            ErrorHandler.error(res, ErrorCodes.ERROR, error.message);
         })
     } else {
         ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing id");
@@ -67,17 +69,14 @@ exports.get = (req, res, next) => {
 exports.update = (req, res, next) => {
     let {id} = req.params;
     if (id) {
-        const update_data = new Restaurant(req.body);
+        const update_data = req.body;
         let ref = firestore.collection(Restaurant.prototype.collectionName()).doc(id);
         ref.update(update_data).then(doc => {
-                const restaurant = new Restaurant(doc.data(), doc.id);
-                ErrorHandler.success(res, {
-                    restaurant : restaurant.toJSON()
-                });
+                ErrorHandler.success(res, {});
 
         }).catch(error => {
             console.log(error);
-            ErrorHandler.error(res, ErrorCodes.RESTAURANT_NOT_FOUND, "Can not update restaurant " + id);
+            ErrorHandler.error(res, ErrorCodes.ERROR, error.message);
         });
     } else {
         ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing id");
@@ -94,7 +93,7 @@ exports.delete = (req, res, next) => {
             })
             .catch(error => {
                 console.log(error);
-                ErrorHandler.error(res, ErrorCodes.ERROR, "Can not delete restaurant");
+                ErrorHandler.error(res, ErrorCodes.ERROR, error.message);
             })
 
     } else {

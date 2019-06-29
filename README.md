@@ -1,4 +1,22 @@
 # foodbodi-server
+## Setup
+#### Local server
+Basically, we will run a local node server with a remote Firestore database
+- Contact credential manager to get the firestore service-account credential (.json file) , or you can create an app-engine project yourself with your personal Firestore.
+- Copy that credential to folder named "src/server/credentials"
+- On Terminal run : ```export FOODBODI_ENV=dev```
+- Start sever : ```npm run start```.
+
+__*Beware, when you use the same Firestore with another, you are sharing the same database with them while testing on your local*__
+#### Unit test
+Finding a mock technique for firestore ....
+#### Deployment
+- Install gcloud tools
+- Create new gcloud configuration : ```gcloud config configurations create foodbodi```
+- Run : ```gcloud auth login```
+- To deploy, go to src/server folder, run: ```gcloud app deploy```.
+
+__*Beware, you may need to be granted the deployment permission by admin.*__
 ## Flows
 #### Login by email & password
 1. Register new user by POST /api/register
@@ -40,6 +58,8 @@ Not implement yet
     weight : Number,
     target_weight : Number,
     need_password : Boolean (false when user use Google SignIn or facebook Signin)
+    
+    complete_profile : Boolean // indicate that whether user has filled all neccessary information in profile
 }
 ```
 ### Restaurant
@@ -49,6 +69,8 @@ Not implement yet
 {
     type : String ("RESTAURANT", "FOOD_TRUCK"),
     name : String,
+    address : String,
+    creator : String ( User.id of creator)
     location : Geographical point,
 }
 ```

@@ -68,6 +68,13 @@ Restaurant.prototype.toJSON = function() {
     return result;
 };
 
+Restaurant.prototype.id = function(value) {
+    if (value) {
+        this._id = value
+    };
+    return this._id;
+}
+
 Restaurant.prototype.collectionName = function() {
     return "restaurants";
 };

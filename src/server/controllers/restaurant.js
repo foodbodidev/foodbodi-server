@@ -32,8 +32,8 @@ exports.create = (req, res, next) => {
     const restaurant = new Restaurant(req.body);
     let restaurantRef = firestore.collection(restaurant.collectionName()).add(restaurant.toJSON())
         .then(doc => {
-            const created = new Restaurant(doc.data(), doc.id);
-            ErrorHandler.success(res, created.toJSON());
+            restaurant.id(doc.id);
+            ErrorHandler.success(res, restaurant.toJSON());
         })
         .catch(error => {
             console.log(error);

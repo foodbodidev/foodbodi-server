@@ -1,5 +1,7 @@
 let Category  = require("./restaurant_category");
 let Type = require("./restaurant_type");
+let validator = require("validator");
+
 function Restaurant(input, id) {
     this._name = input.name || null;
     this._creator = input.creator || null;
@@ -8,6 +10,8 @@ function Restaurant(input, id) {
     this._lng = input.lng || null;
     this._type = input.type || Type.RESTAURANT.key;
     this._category = input.category || Category.ORDINARY.key;
+    this._open_hour = input.open_hour || null;
+    this._close_hour = input.close_hour || null;
     if (id) {
         this._id = id;
     }
@@ -66,6 +70,20 @@ Restaurant.prototype.type = function(value) {
     return this._type;
 };
 
+Restaurant.prototype.openHour = function(value) {
+    if (value) {
+        this._openHour = value;
+    }
+    return this._open_hour;
+};
+
+Restaurant.prototype.closeHour = function(value) {
+    if (value) {
+        this._close_hour = value;
+    }
+    return this._close_hour;
+};
+
 Restaurant.prototype.toJSON = function() {
     let result = {
         name : this._name,
@@ -91,6 +109,19 @@ Restaurant.prototype.id = function(value) {
 
 Restaurant.prototype.collectionName = function() {
     return "restaurants";
+};
+
+Restaurant.prototype.validateInput = function(input) {
+    let {name, address, category, type, lat, lng, open_hour, close_hour} = input;
+    let valid = !name  || validator.isAlphanumeric(name);
+    valid &= !address  || validator.isAlphanumeric(address);
+    valid &= !category  || Category.hasOwnProperty(category);
+    valid &= !type  || Type.hasOwnProperty(type);
+    valid &= !lat  || validator.isNumeric(lat);
+    valid &= !lng  || validator.isNumeric(lng);
+    valid &= !open_hour || validator.isAlphanumeric(open_hour);
+    valid &= !close_hour || validator.isAlphanumeric(close_hour);
+    return valid;
 };
 
 module.exports = Restaurant;

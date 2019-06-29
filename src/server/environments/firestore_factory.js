@@ -1,11 +1,8 @@
 const admin = require('firebase-admin');
 const functions = require('firebase-functions');
 let serviceAccount = require('../credentials/firestore-service-account.json');
-
 module.exports = () => {
-    if (this.firestore) {
-        return this.firestore;
-    } else {
+    if (!this.firestore) {
         const env = process.env.FOODBODI_ENV || "dev";
         if (env === "dev") {
             admin.initializeApp({
@@ -19,5 +16,6 @@ module.exports = () => {
             //TODO : mock firestore
         }
     }
+    return this.firestore;
 
 };

@@ -21,15 +21,18 @@ const ErrorCodes = require("../utils/error_codes");
 
 let createUserInfo = (input) => {
     let {sex, height, weight, target_weight, age, first_name, last_name} = input;
-    return {
-        age : age || 18,
+    let data = {
+        age : age || 0,
         sex : sex || "MALE",
         height : height || 0,
         weight : weight || 0,
         target_weight : target_weight || 0,
         first_name : first_name || "",
         last_name : last_name || ""
-    }
+    };
+    const complete_profile = data.target_weight !== 0 && data.weight !== 0 && data.height !== 0;
+    data.complete_profile = complete_profile;
+
 };
 
 async function verify(token) {

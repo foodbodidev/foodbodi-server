@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "debug": "node ./test/testRestaurants.js"
+    "debug": "node ./tools/debug.js"
   },
   "dependencies": {
     "@firebase/testing": "^0.11.3",
@@ -20,8 +20,14 @@
     "google-auth-library": "^4.2.2",
     "http-errors": "~1.6.3",
     "https": "^1.0.0",
+    "mock-cloud-firestore": "^0.9.3",
     "morgan": "~1.9.1",
     "pug": "2.0.0-beta11",
     "validator": "^11.0.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "mocha": "^6.1.4"
   }
 }

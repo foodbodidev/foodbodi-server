@@ -12,6 +12,7 @@ __*Beware, when you use the same Firestore with another, you are sharing the sam
 Finding a mock technique for firestore ....
 #### Deployment
 - Install gcloud tools
+- Run: ```gcloud projects create foodbodi```
 - Create new gcloud configuration : ```gcloud config configurations create foodbodi```
 - Run : ```gcloud auth login```
 - To deploy, go to src/server folder, run: ```gcloud app deploy```.
@@ -37,7 +38,10 @@ __*Beware, you may need to be granted the deployment permission by admin.*__
 - Can obtain from GET /api/profile (require token)
 - To update profile, use POST /api/profile (require token)
 #### Add restaurant / food_truck
-Implementing...
+ Make sure you have a token
+- To create new one : POST /api/restaurant 
+- To update existing one : PUT /api/restaurant/{restaurant_id}
+- to delete : DELETE .api
 #### Get nearby & track locations
 Not implement yet
 #### Chat 
@@ -68,10 +72,13 @@ Not implement yet
 ```$xslt
 {
     type : String ("RESTAURANT", "FOOD_TRUCK"),
+    category : String ("FAST_FOOD", "ORDINARY",... )
     name : String,
     address : String,
     creator : String ( User.id of creator)
-    location : Geographical point,
+    lat : Number,
+    lng : Number,
+    
 }
 ```
 ### Food
@@ -197,3 +204,5 @@ module.exports = {
 ### POST /api/profile
 - Update user data
 - Require token in header
+
+

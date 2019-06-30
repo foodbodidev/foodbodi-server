@@ -33,6 +33,7 @@ let createUserInfo = (input) => {
     };
     const complete_profile = data.target_weight !== 0 && data.weight !== 0 && data.height !== 0;
     data.complete_profile = complete_profile;
+    return data;
 
 };
 

@@ -1,0 +1,1 @@
+__restaurantController = require('./restaurant')

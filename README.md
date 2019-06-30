@@ -41,7 +41,8 @@ __*Beware, you may need to be granted the deployment permission by admin.*__
  Make sure you have a token
 - To create new one : POST /api/restaurant 
 - To update existing one : PUT /api/restaurant/{restaurant_id}
-- to delete : DELETE .api
+- To delete : DELETE /api/restaurant/{restaurant_id}
+- To get data : GET /api/restaurant/{restaurant_id}
 #### Get nearby & track locations
 Not implement yet
 #### Chat 
@@ -205,4 +206,20 @@ module.exports = {
 - Update user data
 - Require token in header
 
+
+### GET/api/restaurant/{restaurant_id}
+
+### POST/api/restaurant
+```$xslt
+{
+    ...Restaurant data
+}
+```
+### PUT/api/restaurant/{restaurant_id}
+```$xslt
+{
+    ...updated data
+}
+```
+### DELETE/api/restaurant/{restaurant_id}
 

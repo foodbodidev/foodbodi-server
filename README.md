@@ -3,7 +3,7 @@
 #### Local server
 Basically, we will run a local node server with a remote Firestore database
 - Contact credential manager to get the firestore service-account credential (.json file) , or you can create an app-engine project yourself with your personal Firestore.
-- Copy that credential to folder named "src/server/credentials"
+- Copy that credential to folder named "src/server/credentials" as name : ```firestore-service-account.json```
 - On Terminal run : ```export FOODBODI_ENV=dev```
 - Start sever : ```npm run start```.
 
@@ -208,18 +208,73 @@ module.exports = {
 
 
 ### GET/api/restaurant/{restaurant_id}
+- Output (if success)
+```
+{
+    status_code : 0,
+    data : {
+        restaurant : {...Restaurant data},
+        menu : [{...Food}] // Array of Food
+    
+    }
+    
+}
+```
 
 ### POST/api/restaurant
+- Require token in header
+- Input
 ```$xslt
 {
     ...Restaurant data
+    menu : [{...Food data}] //Array of a food. Food in this array will be added to restaurant's menu
+}
+```
+Example 
+```
+{
+    type : "RESTAURANT", "FOOD_TRUCK"
+    category : "FAST_FOOD"
+    name : "Test restaurant",
+    address : "Test address",
+    lat : 10,
+    lng : 30,
+    menu : [
+        {
+            name : "Food A",
+            price : 200,
+            calo : 300,
+           
+        },
+        {
+            name : "Food B",
+            price : 300,
+            calo : 1000
+        }
+    ]
+}
+```
+- Output (if success)
+```
+{
+    status_code : 0,
+    data : {
+        restaurant: {...Restaurant data},
+        menu : [{...Food}] //Array of Food
+    }
 }
 ```
 ### PUT/api/restaurant/{restaurant_id}
-```$xslt
-{
-    ...updated data
-}
-```
+- Require token in header
+- Input : Same as POST/api/restaurant
+- Outout : Same as POST/api/restaurant
 ### DELETE/api/restaurant/{restaurant_id}
+- Require token in header
+- Output (if success)
+```
+{
+    status_code : 0
+}
+
+```
 

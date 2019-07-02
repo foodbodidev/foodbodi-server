@@ -15,6 +15,7 @@ function Restaurant(input, id) {
     if (id) {
         this._id = id;
     }
+    this._menu = input.menu || [];
 
 }
 
@@ -92,7 +93,8 @@ Restaurant.prototype.toJSON = function() {
         category : this._category,
         type : this._type,
         lat : this._lat,
-        lng : this._lng
+        lng : this._lng,
+        menu : this._menu
     };
     if (this._id) {
         result.id = this._id
@@ -111,16 +113,24 @@ Restaurant.prototype.collectionName = function() {
     return "restaurants";
 };
 
+Restaurant.prototype.menu = function(value) {
+    if (value && Array.isArray(value)) {
+        this._menu = value
+    }
+    return this._menu;
+};
+
 Restaurant.prototype.validateInput = function(input) {
-    let {name, address, category, type, lat, lng, open_hour, close_hour} = input;
+    let {name, address, category, type, lat, lng, open_hour, close_hour, menu} = input;
     let valid = !name  || validator.isAlphanumeric(name);
     valid &= !address  || validator.isAlphanumeric(address);
     valid &= !category  || Category.hasOwnProperty(category);
     valid &= !type  || Type.hasOwnProperty(type);
-    valid &= !lat  || validator.isNumeric(lat);
-    valid &= !lng  || validator.isNumeric(lng);
+    valid &= !lat  || typeof lat === "number";
+    valid &= !lng  || typeof lng === "number";
     valid &= !open_hour || validator.isAlphanumeric(open_hour);
     valid &= !close_hour || validator.isAlphanumeric(close_hour);
+    valid &= !menu || Array.isArray(menu);
     return valid;
 };
 

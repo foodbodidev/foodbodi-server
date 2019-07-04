@@ -92,7 +92,7 @@ Not implement yet
     calo : Number,
     price : Number,
 }
-   
+
 ```
 ## APIs
 Every response has status field & data field. 
@@ -277,4 +277,87 @@ Example
 }
 
 ```
+### POST/api/food
+- Require token in header
+- Input
+```$xslt
+{
+    {
+        "name": "asd",
+        "restaurant_id": "LzuwD89FeatgBzbnQZ6E",
+        "calo": 200,
+        "price": 600,
+        "descript": "dsad"
+    }
+}
+- Output (if success)
+```
+{
+    "status_code": 0,
+    "data": {
+        "name": "asd",
+        "restaurant_id": "LzuwD89FeatgBzbnQZ6E",
+        "creator": "long@gmail.com",
+        "calo": 200,
+        "price": 600,
+        "descript": "dsad",
+        "id": "XFhfBf784EMCHz2tyE6I"
+    }
+}
+```
+### GET/api/food/byId/{food_id}
+- Require token in header
+- Output (if success)
+```
+{
+    "status_code": 0,
+    "data": {
+        "name": "asd",
+        "restaurant_id": "LzuwD89FeatgBzbnQZ6E",
+        "creator": "long@gmail.com",
+        "calo": 200,
+        "price": 600,
+        "descript": "dsad",
+        "id": "XFhfBf784EMCHz2tyE6I"
+    }
+}
+```
+```
+### GET/api/food/search?restaurant={restaurant_id}&name={food_name}&calogt={number of calo greater than}&calolt={number of calo less than}&pricegt={number of price greater than}&pricelt={number of price less than}
+- Require token in header
+- Output (if success)
+```
+{
+    "status_code": 0,
+    "data": [{
+        "name": "asd",
+        "restaurant_id": "LzuwD89FeatgBzbnQZ6E",
+        "creator": "long@gmail.com",
+        "calo": 200,
+        "price": 600,
+        "descript": "dsad",
+        "id": "XFhfBf784EMCHz2tyE6I"
+    },{
+        "name": "asd",
+        "restaurant_id": "LzuwD89FeatgBzbnQZ6E",
+        "creator": "long@gmail.com",
+        "calo": 200,
+        "price": 600,
+        "descript": "dsad",
+        "id": "XFhfBf784EMCHz2tyE6I"
+    },...]
+}
+```
+### PUT/api/food/{food_id}
+- Require token in header
+- Input : Same as POST/api/restaurant
+- Outout : Same as POST/api/restaurant
+### DELETE/api/food/{food_id}
+- Require token in header
+- Output (if success)
+```
+{
+    status_code : 0
+}
 
+```

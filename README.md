@@ -323,7 +323,6 @@ Example
     }
 }
 ```
-```
 ### GET/api/food/search?restaurant={restaurant_id}&name={food_name}&calogt={number of calo greater than}&calolt={number of calo less than}&pricegt={number of price greater than}&pricelt={number of price less than}
 - Require token in header
 - Output (if success)

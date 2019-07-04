@@ -31,8 +31,7 @@ let createUserInfo = (input) => {
         first_name : first_name || "",
         last_name : last_name || ""
     };
-    const complete_profile = data.target_weight !== 0 && data.weight !== 0 && data.height !== 0;
-    data.complete_profile = complete_profile;
+    return data;
 
 };
 
@@ -194,11 +193,12 @@ router.post("/googleSignIn", (req, res, next) => {
                             userInfo.need_password = false;
                             userRef.set(userInfo).then(result => {
                                 ErrorHandler.success(res, {
+                                    data : result.data(),
                                     token : tokenHandler.createToken({email : email})
                                 });
                             });
                         } else {
-                            let data = doc.data;
+                            let data = doc.data();
                             delete data.password;
                             ErrorHandler.success(res, {
                                 data : data,
@@ -240,11 +240,12 @@ router.post('/facebookSignIn', (req, res, next) => {
                                userInfo.need_password = false;
                                userRef.set(userInfo).then(result => {
                                    ErrorHandler.success(res, {
+                                       data : result.data(),
                                        token : tokenHandler.createToken({email : json.email})
                                    });
                                });
                            } else {
-                               let data = doc.data;
+                               let data = doc.data();
                                delete data.password;
                                ErrorHandler.success(res, {
                                    data : data,

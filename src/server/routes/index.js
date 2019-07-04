@@ -5,7 +5,7 @@ app.use('/', require('./service'));
 app.use('/users', require('./users'));
 app.use(pathApi, require('./api'));
 app.use(pathApi + '/restaurant', require('./restaurant'));
-app.use(pathApi + '/food', require('./restaurant'));
+app.use(pathApi + '/food', require('./food'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

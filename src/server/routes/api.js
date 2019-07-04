@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router();
 
-const firestoreFactory = require("../environments/firestore_factory");
-const firestore = firestoreFactory();
+// const firestoreFactory = require("../environments/firestore_factory");
+// const firestore = firestoreFactory();
 
 
 var tokenHandler = require("../utils/token");

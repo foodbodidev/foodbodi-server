@@ -39,10 +39,18 @@ __*Beware, you may need to be granted the deployment permission by admin.*__
 - To update profile, use POST /api/profile (require token)
 #### Add restaurant / food_truck
  Make sure you have a token
-- To create new one : POST /api/restaurant 
-- To update existing one : PUT /api/restaurant/{restaurant_id}
+- To create new one + add foods: POST /api/restaurant 
+- To update existing one + add foods : PUT /api/restaurant/{restaurant_id}
 - To delete : DELETE /api/restaurant/{restaurant_id}
 - To get data : GET /api/restaurant/{restaurant_id}
+- To get the menu of a restaurant : GET /api/restaurant/{restaurant_id}/foods
+
+#### Create, Update, Delete foods
+- To create : POST /api/food
+- To update : PUT /api/food/{id}
+- To get : GET /api/food/{id}
+- To delete : DELETE /api/food/{id}
+
 #### Get nearby & track locations
 Not implement yet
 #### Chat 
@@ -79,6 +87,9 @@ Not implement yet
     creator : String ( User.id of creator)
     lat : Number,
     lng : Number,
+    geohash : GeoHash
+    open_hour : String (format HH:mm),
+    close_hour : String (format HH:mm
     
 }
 ```
@@ -99,23 +110,28 @@ Every response has status field & data field.
 - Status value can be
 ```
 module.exports = {
-       SUCCESS : 0,
-       ERROR : 500,
-       LOGIN_EXCEPTION : 501,
-       FIRESTORE_UPDATE_FAIL : 502,
-       FIRESTORE_GET_FAIL : 503,
-   
-       UNAUTHORIZED : 300,
-       USER_NOT_FOUND : 301,
-       USER_EXISTS : 302,
-   
-       WRONG_FORMAT : 400,
-   
-       GOOGLE_LOGIN_FAIL : 600,
-   
-       FACEBOOK_LOGIN_FAIL : 650,
-   
-   };
+    SUCCESS : 0,
+    ERROR : 500,
+    LOGIN_EXCEPTION : 501,
+    FIRESTORE_UPDATE_FAIL : 502,
+    FIRESTORE_GET_FAIL : 503,
+
+    UNAUTHORIZED : 300,
+    USER_NOT_FOUND : 301,
+    USER_EXISTS : 302,
+
+    RESTAURANT_NOT_FOUND : 310,
+    RESTAURANT_CREATE_FAIL : 311,
+    CREATE_FOOD_FAIL : 312,
+    FOOD_NOT_FOUND : 313,
+
+    WRONG_FORMAT : 400,
+
+    GOOGLE_LOGIN_FAIL : 600,
+
+    FACEBOOK_LOGIN_FAIL : 650,
+
+};
 ```
 - Data field is what you expect in the API, based on each API
 ### POST /api/register
@@ -221,6 +237,87 @@ module.exports = {
 }
 ```
 
+### GET /api/restaurant/{restaurant_id}/foods
+- Require token 
+- Output if success 
+```
+{
+    status_code : 0,
+    data : {
+        foods : [Array of food]
+    }
+}
+
+```
+
+Example :
+```
+{
+    "status_code": 0,
+    "data": {
+        "foods": [
+            {
+                "name": "Food1",
+                "restaurant_id": "nO5DDNgbqCp2HvoJAaEw",
+                "creator": "y@test.com",
+                "calo": null,
+                "price": null,
+                "description": null,
+                "created_date": {
+                    "_seconds": 1562425080,
+                    "_nanoseconds": 988000000
+                },
+                "id": "aWG7nmUa55TZFzOxSMB1"
+            }
+        ]
+    }
+}
+```
+
+### GET /api/restaurant/list
+- Not require token
+- List all restaurant in db, now use for testing
+- Output example 
+```
+{
+    "status_code": 0,
+    "data": {
+        "restaurants": [
+            {
+                "name": "R3",
+                "creator": "y@test.com",
+                "address": "NOwhee",
+                "category": "ORDINARY",
+                "type": "FOOD_TRUCK",
+                "lat": null,
+                "lng": null,
+                "menu": [],
+                "geohash": "s0000",
+                "open_hour": null,
+                "close_hour": null,
+                "priority": 10,
+                "id": "AsssHSf2tUf6C0runFr5"
+            },
+            {
+                "name": "R2",
+                "creator": "y@test.com",
+                "address": "NOwhee",
+                "category": "ORDINARY",
+                "type": "FOOD_TRUCK",
+                "lat": null,
+                "lng": null,
+                "menu": [],
+                "geohash": "s0000",
+                "open_hour": null,
+                "close_hour": null,
+                "priority": 10,
+                "id": "r0fbkfiIakRKL5sx582d"
+            }
+        ]
+    }
+}
+```
+
 ### POST/api/restaurant
 - Require token in header
 - Input
@@ -239,19 +336,8 @@ Example
     address : "Test address",
     lat : 10,
     lng : 30,
-    menu : [
-        {
-            name : "Food A",
-            price : 200,
-            calo : 300,
-           
-        },
-        {
-            name : "Food B",
-            price : 300,
-            calo : 1000
-        }
-    ]
+    open_hour : "8:00",
+    close_hour : "22:00"
 }
 ```
 - Output (if success)
@@ -260,7 +346,6 @@ Example
     status_code : 0,
     data : {
         restaurant: {...Restaurant data},
-        menu : [{...Food}] //Array of Food
     }
 }
 ```
@@ -283,11 +368,11 @@ Example
 ```$xslt
 {
     {
-        "name": "asd",
-        "restaurant_id": "LzuwD89FeatgBzbnQZ6E",
+        "name": "asd", (required)
+        "restaurant_id": "LzuwD89FeatgBzbnQZ6E", (required)
         "calo": 200,
         "price": 600,
-        "descript": "dsad"
+        "description": "dsad"
     }
 }
 ```
@@ -306,7 +391,7 @@ Example
     }
 }
 ```
-### GET/api/food/byId/{food_id}
+### GET/api/food/{food_id}
 - Require token in header
 - Output (if success)
 ```
@@ -360,4 +445,42 @@ Example
     status_code : 0
 }
 
+```
+
+### GET /api/metadata/restaurant_category 
+- No token required
+- Return supported restaurant categories on server
+```
+{
+    "status_code": 0,
+    "data": {
+        "ORDINARY": {
+            "key": "ORDINARY",
+            "name": "Ordinary"
+        },
+        "FAST_FOOD": {
+            "key": "FAST_FOOD",
+            "name": "Fast food"
+        }
+    }
+}
+```
+
+### GET /api/metadata/restaurant_type
+- No token required
+- Return all types of restaurant supported on server
+```
+{
+    "status_code": 0,
+    "data": {
+        "RESTAURANT": {
+            "key": "RESTAURANT",
+            "name": "Restaurant"
+        },
+        "FOOD_TRUCK": {
+            "key": "FOOD_TRUCK",
+            "name": "Food Truck"
+        }
+    }
+}
 ```

@@ -17,8 +17,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-require('./models')
-require('./controllers')
-require('./routes')
+require('./models');
+require('./controllers');
+require('./routes');
 
 module.exports = app;

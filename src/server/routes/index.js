@@ -6,6 +6,7 @@ app.use('/users', require('./users'));
 app.use(prefix, require('./api'));
 app.use(prefix + '/restaurant', require('./restaurant'));
 app.use(prefix + '/food', require('./food'));
+app.use(prefix + '/metadata', require('./metadata'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

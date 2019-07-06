@@ -34,4 +34,8 @@ token_handler.verifyToken = (token) => {
     }
 };
 
+token_handler.getEmail = (req) => {
+    return req.token_data.email;
+};
+
 module.exports = token_handler;

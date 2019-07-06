@@ -100,3 +100,18 @@ exports.listFood = (req, res, next) => {
         ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing id");
     }
 };
+
+exports.list = (req, res, next) => {
+    firestore.collection(Restaurant.prototype.collectionName())
+        .orderBy("priority").get()
+        .then(snapshot => {
+            let result = [];
+            snapshot.docs.forEach(item => {
+                let r = new Restaurant(item.data(), item.id);
+                result.push(r.toJSON());
+            });
+            ErrorHandler.success(res, {restaurants : result});
+        }).catch(err => {
+            ErrorHandler.error(res, ErrorCodes.ERROR, err.message);
+    });
+};

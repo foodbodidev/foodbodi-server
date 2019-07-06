@@ -8,6 +8,8 @@ const checkRoles = require("../middlewares/check_roles");
 
 router.get("/:id/foods", tokenVerifier, __restaurantController.listFood);
 
+router.get("/list", __restaurantController.list);
+
 router.get("/:id", tokenVerifier, __restaurantController.get);
 
 router.post("/", tokenVerifier, validator, __restaurantController.create);

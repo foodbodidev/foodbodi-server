@@ -4,10 +4,11 @@ function Food(input, id) {
     this._creator = input.creator || null;
     this._calo = input.calo || null;
     this._price = input.price || null;
-    this._descript = input.descript || null;
+    this._description = input.description || null;
     if (id) {
         this._id = id;
     }
+    this._created_date = input.created_date || null;
 }
 
 Food.prototype.name = function(value) {
@@ -47,9 +48,9 @@ Food.prototype.price = function(value) {
 
 Food.prototype.descript = function(value) {
     if (value) {
-        this._descript = value;
+        this._description = value;
     }
-    return this._descript;
+    return this._description;
 };
 
 Food.prototype.toJSON = function() {
@@ -59,7 +60,8 @@ Food.prototype.toJSON = function() {
         creator: this._creator,
         calo: this._calo,
         price: this._price,
-        descript: this._descript
+        description: this._description,
+        created_date : this._created_date
     };
     if (this._id) {
         result.id = this._id
@@ -67,17 +69,20 @@ Food.prototype.toJSON = function() {
     return result;
 };
 
-Food.prototype.addFieldCreateAt = function() {
-    let result = this.toJSON();
-    result.createAt = timeNow;
-    return result;
-};
 
 Food.prototype.id = function(value) {
     if (value) {
         this._id = value
-    };
+    }
     return this._id;
+};
+
+Food.prototype.created_date = function(value) {
+    if (value) {
+        this._created_date = value;
+    } else {
+        return this._created_date;
+    }
 };
 
 Food.prototype.collectionName = function() {
@@ -85,21 +90,19 @@ Food.prototype.collectionName = function() {
 };
 
 Food.prototype.validateInput = function(input, update) {
-    let mess = [];
-    if (update) {
-        input.name ? validator.isAlphanumeric(input.name) ? "" : mess.push("Name is invalid") : "";
-        input.restaurant_id ? validator.isAlphanumeric(input.restaurant_id) ? "" : mess.push("Restaurant is invalid") : "";
-    } else {
-        input.name ? validator.isAlphanumeric(input.name) ? "" : mess.push("Name is invalid") : mess.push("Name is required");
-        input.restaurant_id ? validator.isAlphanumeric(input.restaurant_id) ? "" : mess.push("Restaurant is invalid") : mess.push("Restaurant is required");
+    let {name, restaurant_id, calo, price, description} = input;
+    if (!update) { // create
+        if (!name) return "Name is required";
+        if (!restaurant_id) return "Restaurant id is required";
     }
-    input.calo ? validator.isNumeric(input.calo.toString()) ? "" : mess.push("Calo is invalid") : "";
-    input.price ? validator.isNumeric(input.price.toString()) ? "" : mess.push("Price is invalid") : "";
-    input.descript ? validator.isAlphanumeric(input.descript) ? "" : mess.push("Descript is invalid") : "";
-    if (mess.length === 0) {
-        return { status: true, data: input }
-    }
-    return { status: false, data: mess }
+
+    if (!!name && !validator.isAscii(name)) return "Name is invalid";
+    if (!!restaurant_id && !validator.isAlphanumeric(restaurant_id)) return "Restaurant id is invalid";
+    if (!!calo && typeof calo !== "number") return "Calo is invalid";
+    if (!!price && typeof price !== "number") return "Price is invalid";
+    if (!!description && !validator.isAscii(description)) return "Desciption is invalid";
+
+    return null;
 };
 
 module.exports = Food;

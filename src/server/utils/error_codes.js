@@ -11,6 +11,8 @@ module.exports = {
 
     RESTAURANT_NOT_FOUND : 310,
     RESTAURANT_CREATE_FAIL : 311,
+    CREATE_FOOD_FAIL : 312,
+    FOOD_NOT_FOUND : 313,
 
     WRONG_FORMAT : 400,
 

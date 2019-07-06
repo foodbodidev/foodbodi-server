@@ -101,7 +101,6 @@ Restaurant.prototype.toJSON = function() {
         type : this._type,
         lat : this._lat,
         lng : this._lng,
-        menu : this._menu,
         geohash : this._geohash,
         open_hour : this._open_hour,
         close_hour : this._close_hour,

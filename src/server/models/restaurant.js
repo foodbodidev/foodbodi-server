@@ -1,6 +1,7 @@
 let Category  = require("./restaurant_category");
 let Type = require("./restaurant_type");
 let validator = require("validator");
+var Geohash = require('latlon-geohash');
 
 function Restaurant(input, id) {
     this._name = input.name || null;
@@ -16,8 +17,14 @@ function Restaurant(input, id) {
         this._id = id;
     }
     this._menu = input.menu || [];
+    this._geohash = input.geohash ||  Geohash.encode(this._lat, this._lng, this.geo_hash_precision());
+    this._priority = input.priority || 10;
 
 }
+
+Restaurant.prototype.geo_hash_precision = () => {
+    return 5;
+};
 
 Restaurant.prototype.name = function(value) {
     if (value) {
@@ -94,7 +101,10 @@ Restaurant.prototype.toJSON = function() {
         type : this._type,
         lat : this._lat,
         lng : this._lng,
-        menu : this._menu
+        menu : this._menu,
+        geohash : this._geohash,
+        open_hour : this._open_hour,
+        close_hour : this._close_hour
     };
     if (this._id) {
         result.id = this._id
@@ -121,17 +131,22 @@ Restaurant.prototype.menu = function(value) {
 };
 
 Restaurant.prototype.validateInput = function(input) {
-    let {name, address, category, type, lat, lng, open_hour, close_hour, menu} = input;
-    let valid = !name  || validator.isAlphanumeric(name);
-    valid &= !address  || validator.isAlphanumeric(address);
-    valid &= !category  || Category.hasOwnProperty(category);
-    valid &= !type  || Type.hasOwnProperty(type);
-    valid &= !lat  || typeof lat === "number";
-    valid &= !lng  || typeof lng === "number";
-    valid &= !open_hour || validator.isAlphanumeric(open_hour);
-    valid &= !close_hour || validator.isAlphanumeric(close_hour);
-    valid &= !menu || Array.isArray(menu);
-    return valid;
+    let {name, address, category, type, lat, lng, open_hour, close_hour, menu, priority} = input;
+    if (!!name && !validator.isAscii(name)) return "Name must be a string";
+    if (!!address && !validator.isAscii(address)) return "Address must be a string";
+    if (!!category && !Category.hasOwnProperty(category)) return "Category " + category + " is not supported";
+    if (!!type && !Type.hasOwnProperty(type)) return "Type " + type + " is not supported";
+    if (!!lat && typeof  lat !== "number") return "Latitude must be a number";
+    if (!!lng && typeof  lng !== "number") return "Longtitude must be a number";
+
+    let hourRegex = /^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$/;
+
+    if (!!open_hour && !hourRegex.test(open_hour)) {
+        return "Open hour must be a HH:mm";
+    }
+    if (!!close_hour && !hourRegex.test(close_hour)) return "Close hour must be HH:mm";
+    if (!!priority) return "Update priority directly is not allowed";
+    return null;
 };
 
 module.exports = Restaurant;

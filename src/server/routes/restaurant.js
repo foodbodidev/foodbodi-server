@@ -5,6 +5,9 @@ const tokenVerifier = require("../middlewares/verify_token");
 const validator = require("../middlewares/restaurant_validator");
 const checkRoles = require("../middlewares/check_roles");
 
+
+router.get("/:id/foods", tokenVerifier, __restaurantController.listFood);
+
 router.get("/:id", tokenVerifier, __restaurantController.get);
 
 router.post("/", tokenVerifier, validator, __restaurantController.create);

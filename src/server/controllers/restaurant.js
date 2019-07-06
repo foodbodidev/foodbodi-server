@@ -1,68 +1,47 @@
 const validation = require("../utils/validation");
 const ErrorHandler = require("../utils/response_handler");
 const ErrorCodes = require("../utils/error_codes");
-
-// const firestoreFactory = require("../environments/firestore_factory");
-// const firestore = firestoreFactory();
+const SearchInfo = require("../utils/search_info");
+let GeoHash = require("latlon-geohash");
+const firestoreFactory = require("../environments/firestore_factory");
+const firestore = firestoreFactory();
 
 let Restaurant = require("../models/restaurant");
+let Food = require("../models/food");
+
 let validator = require("validator");
 
 exports.create = (req, res, next) => {
-    let val = validation.checkReq({
-        type: { type: String, required: true },
-        name: { type: String, required: true },
-        //location: { type: Object, required: true }
-    }, req.body);
-
-    if (validation.isObject(val.wrong)) {
-        return ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, val.wrong);
-    }
-
-    /*
-    if (val.right.location.latitude && typeof val.right.location.latitude != "number") {
-        return ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "latitude must be number");
-    }
-        
-    if (val.right.location.longitude && typeof val.right.location.longitude != "number") {
-        return ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "longitude must be number");
-    }
-
-    let doc = val.right.location.toString();*/
-    //val.right.location = new firebase.firestore.GeoPoint(val.right.location.latitude, val.right.location.longitude)
-
     const restaurant = new Restaurant(req.body);
     const creator = req.token_data.email;
     restaurant.creator(creator);
-    let restaurantRef = firestore.collection(restaurant.collectionName()).add(restaurant.toJSON())
-        .then(doc => {
-            restaurant.id(doc.id);
-            ErrorHandler.success(res, restaurant.toJSON());
-        })
-        .catch(error => {
-            console.log(error);
-            ErrorHandler.error(res, ErrorCodes.RESTAURANT_CREATE_FAIL, "Can not create restaurant");
-        })
+
+    let restaurantRef = firestore.collection(restaurant.collectionName()).add(restaurant.toJSON()).then((doc) => {
+        restaurant.id(doc.id);
+        ErrorHandler.success(res, restaurant.toJSON());
+    }).catch(error => {
+        console.log(error);
+        ErrorHandler.error(res, ErrorCodes.RESTAURANT_CREATE_FAIL, "Can not create restaurant");
+    });
 
 };
 
 exports.get = (req, res, next) => {
     let {id} = req.params;
+    let restaurant = null;
     if (id) {
-        let ref = firestore.collection(Restaurant.prototype.collectionName()).doc(id);
-        ref.get().then(doc => {
+        firestore.collection(Restaurant.prototype.collectionName()).doc(id).get().then(doc => {
             if (doc.exists) {
-                const restaurant = new Restaurant(doc.data(), doc.id);
+                restaurant = new Restaurant(doc.data(), doc.id);
                 ErrorHandler.success(res, {
-                    restaurant : restaurant.toJSON()
-                });
+                    restaurant : restaurant.toJSON()});
             } else {
                 ErrorHandler.error(res, ErrorCodes.RESTAURANT_NOT_FOUND, "Can not found restaurant " + id);
             }
         }).catch(error=> {
             console.log(error);
             ErrorHandler.error(res, ErrorCodes.ERROR, error.message);
-        })
+        });
     } else {
         ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing id");
     }
@@ -89,15 +68,34 @@ exports.update = (req, res, next) => {
 exports.delete = (req, res, next) => {
     let {id} = req.params;
     if (id) {
-        firestore.collection(Restaurant.prototype.collectionName()).doc(id).delete()
-            .then(res => {
-                ErrorHandler.success(res, {})
-            })
-            .catch(error => {
-                console.log(error);
-                ErrorHandler.error(res, ErrorCodes.ERROR, error.message);
-            })
+        firestore.collection(Restaurant.prototype.collectionName()).doc(id).detete().then(() => {
+            //TODO : find cron op to delete foods
+            ErrorHandler.success(res, {});
+        }).catch(err => {
+            ErrorHandler.error(res, ErrorCodes.ERROR, err.message);
+        })
 
+    } else {
+        ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing id");
+    }
+};
+
+exports.listFood = (req, res, next) => {
+    let {id} = req.params;
+    if (id) {
+        firestore.collection(Food.prototype.collectionName())
+            .where("restaurant_id", "==", id)
+            .get()
+            .then(snapshot => {
+                let result = [];
+                snapshot.docs.forEach(item => {
+                    let food = new Food(item.data(), item.id);
+                    result.push(food.toJSON());
+                });
+                ErrorHandler.success(res, {foods : result});
+            }).catch(err => {
+                ErrorHandler.error(res, ErrorCodes.ERROR, err.message);
+        })
     } else {
         ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing id");
     }

@@ -117,7 +117,7 @@ Restaurant.prototype.toJSON = function(ignoreNull) {
         priority : this._priority,
         last_updater : this._last_updater,
         created_date : this._created_date,
-        last_updated_date : this.last_updated_date
+        last_updated_date : this._last_updated_date
     };
     if (this._id) {
         result.id = this._id
@@ -150,7 +150,12 @@ Restaurant.prototype.updater = function(value) {
     return this._last_updater;
 };
 
-
+Restaurant.prototype.id = function(value) {
+    if (value) {
+        this._id = value
+    }
+    return this._id;
+};
 
 Restaurant.prototype.collectionName = function() {
     return "restaurants";

@@ -116,7 +116,7 @@ Restaurant.prototype.toJSON = function(ignoreNull) {
         close_hour : this._close_hour,
         priority : this._priority,
         last_updater : this._last_updater,
-        created_date : this.created_date,
+        created_date : this._created_date,
         last_updated_date : this.last_updated_date
     };
     if (this._id) {

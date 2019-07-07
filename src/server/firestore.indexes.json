@@ -1,4 +1,12 @@
 {
-  "indexes": [],
+  "indexes": [
+    {
+      "collectionId": "restaurants",
+      "fields": [
+        { "fieldPath": "lat", "mode": "ASCENDING" },
+        { "fieldPath": "lng", "mode": "ASCENDING" }
+      ]
+    }
+  ],
   "fieldOverrides": []
 }

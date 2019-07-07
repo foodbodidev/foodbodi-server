@@ -165,8 +165,8 @@ Restaurant.prototype.menu = function(value) {
 
 Restaurant.prototype.validateInput = function(input) {
     let {name, address, category, type, lat, lng, open_hour, close_hour, priority} = input;
-    if (!!name && typeof name === "string") return "Name must be a string";
-    if (!!address && typeof address === "string") return "Address must be a string";
+    if (!!name && typeof name !== "string") return "Name must be a string";
+    if (!!address && typeof address !== "string") return "Address must be a string";
     if (!!category && !Category.hasOwnProperty(category)) return "Category " + category + " is not supported";
     if (!!type && !Type.hasOwnProperty(type)) return "Type " + type + " is not supported";
     if (!!lat && typeof  lat !== "number") return "Latitude must be a number";

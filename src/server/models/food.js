@@ -96,11 +96,11 @@ Food.prototype.validateInput = function(input, update) {
         if (!restaurant_id) return "Restaurant id is required";
     }
 
-    if (!!name && typeof name === "string") return "Name is invalid";
+    if (!!name && typeof name !== "string") return "Name is invalid";
     if (!!restaurant_id && !validator.isAlphanumeric(restaurant_id)) return "Restaurant id is invalid";
     if (!!calo && typeof calo !== "number") return "Calo is invalid";
     if (!!price && typeof price !== "number") return "Price is invalid";
-    if (!!description && typeof description === "string") return "Description is invalid";
+    if (!!description && typeof description !== "string") return "Description is invalid";
 
     return null;
 };

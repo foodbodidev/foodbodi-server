@@ -1,9 +1,12 @@
 let Category  = require("./restaurant_category");
 let Type = require("./restaurant_type");
 let validator = require("validator");
+let Model = require("./model");
 var Geohash = require('latlon-geohash');
+let ObjTool = require("../utils/object_tools");
 
 function Restaurant(input, id) {
+    //Model.call(this, "restaurants");
     this._name = input.name || null;
     this._creator = input.creator || null;
     this._address = input.address || null;
@@ -17,14 +20,21 @@ function Restaurant(input, id) {
         this._id = id;
     }
     this._menu = input.menu || [];
-    this._geohash = input.geohash ||  Geohash.encode(this._lat, this._lng, this.geo_hash_precision());
+    this._geohash = input.geohash ||  Geohash.encode(this._lat, this._lng, this.geo_hash_precision);
     this._priority = input.priority || 10;
+    this._last_updater = input.last_updater || null;
+    this._created_date = input.created_date || null;
+    this._last_updated_date = input.last_updated_date || null;
 
 }
 
-Restaurant.prototype.geo_hash_precision = () => {
-    return 5;
-};
+/*
+Restaurant.prototype = Object.create(Model.prototype);
+Restaurant.prototype.constructor = Restaurant;
+*/
+
+
+Restaurant.prototype.geo_hash_precision = 5;
 
 Restaurant.prototype.name = function(value) {
     if (value) {
@@ -92,7 +102,7 @@ Restaurant.prototype.closeHour = function(value) {
     return this._close_hour;
 };
 
-Restaurant.prototype.toJSON = function() {
+Restaurant.prototype.toJSON = function(ignoreNull) {
     let result = {
         name : this._name,
         creator : this._creator,
@@ -104,20 +114,43 @@ Restaurant.prototype.toJSON = function() {
         geohash : this._geohash,
         open_hour : this._open_hour,
         close_hour : this._close_hour,
-        priority : this._priority
+        priority : this._priority,
+        last_updater : this._last_updater,
+        created_date : this.created_date,
+        last_updated_date : this.last_updated_date
     };
     if (this._id) {
         result.id = this._id
     }
+    if (ignoreNull || false) {
+        ObjTool.clean(result);
+    }
     return result;
 };
 
-Restaurant.prototype.id = function(value) {
+
+Restaurant.prototype.created_date = function(value) {
     if (value) {
-        this._id = value
-    };
-    return this._id;
+        this._created_date = value;
+    }
+    return this._created_date
 };
+
+Restaurant.prototype.updated_date = function(value) {
+    if (value) {
+        this._last_updated_date = value;
+    }
+    return this._last_updated_date
+};
+
+Restaurant.prototype.updater = function(value) {
+    if (value) {
+        this._last_updater = value;
+    }
+    return this._last_updater;
+};
+
+
 
 Restaurant.prototype.collectionName = function() {
     return "restaurants";
@@ -131,9 +164,9 @@ Restaurant.prototype.menu = function(value) {
 };
 
 Restaurant.prototype.validateInput = function(input) {
-    let {name, address, category, type, lat, lng, open_hour, close_hour, menu, priority} = input;
-    if (!!name && !validator.isAscii(name)) return "Name must be a string";
-    if (!!address && !validator.isAscii(address)) return "Address must be a string";
+    let {name, address, category, type, lat, lng, open_hour, close_hour, priority} = input;
+    if (!!name && typeof name === "string") return "Name must be a string";
+    if (!!address && typeof address === "string") return "Address must be a string";
     if (!!category && !Category.hasOwnProperty(category)) return "Category " + category + " is not supported";
     if (!!type && !Type.hasOwnProperty(type)) return "Type " + type + " is not supported";
     if (!!lat && typeof  lat !== "number") return "Latitude must be a number";

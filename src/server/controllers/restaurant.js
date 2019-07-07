@@ -8,13 +8,15 @@ const firestore = firestoreFactory();
 
 let Restaurant = require("../models/restaurant");
 let Food = require("../models/food");
+let TokenHandler = require("../utils/token");
 
 let validator = require("validator");
 
 exports.create = (req, res, next) => {
     const restaurant = new Restaurant(req.body);
-    const creator = req.token_data.email;
+    const creator = TokenHandler.getEmail(req);
     restaurant.creator(creator);
+    restaurant.created_date(new Date());
 
     let restaurantRef = firestore.collection(restaurant.collectionName()).add(restaurant.toJSON()).then((doc) => {
         restaurant.id(doc.id);
@@ -50,9 +52,11 @@ exports.get = (req, res, next) => {
 exports.update = (req, res, next) => {
     let {id} = req.params;
     if (id) {
-        const update_data = req.body;
+        const update_data = new Restaurant(req.body);
+        update_data.updated_date(new Date());
+        update_data.updater(TokenHandler.getEmail(req));
         let ref = firestore.collection(Restaurant.prototype.collectionName()).doc(id);
-        ref.update(update_data).then(doc => {
+        ref.update(update_data.toJSON(true)).then(doc => {
                 ErrorHandler.success(res, {});
 
         }).catch(error => {

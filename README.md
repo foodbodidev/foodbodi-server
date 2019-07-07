@@ -52,7 +52,20 @@ __*Beware, you may need to be granted the deployment permission by admin.*__
 - To delete : DELETE /api/food/{id}
 
 #### Get nearby & track locations
-Not implement yet
+- Do in client side using firetstore's library
+- With devices lonk to a Food truck, send location data to backend every 5s
+- To get nearby locations (psudecode) : 
+Include library, something like (https://github.com/maximveksler/GeohashKit)
+Read more about Geohash : (https://www.movable-type.co.uk/scripts/geohash.html)
+```
+    let lat, lng = current location
+    let geohash = GeoHash(lat, ln, 4);
+    let neighbours = geohash.neighbour(); //an Array of hashs
+    for (neighbour : neighbours) {
+        firestore.collection("restaurants").where("geohash", "==", neighbour)
+        .onSnapshot(snapshot => update map)
+    }
+```
 #### Chat 
 Not implement yet
 ## Collections

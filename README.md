@@ -47,6 +47,7 @@ __*Beware, you may need to be granted the deployment permission by admin.*__
 
 #### Create, Update, Delete foods
 - To create : POST /api/food
+- To create many foods for an restaurant at once : POST /api/food/import
 - To update : PUT /api/food/{id}
 - To get : GET /api/food/{id}
 - To delete : DELETE /api/food/{id}
@@ -55,16 +56,8 @@ __*Beware, you may need to be granted the deployment permission by admin.*__
 - Do in client side using firetstore's library
 - With devices lonk to a Food truck, send location data to backend every 5s
 - To get nearby locations (psudecode) : 
-Include library, something like (https://github.com/maximveksler/GeohashKit)
-Read more about Geohash : (https://www.movable-type.co.uk/scripts/geohash.html)
 ```
-    let lat, lng = current location
-    let geohash = GeoHash(lat, ln, 4);
-    let neighbours = geohash.neighbour(); //an Array of hashs
-    for (neighbour : neighbours) {
-        firestore.collection("restaurants").where("geohash", "==", neighbour)
-        .onSnapshot(snapshot => update map)
-    }
+
 ```
 #### Chat 
 Not implement yet
@@ -337,7 +330,7 @@ Example :
 ```$xslt
 {
     ...Restaurant data
-    menu : [{...Food data}] //Array of a food. Food in this array will be added to restaurant's menu
+    foods : [{...Food data}] //Array of a food. Food in this array will be added to restaurant's menu
 }
 ```
 Example 
@@ -351,6 +344,14 @@ Example
     lng : 30,
     open_hour : "8:00",
     close_hour : "22:00"
+    foods : [
+        {
+            "name" : "food 1",
+        },
+        {
+            "name" : "food 2"
+        },
+    ]
 }
 ```
 - Output (if success)
@@ -403,6 +404,22 @@ Example
         "id": "XFhfBf784EMCHz2tyE6I"
     }
 }
+```
+
+### POST /api/food/import
+- To add many foods as once
+- Require header token
+- Input 
+```
+   {
+    restaurant_id : String (required),
+    foods :[
+        {
+            "name" : "Food1"
+            ...other fields
+        }
+    ]
+   }
 ```
 ### GET/api/food/{food_id}
 - Require token in header

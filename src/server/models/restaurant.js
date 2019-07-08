@@ -4,6 +4,7 @@ let validator = require("validator");
 let Model = require("./model");
 var Geohash = require('latlon-geohash');
 let ObjTool = require("../utils/object_tools");
+let Food = require("./food");
 
 function Restaurant(input, id) {
     //Model.call(this, "restaurants");
@@ -117,7 +118,7 @@ Restaurant.prototype.toJSON = function(ignoreNull) {
         priority : this._priority,
         last_updater : this._last_updater,
         created_date : this._created_date,
-        last_updated_date : this._last_updated_date
+        last_updated_date : this._last_updated_date,
     };
     if (this._id) {
         result.id = this._id
@@ -169,7 +170,7 @@ Restaurant.prototype.menu = function(value) {
 };
 
 Restaurant.prototype.validateInput = function(input) {
-    let {name, address, category, type, lat, lng, open_hour, close_hour, priority} = input;
+    let {name, address, category, type, lat, lng, open_hour, close_hour, priority, foods} = input;
     if (!!name && typeof name !== "string") return "Name must be a string";
     if (!!address && typeof address !== "string") return "Address must be a string";
     if (!!category && !Category.hasOwnProperty(category)) return "Category " + category + " is not supported";
@@ -184,6 +185,14 @@ Restaurant.prototype.validateInput = function(input) {
     }
     if (!!close_hour && !hourRegex.test(close_hour)) return "Close hour must be HH:mm";
     if (!!priority) return "Update priority directly is not allowed";
+    if (!!foods && !Array.isArray(foods)) return "Foods must be an array of food";
+    if (!!foods) {
+        for (let food of foods) {
+            food.restaurant_id = "nonce";
+            let error = Food.prototype.validateInput(food, false);
+            if (error !== null) return error;
+        }
+    }
     return null;
 };
 

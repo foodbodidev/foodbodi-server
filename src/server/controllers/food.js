@@ -93,3 +93,21 @@ exports.delete = (req, res, next) => {
         return ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing id");
     }
 };
+
+exports.import = (req, res, next) => {
+    let {restaurant_id, foods} = req.body;
+    if (!!restaurant_id && !!foods) {
+        let batch = firestore.batch();
+        for (let item of foods) {
+            let food = new __Food(item);
+            food.restaurant_id(restaurant_id);
+            let ref = foodDB.doc();
+            batch.set(ref, food.toJSON());
+        }
+        batch.commit().then(result => {
+            ErrorHandler.success(res, {});
+        }).catch(err => ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, err.message));
+    } else {
+        ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing restaurant_id or foods");
+    }
+};

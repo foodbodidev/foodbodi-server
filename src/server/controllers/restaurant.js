@@ -20,10 +20,26 @@ exports.create = (req, res, next) => {
 
     let restaurantRef = firestore.collection(restaurant.collectionName()).add(restaurant.toJSON()).then((doc) => {
         restaurant.id(doc.id);
-        ErrorHandler.success(res, restaurant.toJSON());
+        return restaurant;
+    }).then((data) => {
+        if (req.body.foods) {
+            let batch = firestore.batch();
+            for (let item of req.body.foods) {
+                let food = new Food(item);
+                food.restaurant_id(restaurant.id());
+                let ref = firestore.collection(Food.prototype.collectionName()).doc();
+                batch.set(ref, food.toJSON());
+            }
+            batch.commit().then(result => {
+                let json = restaurant.toJSON();
+                ErrorHandler.success(res, json);
+            })
+        } else {
+            ErrorHandler.success(res, restaurant.toJSON());
+        }
     }).catch(error => {
         console.log(error);
-        ErrorHandler.error(res, ErrorCodes.RESTAURANT_CREATE_FAIL, "Can not create restaurant");
+        ErrorHandler.error(res, ErrorCodes.RESTAURANT_CREATE_FAIL, error.message);
     });
 
 };

@@ -1,7 +1,7 @@
 let FormData = require("form-data");
 let fs = require("fs");
-let http = require("http");
-let request = http.request;
+let https = require("https");
+let request = https.request;
 
 
 
@@ -11,14 +11,15 @@ formData.append("file", readstream);
 console.log(formData.getHeaders());
 
 const req = request({
-        host: 'localhost',
-        port: '3000',
-        path: '/api/upload/photo?filename=concho',
+        host: 'foodbodi.appspot.com',
+        //port : "3000",
+        path: '/api/upload/photo?filename=concho2',
         method: 'POST',
         headers: formData.getHeaders(),
     },
     response => {
-        console.log(response); // 200
+
+        console.log(response.statusCode); // 200
     });
 
 formData.pipe(req);

@@ -30,10 +30,13 @@ router.post("/photo", multer.single("file"), (req, res, next) => {
         return;
     }
 
+
     // Create a new blob in the bucket and upload the file data.
     const bucketName = "foodbodi-photo";
     let filenamePrefix = req.query.filename || "";
     let filename = filenamePrefix + "-" + new Date().getTime();
+    console.log("Prepare upload " + filename);
+
     const blob = storage.bucket(bucketName).file(filename);
     const blobStream = blob.createWriteStream({
         contentType : "image/jpeg",
@@ -42,10 +45,12 @@ router.post("/photo", multer.single("file"), (req, res, next) => {
     });
 
     blobStream.on('error', err => {
+        console.log("Upload fail " + err.message);
         ErrorHandler.error(res, ErrorCodes.UPLOAD_FAIL, err.message);
     });
 
     blobStream.on('finish', () => {
+        console.log("Upload " + filename + " finish");
         storage.bucket(bucketName).file(filename)
             .get().then(result => {
                 ErrorHandler.success(res, result[1]);
@@ -55,4 +60,8 @@ router.post("/photo", multer.single("file"), (req, res, next) => {
     });
 
     blobStream.end(req.file.buffer);
+});
+
+router.get('/photo', (req, res) => {
+    res.render('upload.pug');
 });

@@ -4,6 +4,8 @@ module.exports = {
     LOGIN_EXCEPTION : 501,
     FIRESTORE_UPDATE_FAIL : 502,
     FIRESTORE_GET_FAIL : 503,
+    UPLOAD_FAIL : 510,
+    GET_UPLOADED_FILE_FAIL : 511,
 
     UNAUTHORIZED : 300,
     USER_NOT_FOUND : 301,
@@ -19,5 +21,6 @@ module.exports = {
     GOOGLE_LOGIN_FAIL : 600,
 
     FACEBOOK_LOGIN_FAIL : 650,
+
 
 };

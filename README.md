@@ -59,6 +59,61 @@ __*Beware, you may need to be granted the deployment permission by admin.*__
 ```
 
 ```
+
+### Upload photo
+- Send a multipart POST request to ```/api/upload/photo?filename={file name to be in storage}```
+The key for the file to be uploaded is "<b>file</b>" <br>
+<i>Notice :  filename will be concatinated with timestamp in server to avoid override existing file.</i>
+A multipart request looks like
+```
+POST /api/upload/photo?filename=myfile HTTP/1.1
+Host: foodbodi.appspot.com
+Content-Type: multipart/form-data; boundary=boundary
+Content-Length: 514
+
+--boundary
+Content-Disposition: form-data; name="file"
+Content-Type: image/jpeg
+
+[JPEG bytes]
+--boundary--
+```
+For iOS, this doc may help : https://newfivefour.com/swift-form-data-multipart-upload-URLRequest.html
+- Response will contain all fields from Cloud Storage : 
+```
+{
+    "status_code": 0,
+    "data": {
+        "kind": "storage#object",
+        "id": "foodbodi-photo/-1563106947575/1563106947778475",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/foodbodi-photo/o/-1563106947575",
+        "name": "-1563106947575",
+        "bucket": "foodbodi-photo",
+        "generation": "1563106947778475",
+        "metageneration": "1",
+        "contentType": "image/jpeg",
+        "timeCreated": "2019-07-14T12:22:27.778Z",
+        "updated": "2019-07-14T12:22:27.778Z",
+        "storageClass": "MULTI_REGIONAL",
+        "timeStorageClassUpdated": "2019-07-14T12:22:27.778Z",
+        "size": "46678",
+        "md5Hash": "0gxxmAwhIlUxE0tq0ZOrUg==",
+        
+        "mediaLink": "https://www.googleapis.com/download/storage/v1/b/foodbodi-photo/o/-1563106947575?generation=1563106947778475&alt=media",
+       
+        "contentEncoding": "gzip",
+        "crc32c": "NS/wqw==",
+        "etag": "CKuP+ZKztOMCEAE="
+    }
+}
+```
+Get the <b>"mediaLink"</b>. This is the url for the photo.
+Example : 
+```
+<img src="https://www.googleapis.com/download/storage/v1/b/foodbodi-photo/o/-1563106947575?generation=1563106947778475&alt=media">
+```
+Submit that <b>mediaLink</b> as "photo" field in restaurant / food api
+
 #### Chat 
 Not implement yet
 ## Collections

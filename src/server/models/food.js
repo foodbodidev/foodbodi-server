@@ -9,6 +9,7 @@ function Food(input, id) {
         this._id = id;
     }
     this._created_date = input.created_date || null;
+    this._photo = input.photo || null;
 }
 
 Food.prototype.name = function(value) {
@@ -61,7 +62,8 @@ Food.prototype.toJSON = function() {
         calo: this._calo,
         price: this._price,
         description: this._description,
-        created_date : this._created_date
+        created_date : this._created_date,
+        photo : this._photo
     };
     if (this._id) {
         result.id = this._id
@@ -90,7 +92,7 @@ Food.prototype.collectionName = function() {
 };
 
 Food.prototype.validateInput = function(input, update) {
-    let {name, restaurant_id, calo, price, description} = input;
+    let {name, restaurant_id, calo, price, description, photo} = input;
     if (!update) { // create
         if (!name) return "Name is required";
         if (!restaurant_id) return "Restaurant id is required";
@@ -101,6 +103,7 @@ Food.prototype.validateInput = function(input, update) {
     if (!!calo && typeof calo !== "number") return "Calo is invalid";
     if (!!price && typeof price !== "number") return "Price is invalid";
     if (!!description && typeof description !== "string") return "Description is invalid";
+    if (!!photo && typeof photo !== "string") return "Photo must be a link";
 
     return null;
 };

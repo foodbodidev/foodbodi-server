@@ -26,6 +26,7 @@ function Restaurant(input, id) {
     this._last_updater = input.last_updater || null;
     this._created_date = input.created_date || null;
     this._last_updated_date = input.last_updated_date || null;
+    this._photo = input.photo || null;
 
 }
 
@@ -119,6 +120,7 @@ Restaurant.prototype.toJSON = function(ignoreNull) {
         last_updater : this._last_updater,
         created_date : this._created_date,
         last_updated_date : this._last_updated_date,
+        photo : this._photo
     };
     if (this._id) {
         result.id = this._id
@@ -170,7 +172,7 @@ Restaurant.prototype.menu = function(value) {
 };
 
 Restaurant.prototype.validateInput = function(input) {
-    let {name, address, category, type, lat, lng, open_hour, close_hour, priority, foods} = input;
+    let {name, address, category, type, lat, lng, open_hour, close_hour, priority, foods, photo} = input;
     if (!!name && typeof name !== "string") return "Name must be a string";
     if (!!address && typeof address !== "string") return "Address must be a string";
     if (!!category && !Category.hasOwnProperty(category)) return "Category " + category + " is not supported";
@@ -186,6 +188,7 @@ Restaurant.prototype.validateInput = function(input) {
     if (!!close_hour && !hourRegex.test(close_hour)) return "Close hour must be HH:mm";
     if (!!priority) return "Update priority directly is not allowed";
     if (!!foods && !Array.isArray(foods)) return "Foods must be an array of food";
+    if (!!photo && (typeof photo) !== "string") return "Photo must be a link";
     if (!!foods) {
         for (let food of foods) {
             food.restaurant_id = "nonce";

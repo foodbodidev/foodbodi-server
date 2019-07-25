@@ -3,8 +3,9 @@ let ErrorHandler = require("../utils/response_handler");
 let ErrorCodes = require("../utils/error_codes");
 const firestoreFactory = require("../environments/firestore_factory");
 const firestore = firestoreFactory();
-const licenseDB = firestore.collection(__License.prototype.collectionName());
 let License = require("../models/license");
+const licenseDB = firestore.collection(License.prototype.collectionName());
+const Status = require("../models/license_status");
 
 exports.create = (req, res, next) => {
     let license = new License(req.body);
@@ -15,15 +16,24 @@ exports.create = (req, res, next) => {
     licenseDB.where("restaurant_id", "==", restaurant_id)
         .get()
         .then(snapshot => {
-            if (snapshot.length > 0) {
+            let exist = false;
+            if (snapshot.docs.length > 0) {
+                let data = snapshot.docs[0].data();
+                exist = Status.WAITING.key === data.status || Status.APPROVED.key === data.status;
+            } else {
+                exist = false;
+            }
+            if (exist) {
                 ErrorHandler.error(res, ErrorCodes.ERROR, "License exists");
             } else {
-                return licenseDB.doc().add(license.toJSON())
+                return licenseDB.add(license.toJSON())
             }
         })
         .then((doc) => {
-            license.id(doc.id);
-            ErrorHandler.success(res, license.toJSON())
+            if (!!doc && doc.exists) {
+                license.id(doc.id);
+                ErrorHandler.success(res, license.toJSON())
+            }
         })
         .catch(error => {
             ErrorHandler.error(res, ErrorCodes.ERROR, error.message);
@@ -37,10 +47,10 @@ exports.get = (req, res, next) => {
         licenseDB.where("restaurant_id", "==", restaurant_id)
             .get()
             .then(snapshot => {
-                if (snapshot.length < 1) {
+                if (snapshot.docs.length < 1) {
                     ErrorHandler.error(res, ErrorCodes.ERROR, "License not found");
                 } else {
-                    let l = new License(snapshot[0].data(), snapshot[0].id);
+                    let l = new License(snapshot.docs[0].data(), snapshot.docs[0].id);
                     ErrorHandler.success(res, l.toJSON());
                 }
             })

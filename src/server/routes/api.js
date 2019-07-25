@@ -91,7 +91,7 @@ router.post("/register", (req, res, next) => {
                 if (!doc.exists) {
                     let docRef = firestore.collection("users").doc(email);
                     docRef.set({
-                        age : age || 18,
+                        age : age || 0,
                         sex : sex || "MALE",
                         height : height || 0,
                         weight : weight || 0,
@@ -123,7 +123,7 @@ router.post("/profile", tokenVerifier, (req, res, next) => {
     if (update_data.email || update_data.password) {
         ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Can not update fields");
     } else {
-        const {email} = req.token_data;
+        const email = tokenHandler.getEmail(req);
         if (!!email) {
             let userRef = firestore.collection('users').doc(email);
             let getDoc = userRef.get()

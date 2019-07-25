@@ -146,4 +146,4 @@ exports.checkReq = (verify, data) => {
     }
 
     return { wrong, right }
-}
+};

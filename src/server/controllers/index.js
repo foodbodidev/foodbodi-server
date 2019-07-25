@@ -3,3 +3,4 @@ ErrorCodes = require("../utils/error_codes");
 
 __restaurantController  = require('./restaurant');
 __foodController        = require('./food');
+licenseController = require("./license");

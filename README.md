@@ -115,7 +115,7 @@ Example :
 Submit that <b>mediaLink</b> as "photo" field in restaurant / food api
 
 #### Chat 
-Not implement yet
+
 ## Collections
 ### User
 - Collection Name : users <br>
@@ -165,7 +165,11 @@ Not implement yet
     price : Number,
 }
 
+
 ```
+### License
+### Comment
+
 ## APIs
 Every response has status field & data field. 
 - Status value can be
@@ -569,3 +573,108 @@ Example
     }
 }
 ```
+
+### Submit License
+- Require token
+- <b>POST /api/license </b>
+- Input : 
+```
+{
+    "restaurant_id" : <String> (required)
+    "business_name" : <String> (required)
+    "registration_number" : <String> (required)
+    "proprietors" : <Array of String> (required)
+    "principle_place" : <String> (required)
+    "license_photo" : <URL of image> (required)
+}
+```
+- Output :
+```
+{
+    "status_code" : 0,
+    "data" : {
+        "business_name" : <String> 
+        "registration_number" : <String>
+        "proprietors" : <Array of String> 
+        "principle_place" : <String>
+        "license_photo" : <URL of image>
+        "restaurant_id" : <String>
+        "boss_id" : <String> (user's email)
+        "status" : <String> (one of WAITING | APPROVED | DENIED, for now is WAITING)
+        "created_date" : Date
+    }
+}
+```
+- An email will send to managers with information about boss & restaurant. Managers will approve / deny it via email
+
+### Approve license
+- <b>Require manager token </b>
+- <b>GET /api/license/approve?id={license_id}</b>
+- After a license is approved, the restaurant related to the license will be populated 
+- Output : field License.status will be set to "APPROVED". Return as a web page
+
+### Deny license
+- <b>Require manager token </b>
+- <b>GET /api/license/deny?id={license_id}</b>
+- After a license is approved, the restaurant related to the license will be populated 
+- Output : field License.status will be set to "DENIED". Return as a web page
+
+### Get license
+- Require token
+- <b>GET /api/license?restaurant_id={restaurant_id}</b>
+- Output
+```
+{
+    status_code : 0,
+    data : {
+       "business_name" : <String> 
+       "registration_number" : <String>
+       "proprietors" : <Array of String> 
+       "principle_place" : <String>
+       "license_photo" : <URL of image>
+       "restaurant_id" : <String>
+       "boss_id" : <String> (user's email)
+       "status" : <String> (one of WAITING | APPROVED | DENIED),
+       "created_date" : <Date>
+   }
+}
+``` 
+
+### Add comment
+- Require token
+- <b>POST /api/comment</b>
+- Input
+```
+{
+   "restaurant_id" : <String> (required)
+   "message" : <String> (required)
+}
+```
+- Output
+```
+{
+    status_code : 0,
+    data :{
+     "restaurant_id" : <String> 
+     "message" : <String>
+     "author" : <String> 
+     "created_date" : <Date>
+  }
+
+```
+
+### Get comments
+- Require token
+- <b>GET /api/comment/list?restaurant_id={restaurant_id}</b>
+- Output : 
+```
+{
+    status_code : 0,
+    data : {
+        comments : [Array of comments]
+        next_page_token : <String>
+    }
+}
+```
+- As default, this api will return lasted 50 comments. To get next comments, add a cursor in the query : 
+ <b>GET /api/comment/list?restaurant_id={restaurant_id}&cursor={next_page_token}</b>

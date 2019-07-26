@@ -1,0 +1,7 @@
+p License information : #{licenseInfo}
+p Restaurant information : #{restaurantInfo}
+p Boss information : #{bossInfo}
+- var approveUrl = "https://localhost:3000/api/license/approve?id=" + licenseInfo.id + "&secret=" + licenseInfo.secret_approve
+- var denyUrl = "https://localhost:3000/api/license/deny?id=" + licenseInfo.id + "&secret=" + licenseInfo.secret_deny
+a(href="" + approveUrl) Approve
+a(href="" + denyUrl) Deny

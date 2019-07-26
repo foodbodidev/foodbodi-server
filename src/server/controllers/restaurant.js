@@ -1,7 +1,7 @@
 const validation = require("../utils/validation");
 const ErrorHandler = require("../utils/response_handler");
 const ErrorCodes = require("../utils/error_codes");
-const SearchInfo = require("../utils/search_info");
+// const SearchInfo = require("../utils/search_info");
 let GeoHash = require("latlon-geohash");
 const firestoreFactory = require("../environments/firestore_factory");
 const firestore = firestoreFactory();

@@ -3,7 +3,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 validator = require("validator");
-require('./credentials/firebase_store'); // goi firestore chay global cua long dung xoa
+//require('./credentials/firebase_store'); // goi firestore chay global cua long dung xoa
 
 app = express();
 

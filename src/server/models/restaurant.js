@@ -1,7 +1,7 @@
 let Category  = require("./restaurant_category");
 let Type = require("./restaurant_type");
 let validator = require("validator");
-let Model = require("./model");
+// let Model = require("./model");
 var Geohash = require('latlon-geohash');
 let ObjTool = require("../utils/object_tools");
 let Food = require("./food");

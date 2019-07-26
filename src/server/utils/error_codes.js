@@ -16,6 +16,8 @@ module.exports = {
     CREATE_FOOD_FAIL : 312,
     FOOD_NOT_FOUND : 313,
 
+    CREATE_COMMENT_FAIL: 320,
+    
     WRONG_FORMAT : 400,
 
     GOOGLE_LOGIN_FAIL : 600,

@@ -10,3 +10,5 @@ router.get("/", tokenVerifier, licenseController.get);
 router.get("/approve", licenseController.approve);
 
 router.get("/deny", licenseController.deny);
+
+router.get("/notify", licenseController.notifyManager);

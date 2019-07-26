@@ -4,9 +4,13 @@ let ErrorCodes = require("../utils/error_codes");
 const firestoreFactory = require("../environments/firestore_factory");
 const firestore = firestoreFactory();
 let License = require("../models/license");
+let SystemProp = require("../models/system_property");
+let EmailConfig = require("../models/email_config");
+let Restaurant = require("../models/restaurant");
 const licenseDB = firestore.collection(License.prototype.collectionName());
 const Status = require("../models/license_status");
 const Random = require("../utils/random");
+const Sendgrid = require("@sendgrid/mail");
 const SECRET_LENGTH = 6;
 
 exports.create = (req, res, next) => {
@@ -38,13 +42,81 @@ exports.create = (req, res, next) => {
         .then((doc) => {
             if (!!doc) {
                 license.id(doc.id);
-                ErrorHandler.success(res, license.toJSON())
+                ErrorHandler.success(res, license.toJSON());
             }
         })
         .catch(error => {
+            console.log("Create license error" + error);
             ErrorHandler.error(res, ErrorCodes.ERROR, error);
         });
 
+};
+
+exports.notifyManager = (req, res, next) => {
+    const apiKey = process.env.SENDGRID_API_KEY;
+    const from = process.env.OWNER_EMAIL;
+    const {id} = req.query;
+    const template = "notify_new_license";
+    var to, subject, html, licenseInfo, restaurantInfo, bossInfo, bossId;
+    if (apiKey) {
+        Sendgrid.setApiKey(apiKey);
+        firestore.collection(SystemProp.prototype.collectionName)
+            .doc("license_manager_email")
+            .get()
+            .then(doc => {
+               if (doc.exists) {
+                   const prop = new SystemProp(doc.data(), doc.id);
+                   to = prop.value();
+                   return licenseDB.doc(id).get();
+               } else {
+                   ErrorHandler.error(res, ErrorCodes.ERROR, "License manager has not been set up")
+               }
+            }).then(license => {
+           if (license.exists) {
+               let l = new License(license.data(), license.id);
+               const restaurantId = l.restaurant_id();
+               bossId = l.boss_id();
+               licenseInfo = l.toJSON(false, true);
+               return firestore.collection(Restaurant.prototype.collectionName()).doc(restaurantId).get()
+           } else {
+               throw "License not exists";
+           }
+        }).then(r => {
+            if (r.exists) {
+                restaurantInfo = new Restaurant(r.data(), r.id).toJSON(false);
+                return firestore.collection("users").doc(bossId).get()
+            } else {
+                throw "Restaurant not found";
+            }
+        }).then(u => {
+            if (u.exists) {
+                bossInfo = u.data();
+                return firestore.collection(EmailConfig.prototype.collectionName).doc(template).get()
+            } else {
+                throw "User " + bossId + " not found";
+            }
+        }).then((emailCf) => {
+            if (emailCf.exists) {
+                const cf = new EmailConfig(emailCf.data(), emailCf.id);
+                const msg = cf.compile({
+                    licenseInfo : licenseInfo,
+                    restaurantInfo : restaurantInfo,
+                    bossInfo : bossInfo,
+                });
+                console.log("Trying to send email to " + msg.to + ": " + msg.subject);
+                return Sendgrid.send(msg);
+            } else {
+                throw "Missing email config " + template;
+            }
+        }).then(result => {
+            ErrorHandler.success(res, "Email sent")
+        }).catch(error => {
+            ErrorHandler.error(res, ErrorCodes.ERROR, error);
+        });
+
+    } else {
+        ErrorHandler.error(res, ErrorCodes.ERROR, "Mail service has not been set up");
+    }
 };
 
 exports.get = (req, res, next) => {

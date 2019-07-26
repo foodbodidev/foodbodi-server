@@ -1,0 +1,5 @@
+{
+  "to" : "|duyy.uit@gmail.com",
+  "from" : "|foodbodidev95@gmail.com",
+  "subject" : "|License of #{restaurantInfo.name} need to be verified"
+}

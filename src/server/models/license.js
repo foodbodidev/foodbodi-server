@@ -1,9 +1,10 @@
 let Status = require("./license_status");
+let ObjTool = require("../utils/object_tools");
 function License(input, id) {
     this._business_name = input.business_name || null;
     this._restaurant_id = input.restaurant_id || null;
     this._registration_number = input.registration_number || null;
-    this._proprietors = input.proprietors || [];
+    this._proprietors = input.proprietors || null;
     this._principle_place = input.principle_place || null;
     this._license_photo = input.license_photo || null;
     if (id) {
@@ -13,6 +14,8 @@ function License(input, id) {
     this._restaurant_id = input.restaurant_id || null;
     this._boss_id = input.boss_id || null;
     this._status = input.status || Status.WAITING.key;
+    this._secret_approve = input.secret_approve || null;
+    this._secret_deny = input.secret_deny || null;
 }
 
 License.prototype.business_name = function(value) {
@@ -36,7 +39,21 @@ License.prototype.boss_id = function(value) {
     return this._boss_id;
 };
 
-License.prototype.toJSON = function() {
+License.prototype.secretApprove = function(value) {
+    if (value) {
+        this._secret_approve = value;
+    }
+    return this._secret_approve;
+};
+
+License.prototype.secretDeny = function(value) {
+    if (value) {
+        this._secret_deny = value;
+    }
+    return this._secret_deny;
+};
+
+License.prototype.toJSON = function(ignoreNull, includeSecrets) {
     let result = {
         business_name: this._business_name,
         restaurant_id: this._restaurant_id,
@@ -48,8 +65,15 @@ License.prototype.toJSON = function() {
         proprietors : this._proprietors,
         status : this._status
     };
+    if (includeSecrets || false) {
+        result.secret_approve = this._secret_approve;
+        result.secret_deny = this._secret_deny;
+    }
     if (this._id) {
         result.id = this._id
+    }
+    if (ignoreNull || false) {
+        ObjTool.clean(result);
     }
     return result;
 };

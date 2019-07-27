@@ -10,5 +10,5 @@ const template = fs.readFileSync(__dirname + "/email_templates/" + id + ".pug");
 param.template = template.toString();
 firestore.collection(EmailConfig.prototype.collectionName)
     .doc(id).set(param).then(doc => {
-    console.log(doc.data())
+    console.log(doc)
 }).catch(err => console.log(err));

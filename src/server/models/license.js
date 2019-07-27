@@ -11,7 +11,6 @@ function License(input, id) {
         this._id = id;
     }
     this._created_date = input.created_date || null;
-    this._restaurant_id = input.restaurant_id || null;
     this._boss_id = input.boss_id || null;
     this._status = input.status || Status.WAITING.key;
     this._secret_approve = input.secret_approve || null;
@@ -32,7 +31,7 @@ License.prototype.restaurant_id = function(value) {
     return this._restaurant_id;
 };
 
-License.prototype.boss_id = function(value) {
+License.prototype.bossId = function(value) {
     if (value) {
         this._boss_id = value;
     }
@@ -102,10 +101,6 @@ License.prototype.approve = function() {
 License.prototype.deny = function() {
     this._status = Status.DENIED.key;
     return this._status
-};
-
-License.prototype.collectionName = function() {
-    return "licenses";
 };
 
 License.prototype.validateInput = function(input, create) {

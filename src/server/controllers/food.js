@@ -42,10 +42,7 @@ exports.get = (req, res, next) => {
 exports.search = (req, res, next) => {
     try {
         let { name, restaurant, calogt, calolt, pricegt, pricelt } = req.query;
-        let food = firestore.collection(__Food.prototype.collectionName());
-
-        food
-        .where('restaurant_id', '==', restaurant)
+        let foodQuery = firestore.collection(__Food.prototype.collectionName()).where('restaurant_id', '==', restaurant)
         .where('name', '==', name)
         .where('calo', '>=', calogt)
         .where('calo', '<=', calolt)

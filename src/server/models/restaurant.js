@@ -5,6 +5,7 @@ let validator = require("validator");
 var Geohash = require('latlon-geohash');
 let ObjTool = require("../utils/object_tools");
 let Food = require("./food");
+let License = require("./license");
 
 function Restaurant(input, id) {
     //Model.call(this, "restaurants");
@@ -27,6 +28,8 @@ function Restaurant(input, id) {
     this._created_date = input.created_date || null;
     this._last_updated_date = input.last_updated_date || null;
     this._photo = input.photo || null;
+
+    this._license = new License(input.license || {});
 
 }
 
@@ -83,6 +86,13 @@ Restaurant.prototype.location = function(lat, lng)  {
     }
 };
 
+Restaurant.prototype.license = function(value) {
+    if (value) {
+        this._license = value;
+    }
+    return this._license;
+}
+
 Restaurant.prototype.type = function(value) {
     if (value) {
         this._type = value;
@@ -92,7 +102,7 @@ Restaurant.prototype.type = function(value) {
 
 Restaurant.prototype.openHour = function(value) {
     if (value) {
-        this._openHour = value;
+        this._open_hour = value;
     }
     return this._open_hour;
 };
@@ -104,7 +114,7 @@ Restaurant.prototype.closeHour = function(value) {
     return this._close_hour;
 };
 
-Restaurant.prototype.toJSON = function(ignoreNull) {
+Restaurant.prototype.toJSON = function(ignoreNull,includeSecret) {
     let result = {
         name : this._name,
         creator : this._creator,
@@ -120,8 +130,10 @@ Restaurant.prototype.toJSON = function(ignoreNull) {
         last_updater : this._last_updater,
         created_date : this._created_date,
         last_updated_date : this._last_updated_date,
-        photo : this._photo
+        photo : this._photo,
+        license : this._license.toJSON(ignoreNull, includeSecret)
     };
+
     if (this._id) {
         result.id = this._id
     }
@@ -171,7 +183,7 @@ Restaurant.prototype.menu = function(value) {
     return this._menu;
 };
 
-Restaurant.prototype.validateInput = function(input) {
+Restaurant.prototype.validateInput = function(input, create) {
     let {name, address, category, type, lat, lng, open_hour, close_hour, priority, foods, photo} = input;
     if (!!name && typeof name !== "string") return "Name must be a string";
     if (!!address && typeof address !== "string") return "Address must be a string";
@@ -195,6 +207,11 @@ Restaurant.prototype.validateInput = function(input) {
             let error = Food.prototype.validateInput(food, false);
             if (error !== null) return error;
         }
+    }
+
+    if (input.hasOwnProperty("license")) {
+        const error = License.prototype.validateInput(input.license || {}, create);
+        if (error != null) return error;
     }
     return null;
 };

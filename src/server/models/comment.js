@@ -2,8 +2,10 @@ function Comment(input, id) {
     this._message = input.message || null;
     this._restaurant_id = input.restaurant_id || null;
     this._creator = input.creator || null;
-    this._topic = input.topic || null;
     this._created_date = input.created_date || null;
+    if (id) {
+        this._id = id;
+    }
 }
 
 Comment.prototype.message = function(value) {
@@ -27,15 +29,9 @@ Comment.prototype.creator = function(value) {
     return this._creator;
 };
 
-Comment.prototype.topic = function(value) {
-    if (value) {
-        this._topic = value;
-    }
-    return this._topic;
-};
-
 Comment.prototype.created_date = function(value) {
     if (value) {
+        console.log(value)
         this._created_date = value;
     } else {
         return this._created_date;
@@ -47,7 +43,6 @@ Comment.prototype.toJSON = function() {
         message: this._message,
         restaurant_id: this._restaurant_id,
         creator: this._creator,
-        topic : this._topic,
         created_date : this._created_date
     };
     if (this._id) {

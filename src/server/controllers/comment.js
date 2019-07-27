@@ -20,17 +20,19 @@ exports.create = (req, res, next) => {
 };
 
 exports.reads = (req, res, next) => {
-    commentDB
-        .where("topic", "==", req.body.topic)
-        .orderBy("created_date", "desc")
-        .limit(3)
-        .get()
-        .then(snapshot => {
-            let arr = [];
-            snapshot.docs.forEach(doc => {
-                let r = new __Comment(doc.data(), doc.id);
+    const query =   commentDB
+                    .where("restaurant_id", "==", req.body.restaurantId)
+                    .orderBy("created_date", "desc")
+                    .limit(3)
+    query.get().then(snapshot => {
+        let lastVisible = snapshot.docs[snapshot.docs.length-1];
+        let arr = [];
+        let next = query.startAt(lastVisible.data().created_date);
+
+        next.get().then(function(docSn){
+                let r = new __Comment(docSn.data(), docSn.id);
                 arr.push(r.toJSON());
-            });  
+            })
             ErrorHandler.success(res, {comments : arr});
         })
         .catch(err => {

@@ -60,18 +60,7 @@ exports.notifyManager = (req, res, next) => {
     var to, subject, html, licenseInfo, restaurantInfo, bossInfo, bossId;
     if (apiKey) {
         Sendgrid.setApiKey(apiKey);
-        firestore.collection(SystemProp.prototype.collectionName)
-            .doc("license_manager_email")
-            .get()
-            .then(doc => {
-               if (doc.exists) {
-                   const prop = new SystemProp(doc.data(), doc.id);
-                   to = prop.value();
-                   return licenseDB.doc(id).get();
-               } else {
-                   ErrorHandler.error(res, ErrorCodes.ERROR, "License manager has not been set up")
-               }
-            }).then(license => {
+        licenseDB.doc(id).get().then(license => {
            if (license.exists) {
                let l = new License(license.data(), license.id);
                const restaurantId = l.restaurant_id();
@@ -109,7 +98,7 @@ exports.notifyManager = (req, res, next) => {
                 throw "Missing email config " + template;
             }
         }).then(result => {
-            ErrorHandler.success(res, "Email sent")
+            ErrorHandler.success(res, {message : "Email sent"})
         }).catch(error => {
             ErrorHandler.error(res, ErrorCodes.ERROR, error);
         });

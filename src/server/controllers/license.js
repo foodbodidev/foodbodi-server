@@ -23,7 +23,7 @@ exports.notifyManager = (req, res, next) => {
         restaurantDB.doc(restaurant_id).get().then(r => {
            if (r.exists) {
                let restaurant = new Restaurant(r.data(), r.id);
-               restaurantInfo = r.data();
+               restaurantInfo = restaurant.toJSON(false, false);
                licenseInfo = restaurant.license().toJSON(false, true);
                bossId = restaurant.creator();
                return firestore.collection("users").doc(bossId).get()
@@ -69,11 +69,11 @@ exports.approve = (req, res, next) => {
                if (doc.exists) {
                    const restaurant = new Restaurant(doc.data(), doc.id);
                    if (restaurant.license().secretApprove() === secret) {
-                       const updateData = new Restaurant();
-                       const updateLicese = new License();
+                       const updateData = new Restaurant({});
+                       const updateLicese = restaurant.license();
                        updateLicese.approve();
                        updateData.license(updateLicese);
-                       return restaurantDB.doc(id).update(updateData.toJSON(true, false))
+                       return restaurantDB.doc(id).update(updateData.toJSON(true, true))
                    } else {
                        throw "Secret is not correct";
                    }
@@ -105,11 +105,11 @@ exports.deny = (req, res, next) => {
                 if (doc.exists) {
                     const restaurant = new Restaurant(doc.data(), doc.id);
                     if (restaurant.license().secretDeny() === secret) {
-                        const updateData = new Restaurant();
-                        const updateLicese = new License();
+                        const updateData = new Restaurant({});
+                        const updateLicese = restaurant.license();
                         updateLicese.deny();
                         updateData.license(updateLicese);
-                        return restaurantDB.doc(id).update(updateData.toJSON(true, false))
+                        return restaurantDB.doc(id).update(updateData.toJSON(true, true))
                     } else {
                         throw "Secret is not correct";
                     }

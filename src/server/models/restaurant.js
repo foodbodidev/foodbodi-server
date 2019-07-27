@@ -145,7 +145,11 @@ Restaurant.prototype.toJSON = function(ignoreNull,includeSecret) {
 
 Restaurant.prototype.created_date = function(value) {
     if (value) {
-        this._created_date = value;
+        if (value instanceof Date) {
+            this._created_date = value.getTime();
+        } else {
+            this._created_date = value;
+        }
     }
     return this._created_date
 };
@@ -211,6 +215,8 @@ Restaurant.prototype.validateInput = function(input, create) {
     if (input.hasOwnProperty("license")) {
         const error = License.prototype.validateInput(input.license || {}, create);
         if (error != null) return error;
+    } else {
+        return "Missing license"
     }
     return null;
 };

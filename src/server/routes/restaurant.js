@@ -10,6 +10,8 @@ router.get("/:id/foods", __restaurantController.listFood);
 
 router.get("/list", __restaurantController.list);
 
+router.get("/mine", tokenVerifier, __restaurantController.myRestaurant);
+
 router.get("/:id", tokenVerifier, __restaurantController.get);
 
 router.post("/", tokenVerifier, validator(true), __restaurantController.create);
@@ -18,4 +20,3 @@ router.put("/:id", tokenVerifier,validator(false), __restaurantController.update
 
 router.delete("/:id", tokenVerifier, __restaurantController.delete);
 
-router.get("/mine", tokenVerifier, __restaurantController.myRestaurant);

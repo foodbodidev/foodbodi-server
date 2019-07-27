@@ -81,7 +81,11 @@ Food.prototype.id = function(value) {
 
 Food.prototype.created_date = function(value) {
     if (value) {
-        this._created_date = value;
+        if (value instanceof Date) {
+            this._created_date = value;
+        } else {
+            this._created_date = value;
+        }
     } else {
         return this._created_date;
     }

@@ -33,6 +33,7 @@ exports.create = (req, res, next) => {
             for (let item of req.body.foods) {
                 let food = new Food(item);
                 food.restaurant_id(restaurant.id());
+                food.created_date(new Date());
                 let ref = firestore.collection(Food.prototype.collectionName()).doc();
                 batch.set(ref, food.toJSON());
             }
@@ -146,6 +147,7 @@ exports.myRestaurant = (req, res, next) => {
     const email = TokenHandler.getEmail(req);
     firestore.collection(Restaurant.prototype.collectionName())
         .where("creator", "==", email)
+        .get()
         .then(snapshot => {
             let result = [];
             snapshot.forEach(item => {

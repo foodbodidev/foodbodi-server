@@ -20,11 +20,9 @@ exports.create = (req, res, next) => {
     const creator = TokenHandler.getEmail(req);
     restaurant.creator(creator);
     restaurant.created_date(new Date());
-
     let license = restaurant.license();
     license.secretApprove(Random.randomString(SECRET_LENGTH));
     license.secretDeny(Random.randomString(SECRET_LENGTH));
-    license.bossId(creator);
 
     firestore.collection(restaurant.collectionName()).add(restaurant.toJSON(false, true)).then((doc) => {
         restaurant.id(doc.id);

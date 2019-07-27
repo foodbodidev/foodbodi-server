@@ -17,3 +17,5 @@ router.post("/", tokenVerifier, validator(true), __restaurantController.create);
 router.put("/:id", tokenVerifier,validator(false), __restaurantController.update);
 
 router.delete("/:id", tokenVerifier, __restaurantController.delete);
+
+router.get("/mine", tokenVerifier, __restaurantController.myRestaurant);

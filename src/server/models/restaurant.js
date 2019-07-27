@@ -21,7 +21,6 @@ function Restaurant(input, id) {
     if (id) {
         this._id = id;
     }
-    this._menu = input.menu || [];
     this._geohash = input.geohash ||  Geohash.encode(this._lat, this._lng, this.geo_hash_precision);
     this._priority = input.priority || 10;
     this._last_updater = input.last_updater || null;

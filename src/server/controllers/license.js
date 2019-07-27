@@ -17,7 +17,7 @@ exports.notifyManager = (req, res, next) => {
     const apiKey = process.env.SENDGRID_API_KEY;
     const {restaurant_id} = req.query;
     const template = "notify_new_license";
-    var to, subject, html, licenseInfo, restaurantInfo, bossInfo, bossId;
+    var licenseInfo, restaurantInfo, bossInfo, bossId;
     if (apiKey) {
         Sendgrid.setApiKey(apiKey);
         restaurantDB.doc(restaurant_id).get().then(r => {
@@ -25,7 +25,7 @@ exports.notifyManager = (req, res, next) => {
                let restaurant = new Restaurant(r.data(), r.id);
                restaurantInfo = r.data();
                licenseInfo = restaurant.license().toJSON(false, true);
-               bossId = restaurant.license().bossId();
+               bossId = restaurant.creator();
                return firestore.collection("users").doc(bossId).get()
            } else {
                throw "Restaurant not exists";

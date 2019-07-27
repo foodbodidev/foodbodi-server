@@ -1,17 +1,11 @@
 let Status = require("./license_status");
 let ObjTool = require("../utils/object_tools");
-function License(input, id) {
+function License(input) {
     this._business_name = input.business_name || null;
-    this._restaurant_id = input.restaurant_id || null;
     this._registration_number = input.registration_number || null;
     this._proprietors = input.proprietors || null;
     this._principle_place = input.principle_place || null;
     this._license_photo = input.license_photo || null;
-    if (id) {
-        this._id = id;
-    }
-    this._created_date = input.created_date || null;
-    this._boss_id = input.boss_id || null;
     this._status = input.status || Status.WAITING.key;
     this._secret_approve = input.secret_approve || null;
     this._secret_deny = input.secret_deny || null;
@@ -22,20 +16,6 @@ License.prototype.business_name = function(value) {
         this._business_name = value;
     }
     return this._business_name;
-};
-
-License.prototype.restaurant_id = function(value) {
-    if (value) {
-        this._restaurant_id = value;
-    }
-    return this._restaurant_id;
-};
-
-License.prototype.bossId = function(value) {
-    if (value) {
-        this._boss_id = value;
-    }
-    return this._boss_id;
 };
 
 License.prototype.secretApprove = function(value) {
@@ -77,21 +57,6 @@ License.prototype.toJSON = function(ignoreNull, includeSecrets) {
     return result;
 };
 
-
-License.prototype.id = function(value) {
-    if (value) {
-        this._id = value
-    }
-    return this._id;
-};
-
-License.prototype.created_date = function(value) {
-    if (value) {
-        this._created_date = value;
-    } else {
-        return this._created_date;
-    }
-};
 
 License.prototype.approve = function() {
     this._status = Status.APPROVED.key;

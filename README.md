@@ -39,13 +39,13 @@ __*Beware, you may need to be granted the deployment permission by admin.*__
 - To update profile, use POST /api/profile (require token)
 #### Add restaurant
 Make sure you have a token
-- To create new one + add foods: POST /api/restaurant
-- To update existing one + add foods : PUT /api/restaurant/{restaurant_id}
-- To delete : DELETE /api/restaurant/{restaurant_id}
-- To get data : GET /api/restaurant/{restaurant_id}
-- To get the menu of a restaurant : GET /api/restaurant/{restaurant_id}/foods
+- To create new one + add foods + license: [POST /api/restaurant](#create-restaurant)
+- To update existing one + add foods : [PUT /api/restaurant/{restaurant_id}](#update-food)
+- To delete : [DELETE /api/restaurant/{restaurant_id}](#delete-restaurant)
+- To get data : [GET /api/restaurant/{restaurant_id}](#get-restaurant)
+- To get the menu of a restaurant : [GET /api/restaurant/{restaurant_id}/foods](#list-food-by-restaurant-id)
 
-####Recommend flow
+#### Recommend flow
 - After user enter license, we send [POST /api/restaurant](#create-restaurant) to create new one first then get the restaurant_id
 - In the Add form, when user add a food, we can [POST /api/food](#create-food) to add directly
 - If user delete food, we call [DELETE /api/food](#delete-food) to delete directly
@@ -54,11 +54,11 @@ Make sure you have a token
 - <b>When user edit restaurant, we can reuse above logic.</b>
 
 #### Create, Update, Delete foods
-- To create : POST /api/food
-- To create many foods for an restaurant at once : POST /api/food/import
-- To update : PUT /api/food/{id}
-- To get : GET /api/food/{id}
-- To delete : DELETE /api/food/{id}
+- To create : [POST /api/food](#create-food)
+- To create many foods for an restaurant at once : [POST /api/food/import](#import-foods)
+- To update : [PUT /api/food/{id}](#update-food)
+- To get : [GET /api/food/{id}](#get-food)
+- To delete : [DELETE /api/food/{id}?restaurant_id={...}](#delete-food)
 
 #### Get nearby & track locations
 - Do in client side using firetstore's library
@@ -302,22 +302,20 @@ module.exports = {
 - Update user data
 - Require token in header
 
-
-### GET/api/restaurant/{restaurant_id}
+### Get restaurant
+- GET/api/restaurant/{restaurant_id}
 - Output (if success)
 ```
 {
     status_code : 0,
     data : {
-        restaurant : {...Restaurant data},
-        menu : [{...Food}] // Array of Food
-    
+        restaurant : {...Restaurant data},    
     }
     
 }
 ```
 
-###List food by restaurant id
+### List food by restaurant id
 - GET /api/restaurant/{restaurant_id}/foods
 - Require token 
 - Output if success 
@@ -398,7 +396,7 @@ Example :
     }
 }
 ```
-###Create restaurant
+### Create restaurant
 - POST/api/restaurant
 - Require token in header
 - Input
@@ -428,7 +426,7 @@ Example :
 }
 ```
 
-###Update restaurant
+### Update restaurant
 - PUT/api/restaurant/{restaurant_id}
 - Require token in header
 - Input : Same as POST/api/restaurant , except field ```foods```
@@ -439,7 +437,7 @@ Example :
 }
 
 ```
-###Delete restaurant
+### Delete restaurant
 - DELETE/api/restaurant/{restaurant_id}
 - Require token in header
 - Output (if success)
@@ -449,7 +447,7 @@ Example :
 }
 
 ```
-###Create food
+### Create food
 - POST/api/food
 - Require token in header
 - Input
@@ -480,7 +478,7 @@ Example :
 }
 ```
 
-###Import foods
+### Import foods
 - POST /api/food/import
 - To add many foods as once
 - Require header token
@@ -496,7 +494,7 @@ Example :
     ]
    }
 ```
-###Get food
+### Get food
 - GET/api/food/{food_id}
 - Require token in header
 - Output (if success)
@@ -514,7 +512,7 @@ Example :
     }
 }
 ```
-###Search food
+### Search food
 - GET/api/food/search?restaurant={restaurant_id}&name={food_name}&calogt={number of calo greater than}&calolt={number of calo less than}&pricegt={number of price greater than}&pricelt={number of price less than}
 - Require token in header
 - Output (if success)
@@ -540,7 +538,7 @@ Example :
     },...]
 }
 ```
-###Update food
+### Update food
 - PUT/api/food/{food_id}
 - Require token in header
 - Input : Same as [POST/api/food](#create-food), ```restaurant_id``` is <b>required</b> in the request body
@@ -551,7 +549,7 @@ Example :
 }
 
 ```
-###Delete food
+### Delete food
 - DELETE/api/food/{food_id}?restaurant_id={restaurant_id}
 - Require token in header
 - Output (if success)
@@ -561,7 +559,7 @@ Example :
 }
 
 ```
-###List restaurant category
+### List restaurant category
 - GET /api/metadata/restaurant_category 
 - No token required
 - Return supported restaurant categories on server
@@ -580,7 +578,7 @@ Example :
     }
 }
 ```
-###Get restaurant type
+### Get restaurant type
 - GET /api/metadata/restaurant_type
 - No token required
 - Return all types of restaurant supported on server

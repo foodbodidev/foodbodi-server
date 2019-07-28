@@ -1,23 +1,23 @@
 h4 License information :
-    p Business name : #{licenseInfo.business_name}
-    p Registration number : #{licenseInfo.registration_number}
-    p Principle place : #{licenseInfo.principle_place}
-    p Proprietors : #{licenseInfo.proprietors.toString()}
-    p License photo : #{licenseInfo.license_photo}
+p Business name : #{licenseInfo.business_name}
+p Registration number : #{licenseInfo.registration_number}
+p Principle place : #{licenseInfo.principle_place}
+p Proprietors : #{licenseInfo.proprietors.toString()}
+p License photo : #{licenseInfo.license_photo}
 
 h4 Restaurant information :
-    p Restaurant name : #{restaurantInfo.name}
-    p Address : #{restaurantInfo.address}
-    p Category : #{restaurantInfo.category}
-    p Type : #{restaurantInfo.type}
+p Restaurant name : #{restaurantInfo.name}
+p Address : #{restaurantInfo.address}
+p Category : #{restaurantInfo.category}
+p Type : #{restaurantInfo.type}
 
 h4 Boss information :
-    p Name : #{bossInfo.firstname} #{bossInfo.lastname}
-    p Email : #{bossInfo.email}
+p Name : #{bossInfo.firstname} #{bossInfo.lastname}
+p Email : #{bossInfo.email}
 - var approveUrl = "https://foodbodi.appspot.com/api/license/approve?id=" + restaurantInfo.id + "&secret=" + licenseInfo.secret_approve
 - var denyUrl = "https://foodbodi.appspot.com/api/license/deny?id=" + restaurantInfo.id + "&secret=" + licenseInfo.secret_deny
 
-p
+div
     i To approve/deny this claim, click on 1 of below links
 
 a(style='background-color:green;color:white;padding:10px;border-radius:5px;margin:10px' href="" + approveUrl) Approve

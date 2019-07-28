@@ -37,7 +37,7 @@ Food.prototype.calo = function(value)  {
     if (value) {
         this._calo = value;
     }
-    return this._calo;
+    return this._calo || 0;
 };
 
 Food.prototype.price = function(value) {

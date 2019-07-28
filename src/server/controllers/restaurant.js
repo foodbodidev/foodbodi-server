@@ -25,7 +25,7 @@ exports.create = (req, res, next) => {
     license.secretDeny(Random.randomString(SECRET_LENGTH));
 
     if (req.body.foods) {
-        const caloValues = req.body.foods.map((value, index) => value);
+        const caloValues = req.body.foods.map((food, index) => food.calo || 0);
         restaurant.caloValues(caloValues);
     }
 

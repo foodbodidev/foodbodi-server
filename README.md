@@ -37,13 +37,21 @@ __*Beware, you may need to be granted the deployment permission by admin.*__
 - User data is included in reponses from login apis as name "data"
 - Can obtain from GET /api/profile (require token)
 - To update profile, use POST /api/profile (require token)
-#### Add restaurant / food_truck
- Make sure you have a token
-- To create new one + add foods: POST /api/restaurant 
+#### Add restaurant
+Make sure you have a token
+- To create new one + add foods: POST /api/restaurant
 - To update existing one + add foods : PUT /api/restaurant/{restaurant_id}
 - To delete : DELETE /api/restaurant/{restaurant_id}
 - To get data : GET /api/restaurant/{restaurant_id}
 - To get the menu of a restaurant : GET /api/restaurant/{restaurant_id}/foods
+
+####Recommend flow
+- After user enter license, we send [POST /api/restaurant](#create-restaurant) to create new one first then get the restaurant_id
+- In the Add form, when user add a food, we can [POST /api/food](#create-food) to add directly
+- If user delete food, we call [DELETE /api/food](#delete-food) to delete directly
+- When user hit submit, we only send restaurant information to update the restaurant [PUT /api/restaurant](#update-restaurant)
+
+- <b>When user edit restaurant, we can reuse above logic.</b>
 
 #### Create, Update, Delete foods
 - To create : POST /api/food
@@ -150,7 +158,15 @@ Submit that <b>mediaLink</b> as "photo" field in restaurant / food api
     lng : Number,
     geohash : GeoHash
     open_hour : String (format HH:mm),
-    close_hour : String (format HH:mm
+    close_hour : String (format HH:mm,
+    calo_values : [Numbers],
+    license : {
+        "business_name": "Chicken bbq 2", (required)
+        "license_photo" : "_license_photo", (required)
+        "registration_number" : "CHICKEN111", (required)
+        "principle_place" : "Somewhere in the Earth", (required)
+        "proprietors" : ["Mickey", "Jonathan"], (required)
+    }
     
 }
 ```
@@ -167,7 +183,6 @@ Submit that <b>mediaLink</b> as "photo" field in restaurant / food api
 
 
 ```
-### License
 ### Comment
 
 ## APIs
@@ -302,7 +317,8 @@ module.exports = {
 }
 ```
 
-### GET /api/restaurant/{restaurant_id}/foods
+###List food by restaurant id
+- GET /api/restaurant/{restaurant_id}/foods
 - Require token 
 - Output if success 
 ```
@@ -382,35 +398,21 @@ Example :
     }
 }
 ```
-
-### POST/api/restaurant
+###Create restaurant
+- POST/api/restaurant
 - Require token in header
 - Input
 ```$xslt
 {
     ...Restaurant data
-    foods : [{...Food data}] //Array of a food. Food in this array will be added to restaurant's menu
-}
-```
-Example 
-```
-{
-    type : "RESTAURANT", "FOOD_TRUCK"
-    category : "FAST_FOOD"
-    name : "Test restaurant",
-    address : "Test address",
-    lat : 10,
-    lng : 30,
-    open_hour : "8:00",
-    close_hour : "22:00"
-    foods : [
-        {
-            "name" : "food 1",
-        },
-        {
-            "name" : "food 2"
-        },
-    ]
+    foods : [{...Food data}] //Array of a food. Food in this array will be added to restaurant's menu,
+    license : {
+        "business_name": "Chicken bbq 2", (required)
+        "license_photo" : "_license_photo", (required)
+        "registration_number" : "CHICKEN111", (required)
+        "principle_place" : "Somewhere in the Earth", (required)
+        "proprietors" : ["Mickey", "Jonathan"], (required)
+    }
 }
 ```
 - Output (if success)
@@ -418,15 +420,27 @@ Example
 {
     status_code : 0,
     data : {
-        restaurant: {...Restaurant data},
+        restaurant: {...Restaurant data,
+            license : {...License}
+        
+        },
     }
 }
 ```
-### PUT/api/restaurant/{restaurant_id}
+
+###Update restaurant
+- PUT/api/restaurant/{restaurant_id}
 - Require token in header
-- Input : Same as POST/api/restaurant
-- Outout : Same as POST/api/restaurant
-### DELETE/api/restaurant/{restaurant_id}
+- Input : Same as POST/api/restaurant , except field ```foods```
+- Output : 
+```
+{
+    status_code : 0
+}
+
+```
+###Delete restaurant
+- DELETE/api/restaurant/{restaurant_id}
 - Require token in header
 - Output (if success)
 ```
@@ -435,18 +449,19 @@ Example
 }
 
 ```
-### POST/api/food
+###Create food
+- POST/api/food
 - Require token in header
 - Input
 ```$xslt
 {
-    {
+    
         "name": "asd", (required)
         "restaurant_id": "LzuwD89FeatgBzbnQZ6E", (required)
-        "calo": 200,
+        "calo": 200, (required)
         "price": 600,
         "description": "dsad"
-    }
+    
 }
 ```
 - Output (if success)
@@ -465,7 +480,8 @@ Example
 }
 ```
 
-### POST /api/food/import
+###Import foods
+- POST /api/food/import
 - To add many foods as once
 - Require header token
 - Input 
@@ -480,7 +496,8 @@ Example
     ]
    }
 ```
-### GET/api/food/{food_id}
+###Get food
+- GET/api/food/{food_id}
 - Require token in header
 - Output (if success)
 ```
@@ -488,7 +505,7 @@ Example
     "status_code": 0,
     "data": {
         "name": "asd",
-        "restaurant_id": "LzuwD89FeatgBzbnQZ6E",
+        "restaurant_id": "LzuwD89FeatgBzbnQZ6E", 
         "creator": "long@gmail.com",
         "calo": 200,
         "price": 600,
@@ -497,7 +514,8 @@ Example
     }
 }
 ```
-### GET/api/food/search?restaurant={restaurant_id}&name={food_name}&calogt={number of calo greater than}&calolt={number of calo less than}&pricegt={number of price greater than}&pricelt={number of price less than}
+###Search food
+- GET/api/food/search?restaurant={restaurant_id}&name={food_name}&calogt={number of calo greater than}&calolt={number of calo less than}&pricegt={number of price greater than}&pricelt={number of price less than}
 - Require token in header
 - Output (if success)
 ```
@@ -522,11 +540,19 @@ Example
     },...]
 }
 ```
-### PUT/api/food/{food_id}
+###Update food
+- PUT/api/food/{food_id}
 - Require token in header
-- Input : Same as POST/api/restaurant
-- Outout : Same as POST/api/restaurant
-### DELETE/api/food/{food_id}
+- Input : Same as [POST/api/food](#create-food), ```restaurant_id``` is <b>required</b> in the request body
+- Output : 
+```
+{
+    status_code : 0
+}
+
+```
+###Delete food
+- DELETE/api/food/{food_id}?restaurant_id={restaurant_id}
 - Require token in header
 - Output (if success)
 ```
@@ -535,8 +561,8 @@ Example
 }
 
 ```
-
-### GET /api/metadata/restaurant_category 
+###List restaurant category
+- GET /api/metadata/restaurant_category 
 - No token required
 - Return supported restaurant categories on server
 ```
@@ -554,8 +580,8 @@ Example
     }
 }
 ```
-
-### GET /api/metadata/restaurant_type
+###Get restaurant type
+- GET /api/metadata/restaurant_type
 - No token required
 - Return all types of restaurant supported on server
 ```
@@ -574,39 +600,6 @@ Example
 }
 ```
 
-### Submit License
-- Require token
-- <b>POST /api/license </b>
-- Input : 
-```
-{
-    "restaurant_id" : <String> (required)
-    "business_name" : <String> (required)
-    "registration_number" : <String> (required)
-    "proprietors" : <Array of String> (required)
-    "principle_place" : <String> (required)
-    "license_photo" : <URL of image> (required)
-}
-```
-- Output :
-```
-{
-    "status_code" : 0,
-    "data" : {
-        "business_name" : <String> 
-        "registration_number" : <String>
-        "proprietors" : <Array of String> 
-        "principle_place" : <String>
-        "license_photo" : <URL of image>
-        "restaurant_id" : <String>
-        "boss_id" : <String> (user's email)
-        "status" : <String> (one of WAITING | APPROVED | DENIED, for now is WAITING)
-        "created_date" : Date
-    }
-}
-```
-- An email will send to managers with information about boss & restaurant. Managers will approve / deny it via email
-
 ### Approve license
 - <b>Require manager token </b>
 - <b>GET /api/license/approve?id={license_id}</b>
@@ -619,26 +612,6 @@ Example
 - After a license is approved, the restaurant related to the license will be populated 
 - Output : field License.status will be set to "DENIED". Return as a web page
 
-### Get license
-- Require token
-- <b>GET /api/license?restaurant_id={restaurant_id}</b>
-- Output
-```
-{
-    status_code : 0,
-    data : {
-       "business_name" : <String> 
-       "registration_number" : <String>
-       "proprietors" : <Array of String> 
-       "principle_place" : <String>
-       "license_photo" : <URL of image>
-       "restaurant_id" : <String>
-       "boss_id" : <String> (user's email)
-       "status" : <String> (one of WAITING | APPROVED | DENIED),
-       "created_date" : <Date>
-   }
-}
-``` 
 
 ### Add comment
 - Require token

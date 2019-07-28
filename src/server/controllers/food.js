@@ -1,8 +1,11 @@
 let TokenHandler = require("../utils/token");
 let ErrorHandler = require("../utils/response_handler");
+let ErrorCodes = require("../utils/error_codes");
 const firestoreFactory = require("../environments/firestore_factory");
+let Restaurant = require("../models/restaurant");
 const firestore = firestoreFactory();
 const foodDB = firestore.collection(__Food.prototype.collectionName());
+const {addCaloToRestaurant, removeCaloFromRestaurant, changeCaloInRestaurant} = require("./cronop");
 
 exports.create = (req, res, next) => {
     let food = new __Food(req.body);
@@ -16,7 +19,24 @@ exports.create = (req, res, next) => {
         })
         .catch(error => {
             ErrorHandler.error(res, ErrorCodes.CREATE_FOOD_FAIL, error.message);
-        })
+        });
+    let ref = firestore.collection(Restaurant.prototype.collectionName())
+        .doc(food.restaurant_id());
+    let transaction = firestore.runTransaction(t => {
+        return t.get(ref).then(r => {
+                if (r.exists) {
+                    const restaurant = new Restaurant(r.data());
+                    restaurant.addCalo(food.calo());
+                    t.update(ref, restaurant.getCaloValuesJSON())
+                } else {
+                    throw "Restaurant " + food.restaurant_id() + " not found";
+                }
+            })
+    }).then(result => {
+        console.log("Transaction update restaurant.calo_values success");
+    }).catch(error => {
+        console.log("Transaction update restaurant.calo_values fail : " + error)
+    })
 
 };
 
@@ -64,30 +84,61 @@ exports.search = (req, res, next) => {
 
 exports.update = (req, res, next) => {
     let {id} = req.params;
+    let food = new __Food(req.body);
+    let restaurant_id = food.restaurant_id();
+    let restaurant;
+    if (!!!restaurant_id) return ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing restaurant_id");
     if (id) {
-        foodDB.doc(id).update(req.body)
-        .then(doc => {
-            return ErrorHandler.success(res, {});
+        firestore.runTransaction(t => {
+            return t.getAll(foodDB.doc(id), firestore.collection(Restaurant.prototype.collectionName()).doc(restaurant_id))
+                .then(docs => {
+                    if (docs.length !== 2) {
+                        throw "Wrong return doc for food or restaurant"
+                    }
+                    food = new __Food(docs[0].data(), docs[0].id);
+                    restaurant = new Restaurant(docs[1].data(), docs[1].id);
+                    t.update(foodDB.doc(id), req.body);
+                    if (req.body.calo) {
+                        restaurant.changeCalo(food.calo(), req.body.calo);
+                        t.update(firestore.collection(Restaurant.prototype.collectionName()).doc(food.restaurant_id()), restaurant.getCaloValuesJSON())
+                    }
+                })
+        }).then(result => {
+            ErrorHandler.success(res, {});
         }).catch(error => {
-            return ErrorHandler.error(res, ErrorCodes.ERROR, error.message);
+            ErrorHandler.error(res, ErrorCodes.ERROR, error);
         });
     } else {
-        return ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing id");
+        return ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing food id");
     }
 };
 
 exports.delete = (req, res, next) => {
     let {id} = req.params;
+    let {restaurant_id} = req.query;
+    if (!!!restaurant_id) ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing restaurant_id");
     if (id) {
-        foodDB.doc(id).delete()
-            .then(() => {
-                return ErrorHandler.success(res, {})
-            })
-            .catch(error => {
-                return ErrorHandler.error(res, ErrorCodes.ERROR, error.message);
-            })
+        let restaurantDB= firestore.collection(Restaurant.prototype.collectionName());
+        firestore.runTransaction(t => {
+            return t.getAll(foodDB.doc(id), restaurantDB.doc(restaurant_id))
+                .then(docs => {
+                    if (docs.length !== 2) {
+                        throw "Wrong return doc for food or restaurant"
+                    }
+                    let food = new __Food(docs[0].data(), docs[0].id);
+                    let restaurant = new Restaurant(docs[1].data(), docs[1].id);
+                    t.delete(foodDB.doc(id));
+                    restaurant.removeCalo(food.calo());
+                    t.update(restaurantDB.doc(food.restaurant_id()), restaurant.getCaloValuesJSON())
+
+                })
+        }).then(result => {
+            ErrorHandler.success(res, {});
+        }).catch(error => {
+            ErrorHandler.error(res, ErrorCodes.ERROR, error);
+        });
     } else {
-        return ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing id");
+        return ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing food id");
     }
 };
 

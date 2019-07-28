@@ -33,7 +33,7 @@ Food.prototype.creator = function(value) {
     return this._creator;
 };
 
-Food.prototype.calo = function(lat, lng)  {
+Food.prototype.calo = function(value)  {
     if (value) {
         this._calo = value;
     }

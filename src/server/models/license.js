@@ -1,14 +1,15 @@
 let Status = require("./license_status");
 let ObjTool = require("../utils/object_tools");
 function License(input) {
-    this._business_name = input.business_name || null;
-    this._registration_number = input.registration_number || null;
-    this._proprietors = input.proprietors || null;
-    this._principle_place = input.principle_place || null;
-    this._license_photo = input.license_photo || null;
-    this._status = input.status || Status.WAITING.key;
-    this._secret_approve = input.secret_approve || null;
-    this._secret_deny = input.secret_deny || null;
+    this.values = {};
+    if (input.business_name) this.values.business_name = input.business_name;
+    if (input.registration_number) this.values.registration_number = input.registration_number;
+    if (input.proprietors) this.values.proprietors = input.proprietors;
+    if (input.principle_place) this.values.principle_place = input.principle_place;
+    if (input.license_photo) this.values.license_photo = input.license_photo;
+    if (input.status) this.values.status = input.status;
+    if (input.secret_approve) this.values.secret_approve = input.secret_approve;
+    if (input.secret_deny) this.values.secret_deny = input.secret_deny;
 }
 
 License.prototype.business_name = function(value) {
@@ -32,24 +33,11 @@ License.prototype.secretDeny = function(value) {
     return this._secret_deny;
 };
 
-License.prototype.toJSON = function(ignoreNull, includeSecrets) {
-    let result = {
-        business_name: this._business_name,
-        license_photo : this._license_photo,
-        registration_number : this._registration_number,
-        principle_place : this._principle_place,
-        proprietors : this._proprietors,
-        status : this._status
-    };
-    if (includeSecrets || false) {
-        result.secret_approve = this._secret_approve;
-        result.secret_deny = this._secret_deny;
-    }
-    if (this._id) {
-        result.id = this._id
-    }
-    if (ignoreNull || false) {
-        ObjTool.clean(result);
+License.prototype.toJSON = function(includeSecrets) {
+    let result = ObjTool.clone(this.values);
+    if (!includeSecrets) {
+        result.secret_approve = null;
+        result.secret_deny = null;
     }
     return result;
 };

@@ -23,8 +23,8 @@ exports.notifyManager = (req, res, next) => {
         restaurantDB.doc(restaurant_id).get().then(r => {
            if (r.exists) {
                let restaurant = new Restaurant(r.data(), r.id);
-               restaurantInfo = restaurant.toJSON(false, false);
-               licenseInfo = restaurant.license().toJSON(false, true);
+               restaurantInfo = restaurant.toJSON( false);
+               licenseInfo = restaurant.license().toJSON(true);
                bossId = restaurant.creator();
                return firestore.collection("users").doc(bossId).get()
            } else {
@@ -73,7 +73,7 @@ exports.approve = (req, res, next) => {
                        const updateLicese = restaurant.license();
                        updateLicese.approve();
                        updateData.license(updateLicese);
-                       return restaurantDB.doc(id).update(updateData.toJSON(true, true))
+                       return restaurantDB.doc(id).update(updateData.toJSON( true))
                    } else {
                        throw "Secret is not correct";
                    }
@@ -109,7 +109,7 @@ exports.deny = (req, res, next) => {
                         const updateLicese = restaurant.license();
                         updateLicese.deny();
                         updateData.license(updateLicese);
-                        return restaurantDB.doc(id).update(updateData.toJSON(true, true))
+                        return restaurantDB.doc(id).update(updateData.toJSON(true))
                     } else {
                         throw "Secret is not correct";
                     }

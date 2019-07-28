@@ -24,7 +24,12 @@ exports.create = (req, res, next) => {
     license.secretApprove(Random.randomString(SECRET_LENGTH));
     license.secretDeny(Random.randomString(SECRET_LENGTH));
 
-    firestore.collection(restaurant.collectionName()).add(restaurant.toJSON(false, true)).then((doc) => {
+    if (req.body.foods) {
+        const caloValues = req.body.foods.map((value, index) => value);
+        restaurant.caloValues(caloValues);
+    }
+
+    firestore.collection(restaurant.collectionName()).add(restaurant.toJSON(true)).then((doc) => {
         restaurant.id(doc.id);
         return restaurant;
     }).then((data) => {
@@ -33,7 +38,6 @@ exports.create = (req, res, next) => {
             for (let item of req.body.foods) {
                 let food = new Food(item);
                 food.restaurant_id(restaurant.id());
-                food.created_date(new Date());
                 let ref = firestore.collection(Food.prototype.collectionName()).doc();
                 batch.set(ref, food.toJSON());
             }
@@ -42,7 +46,7 @@ exports.create = (req, res, next) => {
                 ErrorHandler.success(res, json);
             })
         } else {
-            ErrorHandler.success(res, restaurant.toJSON());
+            ErrorHandler.success(res, restaurant.toJSON(false));
         }
     }).catch(error => {
         console.log(error);
@@ -59,7 +63,7 @@ exports.get = (req, res, next) => {
             if (doc.exists) {
                 restaurant = new Restaurant(doc.data(), doc.id);
                 ErrorHandler.success(res, {
-                    restaurant : restaurant.toJSON(false, false)});
+                    restaurant : restaurant.toJSON( false)});
             } else {
                 ErrorHandler.error(res, ErrorCodes.RESTAURANT_NOT_FOUND, "Can not found restaurant " + id);
             }
@@ -75,11 +79,9 @@ exports.get = (req, res, next) => {
 exports.update = (req, res, next) => {
     let {id} = req.params;
     if (id) {
-        const update_data = new Restaurant(req.body);
-        update_data.updated_date(new Date());
-        update_data.updater(TokenHandler.getEmail(req));
+        let update_data = new Restaurant(req.body);
         let ref = firestore.collection(Restaurant.prototype.collectionName()).doc(id);
-        ref.update(update_data.toJSON(true, false)).then(doc => {
+        ref.update(update_data.toJSON( false)).then(doc => {
                 ErrorHandler.success(res, {});
 
         }).catch(error => {
@@ -135,7 +137,7 @@ exports.list = (req, res, next) => {
             let result = [];
             snapshot.docs.forEach(item => {
                 let r = new Restaurant(item.data(), item.id);
-                result.push(r.toJSON());
+                result.push(r.toJSON(false));
             });
             ErrorHandler.success(res, {restaurants : result});
         }).catch(err => {

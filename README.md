@@ -20,23 +20,24 @@ Finding a mock technique for firestore ....
 __*Beware, you may need to be granted the deployment permission by admin.*__
 ## Flows
 #### Login by email & password
-1. Register new user by POST /api/register
-2. Login by POST /api/login, if success, server returns a token
+1. Register new user by [POST /api/register](#register)
+2. Login by [POST /api/login](#login), if success, server returns a token
 3. Token is base64 encrypted, include it in http headers with header_name "token" for another api requests
 #### Login by Google Sign In
 1. User logins by GoogleSignIn button
-2. Use the token returned from Google, send to POST /api/googleSignIn
+2. Use the token returned from Google, send to [POST /api/googleSignIn](#googlesignin)
 3. If email of user is not exists, server will create new account with field need_password = false and user's data in the request.
 4. Server will return a token encrypted by base64, include it in http headers with header_name "token" for another api requests.
 #### Login by Facebook Sign In
 1. User logins by GoogleSignIn button
-2. Use the token returned from Google, send to POST /api/facebookSignIn
+2. Use the token returned from Google, send to [POST /api/facebookSignIn](#facebooksignin)
 3. If email of user is not exists, server will create new account with field need_password = false and user's data in the request.
 4. Server will return a token encrypted by base64, include it in http headers with header_name "token" for another api requests.
 #### User info
 - User data is included in reponses from login apis as name "data"
-- Can obtain from GET /api/profile (require token)
-- To update profile, use POST /api/profile (require token)
+- Can obtain from [GET /api/profile](#get-profile) (require token)
+- To update profile, use [POST /api/profile](#update-profile) (require token)
+- To get restaurant created by current logged in user : [GET /api/restaurant/mine](#get-my-restaurant)
 #### Add restaurant
 Make sure you have a token
 - To create new one + add foods + license: [POST /api/restaurant](#create-restaurant)
@@ -214,7 +215,8 @@ module.exports = {
 };
 ```
 - Data field is what you expect in the API, based on each API
-### POST /api/register
+### Register
+- POST /api/register
 - Input
 ```$xslt
 {
@@ -235,7 +237,8 @@ module.exports = {
     status : "OK",
 }
 ```
-### POST /api/login
+### Login
+- POST /api/login
 - Input
 ```$xslt
 {
@@ -254,7 +257,8 @@ module.exports = {
     }
 }
 ```
-### POST /api/googleSignIn
+### GoogleSignIn
+- POST /api/googleSignIn
 - Create new account if needed 
 - Input
 ```$xslt
@@ -273,7 +277,8 @@ module.exports = {
     }
 }
 ```
-### POST /api/facebookSignIn
+### FacebookSignIn
+- POST /api/facebookSignIn
 - Create new account if needed 
 - Input
 ```$xslt
@@ -293,14 +298,17 @@ module.exports = {
             }
 }
 ```
-### GET /api/profile
+### Get profile
+- GET /api/profile
 - Extract user data by token
 - Require token in header
 - Output : User
 
-### POST /api/profile
+### Update profile
+- POST /api/profile
 - Update user data
 - Require token in header
+
 
 ### Get restaurant
 - GET/api/restaurant/{restaurant_id}
@@ -312,6 +320,18 @@ module.exports = {
         restaurant : {...Restaurant data},    
     }
     
+}
+```
+
+### Get my restaurant
+- GET/api/restaurant/mine
+- Output
+```
+{
+    status_code : 0,
+    data : {
+        restaurants : [Restaurants]
+    }
 }
 ```
 

@@ -29,7 +29,7 @@ function Restaurant(input, id) {
         this.values.geohash = input.geohash;
     }
     else if (this.values.lat && this.values.lng){
-      Geohash.encode(this.values.lat, this.values.lng, this.geo_hash_precision);
+      this.values.geohash = Geohash.encode(this.values.lat, this.values.lng, this.geo_hash_precision);
     }
     this.values.priority = input.priority || 10;
 

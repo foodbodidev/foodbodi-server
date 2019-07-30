@@ -4,6 +4,7 @@ const prefix = '/api';
 app.use('/', require('./service'));
 app.use('/users', require('./users'));
 app.use(prefix, require('./api'));
+app.use(prefix + '/search', require('./search'));
 app.use(prefix + '/restaurant', require('./restaurant'));
 app.use(prefix + '/food', require('./food'));
 app.use(prefix + '/metadata', require('./metadata'));

@@ -5,3 +5,4 @@ __restaurantController  = require('./restaurant');
 __foodController        = require('./food');
 __commentController     = require('./comment');
 licenseController       = require("./license");
+searchController = require("./search");

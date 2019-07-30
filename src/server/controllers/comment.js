@@ -6,11 +6,11 @@ const commentDB = firestore.collection(__Comment.prototype.collectionName());
 const restaurantDB = firestore.collection(__Restaurant.prototype.collectionName());
 
 exports.create = (req, res, next) => {
-    let comment = new __Comment(req.body);
-    let id = req.body.restaurantId
+    let id = req.body.restaurant_id;
     if (id) {
         restaurantDB.doc(id).get().then(doc => {
             if (doc.exists) {
+                let comment = new __Comment(req.body);
                 const creator = TokenHandler.getEmail(req);
                 comment.creator(creator);
                 comment.created_date(new Date());

@@ -31,8 +31,11 @@ Comment.prototype.creator = function(value) {
 
 Comment.prototype.created_date = function(value) {
     if (value) {
-        console.log(value)
-        this._created_date = value;
+        if (value instanceof Date) {
+            this._created_date = value.getTime();
+        } else {
+            this._created_date = value;
+        }
     } else {
         return this._created_date;
     }

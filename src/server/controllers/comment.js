@@ -32,12 +32,12 @@ exports.create = (req, res, next) => {
         ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing id");
     }
 };
-
+//TODO : get comment will be handle in mobile. Cursor handling in this API is still not correct, we will comeback later
 exports.reads = (req, res, next) => {
     const query =   commentDB
                     .where("restaurant_id", "==", req.body.restaurantId)
                     .orderBy("created_date", "desc")
-                    .limit(3)
+                    .limit(3);
     query.get().then(snapshot => {
         let lastVisible = snapshot.docs[snapshot.docs.length-1];
         let arr = [];

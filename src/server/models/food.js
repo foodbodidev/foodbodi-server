@@ -33,11 +33,11 @@ Food.prototype.creator = function(value) {
     return this._creator;
 };
 
-Food.prototype.calo = function(lat, lng)  {
+Food.prototype.calo = function(value)  {
     if (value) {
         this._calo = value;
     }
-    return this._calo;
+    return this._calo || 0;
 };
 
 Food.prototype.price = function(value) {
@@ -81,7 +81,11 @@ Food.prototype.id = function(value) {
 
 Food.prototype.created_date = function(value) {
     if (value) {
-        this._created_date = value;
+        if (value instanceof Date) {
+            this._created_date = value;
+        } else {
+            this._created_date = value;
+        }
     } else {
         return this._created_date;
     }

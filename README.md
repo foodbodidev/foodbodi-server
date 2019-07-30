@@ -162,11 +162,10 @@ Submit that <b>mediaLink</b> as "photo" field in restaurant / food api
     close_hour : String (format HH:mm,
     calo_values : [Numbers],
     license : {
-        "business_name": "Chicken bbq 2", (required)
-        "license_photo" : "_license_photo", (required)
+        "company_name": "Chicken bbq 2", (required)
         "registration_number" : "CHICKEN111", (required)
-        "principle_place" : "Somewhere in the Earth", (required)
-        "proprietors" : ["Mickey", "Jonathan"], (required)
+        "representative_name" : "Subin Hong", (required)
+        "address" : "ABC Street", (required)
     }
     
 }
@@ -424,13 +423,12 @@ Example :
 {
     ...Restaurant data
     foods : [{...Food data}] //Array of a food. Food in this array will be added to restaurant's menu,
-    license : {
-        "business_name": "Chicken bbq 2", (required)
-        "license_photo" : "_license_photo", (required)
-        "registration_number" : "CHICKEN111", (required)
-        "principle_place" : "Somewhere in the Earth", (required)
-        "proprietors" : ["Mickey", "Jonathan"], (required)
-    }
+     license : {
+            "company_name": "Chicken bbq 2", (required)
+            "registration_number" : "CHICKEN111", (required)
+            "representative_name" : "Subin Hong", (required)
+            "address" : "ABC Street", (required)
+        }
 }
 ```
 - Output (if success)

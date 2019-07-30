@@ -3,20 +3,34 @@ let ErrorHandler = require("../utils/response_handler");
 const firestoreFactory = require("../environments/firestore_factory");
 const firestore = firestoreFactory();
 const commentDB = firestore.collection(__Comment.prototype.collectionName());
+const restaurantDB = firestore.collection(__Restaurant.prototype.collectionName());
 
 exports.create = (req, res, next) => {
     let comment = new __Comment(req.body);
-    const creator = TokenHandler.getEmail(req);
-    comment.creator(creator);
-    comment.created_date(new Date());
-    commentDB.add(comment.toJSON())
-        .then(doc => {
-            comment.id(doc.id);
-            ErrorHandler.success(res, comment.toJSON());
-        })
-        .catch(error => {
-            ErrorHandler.error(res, ErrorCodes.CREATE_COMMENT_FAIL, error.message);
-        })
+    let id = req.body.restaurantId
+    if (id) {
+        restaurantDB.doc(id).get().then(doc => {
+            if (doc.exists) {
+                const creator = TokenHandler.getEmail(req);
+                comment.creator(creator);
+                comment.created_date(new Date());
+                commentDB.add(comment.toJSON())
+                    .then(doc => {
+                        comment.id(doc.id);
+                        ErrorHandler.success(res, comment.toJSON());
+                    })
+                    .catch(error => {
+                        ErrorHandler.error(res, ErrorCodes.CREATE_COMMENT_FAIL, error.message);
+                    })
+            } else {
+                ErrorHandler.error(res, ErrorCodes.RESTAURANT_NOT_FOUND, "Can not found restaurant " + id);
+            }
+        }).catch(error=> {
+            ErrorHandler.error(res, ErrorCodes.ERROR, error.message);
+        });
+    } else {
+        ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing id");
+    }
 };
 
 exports.reads = (req, res, next) => {

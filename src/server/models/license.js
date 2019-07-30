@@ -2,21 +2,20 @@ let Status = require("./license_status");
 let ObjTool = require("../utils/object_tools");
 function License(input) {
     this.values = {};
-    if (input.business_name) this.values.business_name = input.business_name;
+    if (input.company_name) this.values.company_name = input.company_name;
     if (input.registration_number) this.values.registration_number = input.registration_number;
-    if (input.proprietors) this.values.proprietors = input.proprietors;
-    if (input.principle_place) this.values.principle_place = input.principle_place;
-    if (input.license_photo) this.values.license_photo = input.license_photo;
+    if (input.representative_name) this.values.representative_name = input.representative_name;
+    if (input.address) this.values.address = input.address;
     if (input.status) this.values.status = input.status;
     if (input.secret_approve) this.values.secret_approve = input.secret_approve;
     if (input.secret_deny) this.values.secret_deny = input.secret_deny;
 }
 
-License.prototype.business_name = function(value) {
+License.prototype.company_name = function(value) {
     if (value) {
-        this._business_name = value;
+        this._company_name = value;
     }
-    return this._business_name;
+    return this._company_name;
 };
 
 License.prototype.secretApprove = function(value) {
@@ -54,20 +53,18 @@ License.prototype.deny = function() {
 };
 
 License.prototype.validateInput = function(input, create) {
-    let {business_name, restaurant_id, boss_id, license_photo, registration_number, principle_place, proprietors, status} = input;
+    let {company_name, registration_number, address, representative_name, status} = input;
     if (create) {
-        if (business_name == null) return "Missing Business name";
-        if (license_photo == null) return "Missing license photo";
+        if (company_name == null) return "Missing Company name";
         if (registration_number == null) return "Missing registration number";
-        if (principle_place == null) return "Missing Priciple place";
-        if (proprietors == null) return "Missing list of proprietors";
+        if (address == null) return "Missing address";
+        if (representative_name == null) return "Missing representative_name";
         if (!!status) return "Not allow to set status"
     }
-    if (!!business_name && typeof business_name !== "string") return "Business name must be a string";
-    if (!!license_photo && typeof license_photo !== "string") return "License photo is invalid";
+    if (!!company_name && typeof company_name !== "string") return "Company name must be a string";
     if (!!registration_number && typeof registration_number !== "string") return "Registration number must be a string";
-    if (!!principle_place && typeof principle_place !== "string") return "Principle place must be a string";
-    if (!!proprietors && !Array.isArray(proprietors)) return "Proprietors must be an array of string";
+    if (!!address && typeof address !== "string") return "Address must be a string";
+    if (!!representative_name && typeof address !== "string") return "representative_name must be an array of string";
     if (!!status && !Status.hasOwnProperty(status)) return "Invalid status";
 
     return null;

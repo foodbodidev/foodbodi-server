@@ -6,6 +6,7 @@ let GeoHash = require("latlon-geohash");
 let License = require("../models/license");
 const firestoreFactory = require("../environments/firestore_factory");
 const firestore = firestoreFactory();
+let {addIndex, removeIndexOfDocument, updateIndex} = require("./search");
 let Random = require("../utils/random");
 
 let Restaurant = require("../models/restaurant");
@@ -13,6 +14,7 @@ let Food = require("../models/food");
 let TokenHandler = require("../utils/token");
 
 let validator = require("validator");
+let ObjectTool = require("../utils/object_tools");
 const SECRET_LENGTH = 6;
 
 exports.create = (req, res, next) => {
@@ -48,6 +50,12 @@ exports.create = (req, res, next) => {
         } else {
             ErrorHandler.success(res, restaurant.toJSON(false));
         }
+        addIndex(restaurant.searchText(),
+            Restaurant.prototype.collectionName(),
+            restaurant.id(),
+            restaurant.searchDoc(),
+            (result) => console.log(result),
+            error => console.log(error));
     }).catch(error => {
         console.log(error);
         ErrorHandler.error(res, ErrorCodes.RESTAURANT_CREATE_FAIL, error.message);
@@ -80,10 +88,39 @@ exports.update = (req, res, next) => {
     let {id} = req.params;
     if (id) {
         let update_data = new Restaurant(req.body);
+        let oldData;
         let ref = firestore.collection(Restaurant.prototype.collectionName()).doc(id);
-        ref.update(update_data.toJSON( false)).then(doc => {
+        ref.get().then(doc => {
+               if (doc.exists) {
+                   oldData = new Restaurant(doc.data(), doc.id);
+                   return ref.update(update_data.toJSON(false))
+               } else {
+                   ErrorHandler.error(res, ErrorCodes.ERROR, "Restaurant " + id + " not found");
+               }
+            }).then(result => {
                 ErrorHandler.success(res, {});
 
+                let oldSearchText = oldData.searchText();
+                if (ObjectTool.isValue(update_data.name())) {
+                    oldData.name(update_data.name());
+                }
+                if (ObjectTool.isValue(update_data.address())) {
+                    oldData.address(update_data.address());
+                }
+                let newSearchText = oldData.searchText();
+                if (oldSearchText !== newSearchText) {
+                    removeIndexOfDocument(Restaurant.prototype.collectionName(), id,
+                        (result) => {
+                            addIndex(newSearchText,
+                                Restaurant.prototype.collectionName(),
+                                id,
+                                oldData.searchDoc(),
+                                (result) => console.log("Update indexes success " + result),
+                                error => console.log("Update indexes error " + error))
+                        }, error => {
+                        console.log("Remove indexes error " + error);
+                        })
+                }
         }).catch(error => {
             console.log(error);
             ErrorHandler.error(res, ErrorCodes.ERROR, error.message);
@@ -102,7 +139,12 @@ exports.delete = (req, res, next) => {
             ErrorHandler.success(res, {});
         }).catch(err => {
             ErrorHandler.error(res, ErrorCodes.ERROR, err.message);
-        })
+        });
+
+        removeIndexOfDocument(Restaurant.prototype.collectionName(),
+            id,
+            (result) => console.log(result),
+            (error) => console.log(error));
 
     } else {
         ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing id");

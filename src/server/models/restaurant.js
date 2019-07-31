@@ -256,4 +256,22 @@ Restaurant.prototype.validateInput = function(input, create) {
     return null;
 };
 
+Restaurant.prototype.searchText = function() {
+    if (ObjTool.isValue(this.name()) && ObjTool.isValue(this.address())) {
+        return this.name() + " " + this.address();
+    } else if (ObjTool.isValue(this.name())) {
+        return this.name();
+    } else if (ObjTool.isValue(this.address())) {
+        return this.address();
+    } else return null;
+};
+
+Restaurant.prototype.searchDoc = function() {
+    return {
+        name : this.values.name,
+        address : this.values.address,
+        photo : this.values.photo || null
+    }
+};
+
 module.exports = Restaurant;

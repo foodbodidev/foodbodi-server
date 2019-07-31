@@ -44,26 +44,30 @@ exports.search = function(req, res, next) {
 };
 
 exports.addIndex = function(text, kind, document_id, document, successCb, errorCb) {
-    let preprocessedText = preprocessText(text);
-    let words = preprocessedText.split(" ");
+    if (text !== null) {
+        let preprocessedText = preprocessText(text);
+        let words = preprocessedText.split(" ");
 
-    let batch = firestore.batch();
-    for (let i in words) {
-        const word = words[i];
-        const catalog = new Catalog({});
-        catalog.word(word);
-        catalog.kind(kind);
-        catalog.document(document);
-        catalog.document_id(document_id);
-        catalog.position(i);
-        let ref = CatalogDb.doc();
-        batch.set(ref, catalog.toJSON());
+        if (words.length > 0) {
+            let batch = firestore.batch();
+            for (let i in words) {
+                const word = words[i];
+                const catalog = new Catalog({});
+                catalog.word(word);
+                catalog.kind(kind);
+                catalog.document(document);
+                catalog.document_id(document_id);
+                catalog.position(i);
+                let ref = CatalogDb.doc();
+                batch.set(ref, catalog.toJSON());
+            }
+            batch.commit().then(result => {
+                successCb(result);
+            }).catch(error => {
+                errorCb(error);
+            })
+        }
     }
-    batch.commit().then(result => {
-        successCb(result);
-    }).catch(error => {
-        errorCb(error);
-    })
 };
 
 exports.removeIndexOfDocument = function(kind, document_id, successCb, errorCb) {

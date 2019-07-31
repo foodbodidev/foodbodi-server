@@ -3,6 +3,7 @@ let ErrorHandler = require("../utils/response_handler");
 let ErrorCodes = require("../utils/error_codes");
 const firestoreFactory = require("../environments/firestore_factory");
 let Restaurant = require("../models/restaurant");
+let {addIndex, removeIndexOfDocument, updateIndex} = require("./search");
 const firestore = firestoreFactory();
 const foodDB = firestore.collection(__Food.prototype.collectionName());
 const {addCaloToRestaurant, removeCaloFromRestaurant, changeCaloInRestaurant} = require("./cronop");
@@ -16,6 +17,9 @@ exports.create = (req, res, next) => {
         .then(doc => {
             food.id(doc.id);
             ErrorHandler.success(res, food.toJSON());
+            addIndex(food.searchText(), food.collectionName(), food.id(), food.searchDoc(),
+                (result) => console.log("Add indexes for food " + food.id() + " success"),
+                error => console.log("Add indexes for food " + food.id() + " fail : " + error));
         })
         .catch(error => {
             ErrorHandler.error(res, ErrorCodes.CREATE_FOOD_FAIL, error.message);
@@ -36,7 +40,9 @@ exports.create = (req, res, next) => {
         console.log("Transaction update restaurant.calo_values success");
     }).catch(error => {
         console.log("Transaction update restaurant.calo_values fail : " + error)
-    })
+    });
+
+
 
 };
 
@@ -130,6 +136,13 @@ exports.delete = (req, res, next) => {
                     t.delete(foodDB.doc(id));
                     restaurant.removeCalo(food.calo());
                     t.update(restaurantDB.doc(food.restaurant_id()), restaurant.getCaloValuesJSON())
+
+                    removeIndexOfDocument(food.collectionName(), id,
+                        (result) => {
+                        console.log("Remove indexes of food " + id + " success")
+                    }, error => {
+                        console.log("Remove indexes of food " + id + " fail :" + error);
+                        })
 
                 })
         }).then(result => {

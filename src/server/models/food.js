@@ -112,4 +112,15 @@ Food.prototype.validateInput = function(input, update) {
     return null;
 };
 
+Food.prototype.searchText = function() {
+    return this.name();
+};
+
+Food.prototype.searchDoc = function() {
+    return {
+        name : this._name,
+        restaurant_id : this._restaurant_id,
+        photo : this._photo || null
+    }
+};
 module.exports = Food;

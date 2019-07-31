@@ -4,6 +4,8 @@ var router = express.Router();
 const firestoreFactory = require("../environments/firestore_factory");
 const firestore = firestoreFactory();
 
+let Restaurant = require("../models/restaurant");
+
 
 var tokenHandler = require("../utils/token");
 let {hash} = require("../utils/password");
@@ -154,6 +156,7 @@ router.post("/profile", tokenVerifier, (req, res, next) => {
 
 router.get("/profile", tokenVerifier, (req, res, next) => {
     let {email} = req.token_data;
+    let {include_restaurant} = req.query;
     if (!!email) {
         let userRef = firestore.collection('users').doc(email);
         let getDoc = userRef.get()
@@ -161,7 +164,22 @@ router.get("/profile", tokenVerifier, (req, res, next) => {
                 if (doc.exists) {
                     const data = doc.data();
                     delete data.password;
-                    ErrorHandler.success(res, data);
+                    if (include_restaurant || false) {
+                        firestore.collection(Restaurant.prototype.collectionName())
+                            .where("creator", "==", email)
+                            .get()
+                            .then(snapshot => {
+                                let restaurants = [];
+                                snapshot.docs.forEach(item => {
+                                    let restaurant = new Restaurant(item.data(), item.id);
+                                    restaurants.push(restaurant.toJSON(false));
+                                });
+                                data.restaurants = restaurants;
+                                ErrorHandler.success(res, data);
+                            })
+                    } else {
+                        ErrorHandler.success(res, data);
+                    }
                 } else {
                     ErrorHandler.error(res, ErrorCodes.USER_NOT_FOUND, "User not found");
                 }

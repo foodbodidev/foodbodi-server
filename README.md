@@ -303,6 +303,54 @@ module.exports = {
 - Require token in header
 - Output : User
 
+### Get restaurants with profile
+- GET /api/profile?include_restaurant=true
+- Require token in header
+- Extract user data & restaurants created by a user
+- Output example 
+```
+{
+    "status_code": 0,
+    "data": {
+        "last_name": "Nguyen",
+        "age": 18,
+        "first_name": "Y",
+        "sex": "FEMALE",
+        "email": "y@test.com",
+        "target_weight": 0,
+        "weight": 0,
+        "height": 0,
+        "restaurants": [
+            {
+                "name": "Green pepper",
+                "creator": "y@test.com",
+                "address": "321 Sanfransico USA",
+                "id": "19wdIUspOj0FVPJT16xX",
+                "priority": 10,
+                "created_date": 1564578224786,
+                "calo_values": [
+                    200,
+                    200,
+                    200,
+                    200,
+                    200,
+                    500,
+                    600,
+                    400
+                ],
+                "license": {
+                    "company_name": "Red pepper",
+                    "registration_number": "3333334",
+                    "representative_name": "Y Nguyen",
+                    "address": "My home 20",
+                    "secret_approve": null,
+                    "secret_deny": null
+                }
+            },
+           ]}
+          
+```
+
 ### Update profile
 - POST /api/profile
 - Update user data
@@ -667,3 +715,7 @@ Example :
 ```
 - As default, this api will return lasted 50 comments. To get next comments, add a cursor in the query : 
  <b>GET /api/comment/list?restaurant_id={restaurant_id}&cursor={next_page_token}</b>
+
+
+### Search
+- GET /api/search?q=some+text+here

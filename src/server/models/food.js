@@ -37,7 +37,7 @@ Food.prototype.calo = function(value)  {
     if (value) {
         this._calo = value;
     }
-    return this._calo || 0;
+    return this._calo;
 };
 
 Food.prototype.price = function(value) {
@@ -100,6 +100,7 @@ Food.prototype.validateInput = function(input, update) {
     if (!update) { // create
         if (!name) return "Name is required";
         if (!restaurant_id) return "Restaurant id is required";
+        if (!calo) return "Calo is required";
     }
 
     if (!!name && typeof name !== "string") return "Name is invalid";

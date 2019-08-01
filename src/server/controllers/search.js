@@ -3,14 +3,15 @@ const ErrorCodes = require("../utils/error_codes");
 const firestoreFactory = require("../environments/firestore_factory");
 const firestore = firestoreFactory();
 let Catalog = require("../models/catalog");
+let Stemmer = require("../utils/stemming");
 let CatalogDb = firestore.collection(Catalog.prototype.collectionName);
 exports.search = function(req, res, next) {
   let {q} = req.query;
   if (q) {
-      const words = q.split(" ");
+      const words = Stemmer.defaultStem(q);
       let promises = [];
       for (let word of words) {
-          promises.push(CatalogDb.where("word", "==", word).get())
+          promises.push(CatalogDb.where("word", ">=", word).where("word", "<", getSuccessor(word)).get())
       }
       Promise.all(promises)
           .then(snapshots => {
@@ -45,8 +46,7 @@ exports.search = function(req, res, next) {
 
 exports.addIndex = function(text, kind, document_id, document, successCb, errorCb) {
     if (text !== null) {
-        let preprocessedText = preprocessText(text);
-        let words = preprocessedText.split(" ");
+        let words =  Stemmer.defaultStem(text);
 
         if (words.length > 0) {
             let batch = firestore.batch();
@@ -86,8 +86,8 @@ exports.removeIndexOfDocument = function(kind, document_id, successCb, errorCb) 
 };
 
 exports.updateIndex = function(kind, document_id, oldText, newText, newDocument, successCb, errorCb) {
-    let oldWords = preprocessText(oldText).split(" ");
-    let newWords = preprocessText(newText).split(" ");
+    let oldWords = Stemmer.defaultStem(oldText);
+    let newWords = Stemmer.defaultStem(newText);
 
     CatalogDb.where("kind", "==", kind).where("document_id", "==", document_id)
         .get()
@@ -125,6 +125,15 @@ exports.updateIndex = function(kind, document_id, oldText, newText, newDocument,
 
 };
 
-let preprocessText = function(text) {
-    return text.trim().toLowerCase().replace(/\s\s+/g, ' ');
+let getSuccessor = function(word) {
+    const lastLetter = word[word.length - 1];
+    if (lastLetter === "z") {
+       return word.substr(0, word.length - 1);
+    } else {
+        return word.substr(0, word.length - 1) + nextChar(lastLetter);
+    }
 };
+
+function nextChar(c) {
+    return String.fromCharCode(c.charCodeAt(0) + 1);
+}

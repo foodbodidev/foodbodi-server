@@ -7,6 +7,7 @@ let License = require("../models/license");
 const firestoreFactory = require("../environments/firestore_factory");
 const firestore = firestoreFactory();
 let {addIndex, removeIndexOfDocument, updateIndex} = require("./search");
+let {createFoodIndexes} = require("./food");
 let Random = require("../utils/random");
 
 let Restaurant = require("../models/restaurant");
@@ -37,15 +38,22 @@ exports.create = (req, res, next) => {
     }).then((data) => {
         if (req.body.foods) {
             let batch = firestore.batch();
+            let ids = [];
             for (let item of req.body.foods) {
                 let food = new Food(item);
                 food.restaurant_id(restaurant.id());
                 let ref = firestore.collection(Food.prototype.collectionName()).doc();
+                ids.push(ref);
                 batch.set(ref, food.toJSON());
             }
             batch.commit().then(result => {
                 let json = restaurant.toJSON();
                 ErrorHandler.success(res, json);
+                createFoodIndexes(ids, (result) => {
+                    console.log("Add indexes for foods " + ids + " success");
+                }, error => {
+                    console.log("Add indexes for foods " + ids + " fail " + error);
+                })
             })
         } else {
             ErrorHandler.success(res, restaurant.toJSON(false));

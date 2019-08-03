@@ -108,6 +108,19 @@ exports.update = (req, res, next) => {
                         restaurant.changeCalo(food.calo(), req.body.calo);
                         t.update(firestore.collection(Restaurant.prototype.collectionName()).doc(food.restaurant_id()), restaurant.getCaloValuesJSON())
                     }
+                    if (req.body.name) {
+                        food.name(req.body.name);
+                        removeIndexOfDocument(__Food.prototype.collectionName(), id,
+                            (result) => {
+                                addIndex(food.toJSON(), food.collectionName(), id, food.searchDoc(), (result) => {
+                                    console.log("Update indexes for food " + id + " success");
+                                }, error => {
+                                    console.log("Update indexes for food " + id + " fail: " + error);
+                                } )
+                            }, error => {
+                                console.log('Rmeove indexes of food ' + id + " fail : " + error);
+                            })
+                    }
                 })
         }).then(result => {
             ErrorHandler.success(res, {});
@@ -159,16 +172,47 @@ exports.import = (req, res, next) => {
     let {restaurant_id, foods} = req.body;
     if (!!restaurant_id && !!foods) {
         let batch = firestore.batch();
+        let ids = [];
         for (let item of foods) {
             let food = new __Food(item);
             food.restaurant_id(restaurant_id);
             let ref = foodDB.doc();
+            ids.push(ref);
             batch.set(ref, food.toJSON());
         }
         batch.commit().then(result => {
             ErrorHandler.success(res, {});
+            //TODO : update calo_values of restaurant
+            _createFoodIndexes(ids, (result) => {
+                console.log("Add indexes for foods " + ids + " success");
+            }, error => {
+                console.log("Add indexes for foods " + ids + " fail " + error);
+            })
         }).catch(err => ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, err.message));
     } else {
         ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing restaurant_id or foods");
     }
 };
+
+let _createFoodIndexes = function(ids, successCb, errorCb,) {
+    if (Array.isArray(ids)) {
+    firestore.getAll(...ids)
+        .then(result => {
+            for(let doc of result) {
+                let food = new __Food(doc.data(), doc.id);
+                addIndex(food.searchText(), food.collectionName(), food.id(), food.searchDoc(),
+                    result => {
+                        console.log("Add indexes for food " + food.id() + " success");
+                    }, error => {
+                        console.log("Add indexes for food " + food.id() + " fail : " + error);
+                    });
+            }
+        })
+    } else {
+        errorCb("Require array of id");
+    }
+
+};
+
+exports.createFoodIndexes = _createFoodIndexes;
+

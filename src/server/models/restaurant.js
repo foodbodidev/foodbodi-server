@@ -269,7 +269,7 @@ Restaurant.prototype.searchText = function() {
 Restaurant.prototype.searchDoc = function() {
     return {
         name : this.values.name,
-        address : this.values.address,
+        address : this.values.address || null,
         photo : this.values.photo || null
     }
 };

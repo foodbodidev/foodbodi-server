@@ -112,7 +112,7 @@ exports.update = (req, res, next) => {
                         food.name(req.body.name);
                         removeIndexOfDocument(__Food.prototype.collectionName(), id,
                             (result) => {
-                                addIndex(food.toJSON(), food.collectionName(), id, food.searchDoc(), (result) => {
+                                addIndex(food.searchText(), food.collectionName(), id, food.searchDoc(), (result) => {
                                     console.log("Update indexes for food " + id + " success");
                                 }, error => {
                                     console.log("Update indexes for food " + id + " fail: " + error);

@@ -182,12 +182,26 @@ exports.import = (req, res, next) => {
         }
         batch.commit().then(result => {
             ErrorHandler.success(res, {});
-            //TODO : update calo_values of restaurant
             _createFoodIndexes(ids, (result) => {
                 console.log("Add indexes for foods " + ids + " success");
             }, error => {
                 console.log("Add indexes for foods " + ids + " fail " + error);
-            })
+            });
+
+            let ref = firestore.collection(Restaurant.prototype.collectionName())
+                .doc(restaurant_id);
+            firestore.runTransaction(t => {
+                return t.get(ref)
+                    .then(result => {
+                        let restaurant = new Restaurant(result.data(), result.id);
+                        for (let item of req.body.foods) {
+                            restaurant.addCalo(item.calo || 0);
+                        }
+                        t.update(ref, restaurant.getCaloValuesJSON());
+                    })
+
+            });
+
         }).catch(err => ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, err.message));
     } else {
         ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing restaurant_id or foods");

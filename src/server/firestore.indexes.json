@@ -1,10 +1,10 @@
 {
   "indexes": [
     {
-      "collectionId": "restaurants",
+      "collectionId": "reservations",
       "fields": [
-        { "fieldPath": "lat", "mode": "ASCENDING" },
-        { "fieldPath": "lng", "mode": "ASCENDING" }
+        { "fieldPath": "owner", "mode": "ASCENDING" },
+        { "fieldPath": "created_date", "mode": "DESCENDING" }
       ]
     }
   ],

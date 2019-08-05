@@ -716,6 +716,254 @@ Example :
 - As default, this api will return lasted 50 comments. To get next comments, add a cursor in the query : 
  <b>GET /api/comment/list?restaurant_id={restaurant_id}&cursor={next_page_token}</b>
 
+### Add a reservation
+- Require token
+- POST /api/reservation
+- Input :
+```
+{
+	"foods" : [
+		{
+			"food_id" : "3uLHSwLBOYdFQuSd83w7",
+			"amount" : 3
+		},
+		{
+			"food_id" : "43EgTAeYmIqoAxL0M0E1",
+			"amount" : 1
+		}
+		],
+	"restaurant_id" : "uhLvYpYaN9Q3XLxL9Jof"
+}
+```
+-Output : 
+```
+{
+    "status_code": 0,
+    "data": {
+        "foods": [
+            {
+                "food_id": "3uLHSwLBOYdFQuSd83w7",
+                "amount": 3
+            },
+            {
+                "food_id": "43EgTAeYmIqoAxL0M0E1",
+                "amount": 1
+            }
+        ],
+        "restaurant_id": "uhLvYpYaN9Q3XLxL9Jof",
+        "owner": "y@test.com",
+        "created_date": 1565006258110,
+        "restaurant_name": "New centery restaurant",
+        "total": 2900,
+        "id": "rsv_uhLvYpYaN9Q3XLxL9Jof_y@test.com_1565006258110"
+    }
+}
+```
+### Update a reservation
+- Require token
+- PUT /api/reservation/{reservation_id}
+- Input & Output same as [Create](#add-a-reservation)
+
+### Delete a reservation
+- Require token
+- DELETE /api/reservation/{reservation_id}
+
+### Get a reservation
+- Require token
+- GET /api/reservation/{reservation_id}
+- Output 
+```
+{
+    "status_code": 0,
+    "data": {
+        "restaurant": {
+            "name": "New centery restaurant",
+            "creator": "y@test.com",
+            "address": "234 Milky way",
+            "id": "uhLvYpYaN9Q3XLxL9Jof",
+            "priority": 10,
+            "created_date": 1564814443334,
+            "calo_values": [
+                300,
+                500,
+                800,
+                1000,
+                1000
+            ],
+            "license": {
+                "company_name": "New centery",
+                "registration_number": "mmnsns1112",
+                "representative_name": "Y Nguyen",
+                "address": "234 Milky way",
+                "secret_approve": null,
+                "secret_deny": null
+            }
+        },
+        "foods": {
+            "3uLHSwLBOYdFQuSd83w7": {
+                "name": "Egg shoup",
+                "restaurant_id": "uhLvYpYaN9Q3XLxL9Jof",
+                "creator": null,
+                "calo": 800,
+                "price": 30,
+                "description": null,
+                "created_date": null,
+                "photo": null,
+                "id": "3uLHSwLBOYdFQuSd83w7"
+            },
+            "43EgTAeYmIqoAxL0M0E1": {
+                "name": "Fish soup",
+                "restaurant_id": "uhLvYpYaN9Q3XLxL9Jof",
+                "creator": null,
+                "calo": 500,
+                "price": 20,
+                "description": null,
+                "created_date": null,
+                "photo": null,
+                "id": "43EgTAeYmIqoAxL0M0E1"
+            }
+        },
+        "reservation": {
+            "total": 3400,
+            "foods": [
+                {
+                    "food_id": "3uLHSwLBOYdFQuSd83w7",
+                    "amount": 3
+                },
+                {
+                    "food_id": "43EgTAeYmIqoAxL0M0E1",
+                    "amount": 2
+                }
+            ],
+            "restaurant_id": "uhLvYpYaN9Q3XLxL9Jof",
+            "id": "uhLvYpYaN9Q3XLxL9Jof"
+        }
+    }
+}
+```
+
+### List user reservation
+- Require token
+- GET /api/reservation/mine
+- To get next page /api/reservation/mine?cursor={cursor}
+```
+{
+    "status_code": 0,
+    "data": {
+        "reservations": [
+            {
+                "created_date": 1564914828142,
+                "total": 2900,
+                "foods": [
+                    {
+                        "food_id": "3uLHSwLBOYdFQuSd83w7",
+                        "amount": 3
+                    },
+                    {
+                        "food_id": "43EgTAeYmIqoAxL0M0E1",
+                        "amount": 1
+                    }
+                ],
+                "restaurant_id": "uhLvYpYaN9Q3XLxL9Jof",
+                "restaurant_name": "New centery restaurant",
+                "owner": "y@test.com",
+                "id": "rsv_uhLvYpYaN9Q3XLxL9Jof_y@test.com_1564914828142"
+            },
+            {
+                "created_date": 1564914826907,
+                "total": 2900,
+                "foods": [
+                    {
+                        "food_id": "3uLHSwLBOYdFQuSd83w7",
+                        "amount": 3
+                    },
+                    {
+                        "food_id": "43EgTAeYmIqoAxL0M0E1",
+                        "amount": 1
+                    }
+                ],
+                "restaurant_id": "uhLvYpYaN9Q3XLxL9Jof",
+                "restaurant_name": "New centery restaurant",
+                "owner": "y@test.com",
+                "id": "rsv_uhLvYpYaN9Q3XLxL9Jof_y@test.com_1564914826907"
+            },
+            {
+                "created_date": 1564914825692,
+                "total": 2900,
+                "foods": [
+                    {
+                        "food_id": "3uLHSwLBOYdFQuSd83w7",
+                        "amount": 3
+                    },
+                    {
+                        "food_id": "43EgTAeYmIqoAxL0M0E1",
+                        "amount": 1
+                    }
+                ],
+                "restaurant_id": "uhLvYpYaN9Q3XLxL9Jof",
+                "restaurant_name": "New centery restaurant",
+                "owner": "y@test.com",
+                "id": "rsv_uhLvYpYaN9Q3XLxL9Jof_y@test.com_1564914825692"
+            },
+            {
+                "created_date": 1564914822793,
+                "total": 2900,
+                "foods": [
+                    {
+                        "food_id": "3uLHSwLBOYdFQuSd83w7",
+                        "amount": 3
+                    },
+                    {
+                        "food_id": "43EgTAeYmIqoAxL0M0E1",
+                        "amount": 1
+                    }
+                ],
+                "restaurant_id": "uhLvYpYaN9Q3XLxL9Jof",
+                "restaurant_name": "New centery restaurant",
+                "owner": "y@test.com",
+                "id": "rsv_uhLvYpYaN9Q3XLxL9Jof_y@test.com_1564914822793"
+            },
+            {
+                "created_date": 1564914096929,
+                "total": 2900,
+                "foods": [
+                    {
+                        "food_id": "3uLHSwLBOYdFQuSd83w7",
+                        "amount": 3
+                    },
+                    {
+                        "food_id": "43EgTAeYmIqoAxL0M0E1",
+                        "amount": 1
+                    }
+                ],
+                "restaurant_id": "uhLvYpYaN9Q3XLxL9Jof",
+                "restaurant_name": "New centery restaurant",
+                "owner": "y@test.com",
+                "id": "rsv_uhLvYpYaN9Q3XLxL9Jof_y@test.com_1564914096929"
+            },
+            {
+                "created_date": 1564914080274,
+                "total": 2900,
+                "foods": [
+                    {
+                        "food_id": "3uLHSwLBOYdFQuSd83w7",
+                        "amount": 3
+                    },
+                    {
+                        "food_id": "43EgTAeYmIqoAxL0M0E1",
+                        "amount": 1
+                    }
+                ],
+                "restaurant_id": "uhLvYpYaN9Q3XLxL9Jof",
+                "restaurant_name": "New centery restaurant",
+                "owner": "y@test.com",
+                "id": "rsv_uhLvYpYaN9Q3XLxL9Jof_y@test.com_1564914080274"
+            }
+        ],
+        "cursor": "rsv_uhLvYpYaN9Q3XLxL9Jof_y@test.com_1564914080274"
+    }
+}
+```
 
 ### Search
 - GET /api/search?q=some+text+here

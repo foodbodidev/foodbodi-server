@@ -28,7 +28,8 @@
     "multer": "^1.4.1",
     "natural": "^0.6.3",
     "pug": "2.0.0-beta11",
-    "validator": "^11.0.0"
+    "validator": "^11.0.0",
+    "mock-cloud-firestore": "^0.9.3"
   },
   "devDependencies": {
     "chai": "^4.2.0",

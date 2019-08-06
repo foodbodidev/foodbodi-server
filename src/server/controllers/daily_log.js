@@ -35,6 +35,7 @@ exports.update = (req, res, next) => {
            if (doc.exists) {
                return dailyLogDb.doc(id).update(updateLog.toJSON(false))
            } else {
+               updateLog.owner(TokenHandler.getEmail(req));
                return dailyLogDb.doc(id).set(updateLog.toJSON(false));
            }
        }).then(doc => {

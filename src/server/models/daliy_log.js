@@ -4,7 +4,7 @@ function DailyLog(input, id) {
     if (input.calo_threshold) this.values.calo_threshold = input.calo_threshold;
     if (input.remain_calo) this.values.remain_calo = input.remain_calo;
     if (input.date) this.values.date = input.date;
-    if (input.user_id) this.values.user_id = input.user_id;
+    if (input.owner) this.values.owner = input.owner;
     if (id) {
         this.id = id;
     }
@@ -17,10 +17,17 @@ DailyLog.prototype.toJSON = function(includeId) {
 };
 
 DailyLog.prototype.generateId = function(year, month , day, userEmail) {
-    let monthStr = month < 10 ? "0" + month : "" + month;
-    let dayStr = day < 10 ? "0" + day : "" + day;
+    let monthStr = parseInt(month) < 10 ? "0" + parseInt(month) : "" + parseInt(month);
+    let dayStr = parseInt(day) < 10 ? "0" + parseInt(day) : "" + parseInt(day);
 
-    return year + "-" + month +"-" + day + "-" + userEmail;
+    return year + "-" + monthStr +"-" + dayStr + "-" + userEmail;
+};
+
+DailyLog.prototype.owner = function(owner) {
+    if (owner) {
+        this.values.owner = owner;
+    }
+    return this.values.owner;
 };
 
 DailyLog.prototype.validateInput = function(input) {
@@ -37,7 +44,7 @@ DailyLog.prototype.getId = function() {
 };
 
 DailyLog.prototype.setId = function(id) {
-    return this.values.id = id;
+    return this.id = id;
 };
 
 DailyLog.prototype.collectionName = "dailylogs";

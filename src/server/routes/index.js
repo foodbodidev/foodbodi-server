@@ -12,6 +12,7 @@ app.use(prefix + "/upload", require("./uploader"));
 app.use(prefix + "/comment", require("./comment"));
 app.use(prefix + "/license", require("./license"));
 app.use(prefix + "/reservation", require("./reservation"));
+app.use(prefix + "/dailylog", require("./daily_log"));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

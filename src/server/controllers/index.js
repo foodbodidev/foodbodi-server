@@ -6,3 +6,4 @@ __foodController        = require('./food');
 __commentController     = require('./comment');
 licenseController       = require("./license");
 searchController = require("./search");
+dailyLogController = require("./daily_log");

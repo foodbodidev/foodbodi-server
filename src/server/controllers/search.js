@@ -33,7 +33,12 @@ exports.search = function(req, res, next) {
                       });
                   }
 
-                  ErrorHandler.success(res, Object.values(map));
+                  let arr = Object.values(map);
+                  let sorted = arr.sort((a, b) => {
+                      return a.count > b.count
+                  });
+
+                  ErrorHandler.success(res, sorted);
 
               } else {
                   ErrorHandler.success(res, []);

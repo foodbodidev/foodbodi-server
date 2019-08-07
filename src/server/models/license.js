@@ -55,9 +55,7 @@ License.prototype.deny = function() {
 License.prototype.validateInput = function(input, create) {
     let {company_name, registration_number, address, representative_name, status} = input;
     if (create) {
-        if (company_name == null) return "Missing Company name";
         if (registration_number == null) return "Missing registration number";
-        if (address == null) return "Missing address";
         if (representative_name == null) return "Missing representative_name";
         if (!!status) return "Not allow to set status"
     }

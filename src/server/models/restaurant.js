@@ -223,6 +223,10 @@ Restaurant.prototype.changeCalo = function(oldValue, newValue) {
 
 Restaurant.prototype.validateInput = function(input, create) {
     let {name, address, category, type, lat, lng, open_hour, close_hour, priority, foods, photo} = input;
+    if (create) {
+        if (!input.hasOwnProperty("name")) return "Name is required";
+        if (!input.hasOwnProperty("address")) return "Address is required"
+    }
     if (!!name && typeof name !== "string") return "Name must be a string";
     if (!!address && typeof address !== "string") return "Address must be a string";
     if (!!category && !Category.hasOwnProperty(category)) return "Category " + category + " is not supported";

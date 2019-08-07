@@ -33,8 +33,8 @@ DailyLog.prototype.owner = function(owner) {
 DailyLog.prototype.validateInput = function(input) {
     if (!!input.step && typeof input.step !== "number") return "Step must be a number";
     if (!!input.calo_threshold && typeof input.calo_threshold !== "number") return "Calo threshold must be a number";
-    if (!!input.remain_calo && typeof input.remain_calo !== "number") return "Calo threshold must be a number";
-    if (!!input.date && typeof input.date !== "string") return "Calo threshold must be a string";
+    if (!!input.remain_calo && typeof input.remain_calo !== "number") return "Remain calo must be a number";
+    if (!!input.date && typeof input.date !== "string") return "Date must be a string";
     return null;
 };
 

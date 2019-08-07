@@ -965,5 +965,23 @@ Example :
 }
 ```
 
+### Update daily log
+- Require token
+- POST /api/dailylog/{year}/{month}/{day} .Example : ```POST /api/dailylog/2019/8/4``` or ```POST /api/dailylog/2019/08/04```
+- New record will be created if not exists 
+- Input
+```
+    {
+        step : <Number>,
+        calo_threshold : <Number>,
+        remain_calo : <Number>,
+        date : <String> 
+    }
+```
+
+### Get daily log
+- Require token
+- GET /api/dailylog/{year}/{month}/{day} .Example : ```GET /api/dailylog/2019/8/4``` or ```GET /api/dailylog/2019/08/04```
+
 ### Search
 - GET /api/search?q=some+text+here

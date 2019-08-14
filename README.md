@@ -732,7 +732,8 @@ Example :
 			"amount" : 1
 		}
 		],
-	"restaurant_id" : "uhLvYpYaN9Q3XLxL9Jof"
+	"restaurant_id" : "uhLvYpYaN9Q3XLxL9Jof",
+	"date_string" : "2019-08-10" (required)
 }
 ```
 -Output : 
@@ -971,12 +972,34 @@ Example :
 - New record will be created if not exists 
 - Input
 ```
-    {
-        step : <Number>,
-        calo_threshold : <Number>,
-        remain_calo : <Number>,
-        date : <String> 
-    }
+   {
+       "status_code": 0,
+       "data": {
+           "step": 1000,
+           "calo_threshold": 3000,
+           "reservations": [
+               {
+                   "foods": [
+                       {
+                           "food_id": "3uLHSwLBOYdFQuSd83w7",
+                           "amount": 1
+                       },
+                       {
+                           "food_id": "43EgTAeYmIqoAxL0M0E1",
+                           "amount": 2
+                       }
+                   ],
+                   "id": "rsv_uhLvYpYaN9Q3XLxL9Jof_y@test.com_1564911277172",
+                   "total": 1800,
+                   "date_string": "2018-08-10",
+                   "restaurant_id": "uhLvYpYaN9Q3XLxL9Jof"
+               }
+           ],
+           "total_eat": 1800,
+           "owner": "y@test.com",
+           "id": "2018-08-10-y@test.com"
+       }
+   }
 ```
 
 ### Get daily log

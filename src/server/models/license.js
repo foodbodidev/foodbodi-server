@@ -62,7 +62,7 @@ License.prototype.validateInput = function(input, create) {
     if (!!company_name && typeof company_name !== "string") return "Company name must be a string";
     if (!!registration_number && typeof registration_number !== "string") return "Registration number must be a string";
     if (!!address && typeof address !== "string") return "Address must be a string";
-    if (!!representative_name && typeof address !== "string") return "representative_name must be an array of string";
+    if (!!representative_name && !Array.isArray(representative_name)) return "representative_name must be an array of string";
     if (!!status && !Status.hasOwnProperty(status)) return "Invalid status";
 
     return null;

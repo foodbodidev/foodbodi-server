@@ -1,6 +1,7 @@
 function Reservation(input, id) {
     this.values = {};
     if (input.created_date) this.values.created_date = input.created_date;
+    if (input.date_string) this.values.date_string = input.date_string;
     if (input.total) this.values.total = input.total;
     if (input.foods) this.values.foods = input.foods;
     if (input.restaurant_id) this.values.restaurant_id = input.restaurant_id;
@@ -17,6 +18,17 @@ Reservation.prototype.create_date = function(value) {
         this.values.created_date = value;
     }
     return this.values.created_date;
+};
+
+Reservation.prototype.date_string = function(value) {
+    if (value) {
+        this.values.date_string = value;
+    }
+    return this.values.date_string;
+};
+
+Reservation.prototype.createDateString = function(year, month, day) {
+    return year + "-" + (month < 10 ? "0" + month : month) + "-" + (day < 10 ? "0" + day : day);
 };
 
 Reservation.prototype.total = function(value) {
@@ -62,7 +74,7 @@ Reservation.prototype.setId = function(id) {
     this.id = id;
 };
 
-Reservation.prototype.validateInput = function(input) {
+Reservation.prototype.validateInput = function(input, create) {
     if (input.foods) {
         if (!Array.isArray(input.foods)) return "Foods must be a array";
         for (let item of input.foods) {
@@ -71,6 +83,13 @@ Reservation.prototype.validateInput = function(input) {
         }
     } else {
         return "Foods is required"
+    }
+
+    if (create && !input.hasOwnProperty("date_string")) return "date_string is required (yyyy-mm-dd)";
+
+    if (!!input.date_string) {
+        var regEx = /^\d{4}-\d{2}-\d{2}$/;
+        if (typeof input.date_string !== "string" || input.date_string.match(regEx) === null) return "date_string must be yyyy-mm-dd"
     }
 
     if (typeof input.restaurant_id !== "string") return "Restaurant id is invalid or missing";

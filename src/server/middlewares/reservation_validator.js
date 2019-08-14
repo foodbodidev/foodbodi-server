@@ -10,7 +10,8 @@ module.exports = (hasData) => {
 
     if (hasData) {
         if (req.body) {
-            const error = Reservation.prototype.validateInput(req.body);
+            const isCreating = !!!req.params.id;
+            const error = Reservation.prototype.validateInput(req.body, isCreating);
             if (error !== null) return ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, error);
         }
     }

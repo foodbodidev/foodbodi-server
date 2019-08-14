@@ -31,7 +31,8 @@ let createUserInfo = (input) => {
         weight : weight || 0,
         target_weight : target_weight || 0,
         first_name : first_name || "",
-        last_name : last_name || ""
+        last_name : last_name || "",
+        daily_calo : 3000
     };
     return data;
 

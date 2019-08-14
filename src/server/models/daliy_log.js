@@ -1,8 +1,10 @@
+let Reservation = require("./reservation");
 function DailyLog(input, id) {
     this.values = {};
     if (input.step) this.values.step = input.step;
     if (input.calo_threshold) this.values.calo_threshold = input.calo_threshold;
-    if (input.remain_calo) this.values.remain_calo = input.remain_calo;
+    if (input.reservations) this.values.reservations = input.reservations;
+    if (input.total_eat) this.values.total_eat = input.total_eat;
     if (input.date) this.values.date = input.date;
     if (input.owner) this.values.owner = input.owner;
     if (id) {
@@ -33,8 +35,9 @@ DailyLog.prototype.owner = function(owner) {
 DailyLog.prototype.validateInput = function(input) {
     if (!!input.step && typeof input.step !== "number") return "Step must be a number";
     if (!!input.calo_threshold && typeof input.calo_threshold !== "number") return "Calo threshold must be a number";
-    if (!!input.remain_calo && typeof input.remain_calo !== "number") return "Remain calo must be a number";
+    if (!!input.eat && typeof input.eat !== "number") return "Remain calo must be a number";
     if (!!input.date && typeof input.date !== "string") return "Date must be a string";
+    if (!!input.reservations && !Array.isArray(input.reservations)) return "Reservations must be an array";
     return null;
 };
 
@@ -45,6 +48,20 @@ DailyLog.prototype.getId = function() {
 
 DailyLog.prototype.setId = function(id) {
     return this.id = id;
+};
+
+DailyLog.prototype.eat = function(value) {
+    if (value) {
+        this.values.total_eat = value;
+    }
+    return this.values.total_eat;
+};
+
+DailyLog.prototype.reservations = function(values) {
+    if (values) {
+        this.values.reservations = values;
+    }
+    return this.values.reservations;
 };
 
 DailyLog.prototype.collectionName = "dailylogs";

@@ -81,7 +81,7 @@ exports.update = function(req, res, next) {
                 totalCalo += calo * amount;
             }
             reservation.total(totalCalo);
-            return ref.set(reservation.toJSON())
+            return ref.update(reservation.toJSON())
         }).then(doc => {
         reservation.setId(reservation_id);
         ErrorHandler.success(res, reservation.toJSON());

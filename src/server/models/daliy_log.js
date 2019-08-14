@@ -2,6 +2,7 @@ let Reservation = require("./reservation");
 function DailyLog(input, id) {
     this.values = {};
     if (input.step) this.values.step = input.step;
+    if (input.burned_calo) this.values.burned_calo = input.burned_calo;
     if (input.calo_threshold) this.values.calo_threshold = input.calo_threshold;
     if (input.reservations) this.values.reservations = input.reservations;
     if (input.total_eat) this.values.total_eat = input.total_eat;
@@ -35,7 +36,8 @@ DailyLog.prototype.owner = function(owner) {
 DailyLog.prototype.validateInput = function(input) {
     if (!!input.step && typeof input.step !== "number") return "Step must be a number";
     if (!!input.calo_threshold && typeof input.calo_threshold !== "number") return "Calo threshold must be a number";
-    if (!!input.eat && typeof input.eat !== "number") return "Remain calo must be a number";
+    if (!!input.total_eat && typeof input.total_eat !== "number") return "total_eat must be a number";
+    if (!!input.burned_calo && typeof input.burned_calo !== "number") return "burned_calo must be a number";
     if (!!input.date && typeof input.date !== "string") return "Date must be a string";
     if (!!input.reservations && !Array.isArray(input.reservations)) return "Reservations must be an array";
     return null;

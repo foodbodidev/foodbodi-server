@@ -134,7 +134,7 @@ exports.get = function(req, res, next) {
 
 exports.mine = function(req, res, next) {
     let currentUser = TokenHandler.getEmail(req);
-    let {cursor} = req.query;
+    let {cursor, date_string} = req.query;
     let promise = new Promise((resolve, reject) => {
        if (cursor) {
            let lastReservation = reservationDb.doc(cursor);
@@ -144,8 +144,13 @@ exports.mine = function(req, res, next) {
        }
     }).then(doc => {
         let query = firestore.collection(Reservation.prototype.collectionName());
-        query = query.where("owner", "==", currentUser);
-        query = query.orderBy("created_date", "desc").limit(50);
+        if (date_string) {
+            query = query.where("owner", "==", currentUser);
+            query = query.where('date_string', "==", date_string);
+        } else {
+            query = query.where("owner", "==", currentUser);
+            query = query.orderBy("created_date", "desc").limit(50);
+        }
         if (doc !== null) {
             query = query.startAfter(doc);
         }

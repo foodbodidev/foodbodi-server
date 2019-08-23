@@ -20,16 +20,16 @@ License.prototype.company_name = function(value) {
 
 License.prototype.secretApprove = function(value) {
     if (value) {
-        this._secret_approve = value;
+        this.values.secret_approve = value;
     }
-    return this._secret_approve;
+    return this.values.secret_approve;
 };
 
 License.prototype.secretDeny = function(value) {
     if (value) {
-        this._secret_deny = value;
+        this.values.secret_deny = value;
     }
-    return this._secret_deny;
+    return this.values.secret_deny;
 };
 
 License.prototype.toJSON = function(includeSecrets) {
@@ -43,13 +43,13 @@ License.prototype.toJSON = function(includeSecrets) {
 
 
 License.prototype.approve = function() {
-    this._status = Status.APPROVED.key;
-    return this._status
+    this.values.status = Status.APPROVED.key;
+    return this.values.status
 };
 
 License.prototype.deny = function() {
-    this._status = Status.DENIED.key;
-    return this._status
+    this.values.status = Status.DENIED.key;
+    return this.values.status
 };
 
 License.prototype.validateInput = function(input, create) {

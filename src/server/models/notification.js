@@ -37,6 +37,18 @@ Notification.prototype.generateId = function() {
     return this.type() + "-" + this.receiver() + "-" + new Date().getTime();
 };
 
+Notification.prototype.markUnread = function() {
+    this.values.read = false;
+};
+
+Notification.prototype.markRead = function() {
+    this.values.read = true;
+};
+
+Notification.prototype.isRead = function() {
+    return this.values.read || false;
+};
+
 Notification.prototype.collectionName = "notifications";
 
 Notification.prototype.toJSON = function() {

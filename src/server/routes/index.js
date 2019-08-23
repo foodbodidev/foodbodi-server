@@ -14,6 +14,7 @@ app.use(prefix + "/license", require("./license"));
 app.use(prefix + "/reservation", require("./reservation"));
 app.use(prefix + "/dailylog", require("./daily_log"));
 app.use(prefix + "/ingredient", require("./ingredient"));
+app.use(prefix + "/notification", require("./notification"));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

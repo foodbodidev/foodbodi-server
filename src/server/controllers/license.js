@@ -94,6 +94,7 @@ exports.approve = (req, res, next) => {
                     notification.receiver(restaurant.creator());
                     notification.type("APPROVE_LICENSE");
                     notification.message(approve_license());
+                    notification.markUnread();
                     const id = notification.generateId();
                     notificationDb.doc(id)
                         .set(notification.toJSON())
@@ -145,6 +146,7 @@ exports.deny = (req, res, next) => {
                     notification.receiver(restaurant.creator());
                     notification.type("REJECT_LICENSE");
                     notification.message(reject_license());
+                    notification.markUnread();
                     const id = notification.generateId();
                     notificationDb.doc(id)
                         .set(notification.toJSON())

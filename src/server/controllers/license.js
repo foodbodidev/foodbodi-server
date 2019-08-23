@@ -13,6 +13,10 @@ const Random = require("../utils/random");
 const Sendgrid = require("@sendgrid/mail");
 const SECRET_LENGTH = 6;
 
+let Notification = require("../models/notification");
+let notificationDb = firestore.collection(Notification.prototype.collectionName);
+let {approve_license, reject_license} = require("./messages_factory");
+
 exports.notifyManager = (req, res, next) => {
     const apiKey = process.env.SENDGRID_API_KEY;
     const {restaurant_id} = req.query;
@@ -63,11 +67,12 @@ exports.notifyManager = (req, res, next) => {
 
 exports.approve = (req, res, next) => {
     let {id, secret} = req.query;
+    let restaurant;
     if (id) {
         restaurantDB.doc(id).get()
             .then(doc => {
                if (doc.exists) {
-                   const restaurant = new Restaurant(doc.data(), doc.id);
+                   restaurant = new Restaurant(doc.data(), doc.id);
                    if (restaurant.license().secretApprove() === secret) {
                        const updateData = new Restaurant({});
                        const updateLicese = restaurant.license();
@@ -84,6 +89,20 @@ exports.approve = (req, res, next) => {
             .then(doc => {
                 if (!!doc) {
                     res.render("license_approved_info", {});
+
+                    let notification = new Notification({});
+                    notification.receiver(restaurant.creator());
+                    notification.type("APPROVE_LICENSE");
+                    notification.message(approve_license());
+                    const id = notification.generateId();
+                    notificationDb.doc(id)
+                        .set(notification.toJSON())
+                        .then(doc => {
+                            console.log("Create notification " + id + " successfully");
+                        }).catch(error => {
+                            console.log("Fail to create notification " + id);
+                    })
+
                 } else {
                     throw "Flow is crashed"
                 }
@@ -93,17 +112,18 @@ exports.approve = (req, res, next) => {
             })
 
     } else {
-        ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing license id");
+        ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing restaurant id");
     }
 };
 
 exports.deny = (req, res, next) => {
     let {id, secret} = req.query;
+    let restaurant;
     if (id) {
         restaurantDB.doc(id).get()
             .then(doc => {
                 if (doc.exists) {
-                    const restaurant = new Restaurant(doc.data(), doc.id);
+                    restaurant = new Restaurant(doc.data(), doc.id);
                     if (restaurant.license().secretDeny() === secret) {
                         const updateData = new Restaurant({});
                         const updateLicese = restaurant.license();
@@ -120,6 +140,19 @@ exports.deny = (req, res, next) => {
             .then(doc => {
                 if (!!doc) {
                     res.render("license_denied_info", {});
+
+                    let notification = new Notification({});
+                    notification.receiver(restaurant.creator());
+                    notification.type("REJECT_LICENSE");
+                    notification.message(reject_license());
+                    const id = notification.generateId();
+                    notificationDb.doc(id)
+                        .set(notification.toJSON())
+                        .then(doc => {
+                            console.log("Create notification " + id + " successfully");
+                        }).catch(error => {
+                        console.log("Fail to create notification " + id);
+                    })
                 } else {
                     throw "Flow is crashed"
                 }
@@ -129,7 +162,7 @@ exports.deny = (req, res, next) => {
             })
 
     } else {
-        ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing license id");
+        ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Missing restaurant id");
     }
 };
 

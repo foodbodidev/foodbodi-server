@@ -14,3 +14,6 @@ router.get("/terms_of_service", (req, res, next) => {
 router.get("/login", (req, res, next) => {
   res.render('login')
 });
+router.get("/test-notification", (req, res, next) => {
+  res.render("test_notification");
+});

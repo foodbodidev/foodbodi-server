@@ -149,7 +149,7 @@ exports.mine = function(req, res, next) {
             query = query.where('date_string', "==", date_string);
         } else {
             query = query.where("owner", "==", currentUser);
-            query = query.orderBy("created_date", "desc").limit(50);
+            query = query.orderBy("created_date", "desc").limit(10);
         }
         if (doc !== null) {
             query = query.startAfter(doc);

@@ -7,3 +7,5 @@ __commentController     = require('./comment');
 licenseController       = require("./license");
 searchController = require("./search");
 dailyLogController = require("./daily_log");
+ingredientController = require("./ingredient");
+notificationController = require("./notification");

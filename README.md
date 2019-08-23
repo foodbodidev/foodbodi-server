@@ -1008,3 +1008,10 @@ Example :
 
 ### Search
 - GET /api/search?q=some+text+here
+
+### Notification
+- Add a realtime listener on ```notifications``` collection
+```
+db.collection("notifications").where("receiver", "==", "userid").where("read", "==", false).onSnapshot(function(snapshot => { ...do something here ...}));
+
+```

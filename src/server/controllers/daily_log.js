@@ -15,12 +15,22 @@ exports.get = (req, res, next) => {
     dailyLogDb.doc(id)
         .get()
         .then(doc => {
-            if (doc.exists) {
-                let log = new DailyLog(doc.data(), doc.id);
-                ErrorHandler.success(res, log.toJSON(true));
-            } else {
-                ErrorHandler.success(res, {})
-            }
+            let log = doc.exists ?  new DailyLog(doc.data(), doc.id) : new DailyLog({});
+            let date = Reservation.prototype.createDateString(parseInt(year), parseInt(month), parseInt(day));
+            reservationDb.where("date_string", "==", date).where("owner", "==", email)
+                .get()
+                .then(snapshot => {
+                    let result = [];
+                    let totalEat = 0;
+                    for (let doc of snapshot.docs) {
+                        let reser = new Reservation(doc.data(), doc.id);
+                        result.push(reser.toJSON());
+                        totalEat += !!reser.total() ? reser.total() : 0;
+                    }
+                    log.eat(totalEat);
+                    log.reservations(result);
+                    ErrorHandler.success(res, log.toJSON())
+                });
         }).catch(error => {
             ErrorHandler.error(res, ErrorCode.ERROR, error);
     })
@@ -32,25 +42,7 @@ exports.update = (req, res, next) => {
     let id = DailyLog.prototype.generateId(year, month, day, email);
    let updateLog = new DailyLog(req.body);
    new Promise((resolve, reject) => {
-      if (!!!updateLog.eat()) {
-          let date = Reservation.prototype.createDateString(parseInt(year), parseInt(month), parseInt(day));
-          reservationDb.where("date_string", "==", date)
-              .get()
-              .then(snapshot => {
-                  let result = [];
-                  let totalEat = 0;
-                  for (let doc of snapshot.docs) {
-                      let reser = new Reservation(doc.data(), doc.id);
-                      result.push(reser.toJSON());
-                      totalEat += !!reser.total() ? reser.total() : 0;
-                  }
-                  updateLog.eat(totalEat);
-                  updateLog.reservations(result);
-                  resolve(updateLog);
-              })
-      } else {
-          resolve(updateLog)
-      }
+       resolve(updateLog)
    }).then(data => {
       return dailyLogDb.doc(id).get()
    }).then(doc => {

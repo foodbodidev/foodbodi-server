@@ -14,6 +14,7 @@ function Restaurant(input, id) {
         this._license = new License(input.license);
     }
     if (input.name) this.values.name = input.name;
+    if (input.phone) this.values.phone = input.phone;
     if (input.creator) this.values.creator = input.creator;
     if (input.address) this.values.address = input.address;
     if (input.lat) this.values.lat = input.lat;

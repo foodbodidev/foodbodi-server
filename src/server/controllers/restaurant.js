@@ -16,6 +16,7 @@ let TokenHandler = require("../utils/token");
 
 let validator = require("validator");
 let ObjectTool = require("../utils/object_tools");
+let {notifyManager} = require("../controllers/license");
 const SECRET_LENGTH = 6;
 
 exports.create = (req, res, next) => {
@@ -64,6 +65,11 @@ exports.create = (req, res, next) => {
             restaurant.searchDoc(),
             (result) => console.log(result),
             error => console.log(error));
+        notifyManager(restaurant.id(), (result) => {
+            console.log("Send notify new restaurant success : " + restaurant.id())
+        }, error => {
+            console.log("Send notify new restaurant fail : " + restaurant.id())
+        })
     }).catch(error => {
         console.log(error);
         ErrorHandler.error(res, ErrorCodes.RESTAURANT_CREATE_FAIL, error.message);

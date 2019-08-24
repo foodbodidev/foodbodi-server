@@ -17,9 +17,8 @@ let Notification = require("../models/notification");
 let notificationDb = firestore.collection(Notification.prototype.collectionName);
 let {approve_license, reject_license} = require("./messages_factory");
 
-exports.notifyManager = (req, res, next) => {
+exports.notifyManager = (restaurant_id, successCb, errorCb) => {
     const apiKey = process.env.SENDGRID_API_KEY;
-    const {restaurant_id} = req.query;
     const template = "notify_new_license";
     var licenseInfo, restaurantInfo, bossInfo, bossId;
     if (apiKey) {
@@ -55,13 +54,13 @@ exports.notifyManager = (req, res, next) => {
                 throw "Missing email config " + template;
             }
         }).then(result => {
-            ErrorHandler.success(res, {message : "Email sent"})
+            successCb(result);
         }).catch(error => {
-            ErrorHandler.error(res, ErrorCodes.ERROR, error);
+            errorCb(error);
         });
 
     } else {
-        ErrorHandler.error(res, ErrorCodes.ERROR, "Mail service has not been set up");
+        errorCb("Mail service has not been set up");
     }
 };
 

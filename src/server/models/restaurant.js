@@ -37,7 +37,9 @@ function Restaurant(input, id) {
     if (input.last_updater) this.values.last_updater = input.last_updater;
     if (input.created_date) this.values.created_date = input.created_date;
     if (input.last_updated_date) this.values.last_updated_date = input.last_updated_date;
+    //TODO : remove photo field
     if (input.photo) this.values.photo = input.photo;
+    if (input.photos) this.values.photos = input.photos;
 
     if (input.calo_values) this.values.calo_values = input.calo_values;
 
@@ -223,7 +225,7 @@ Restaurant.prototype.changeCalo = function(oldValue, newValue) {
 };
 
 Restaurant.prototype.validateInput = function(input, create) {
-    let {name, address, category, type, lat, lng, open_hour, close_hour, priority, foods, photo} = input;
+    let {name, address, category, type, lat, lng, open_hour, close_hour, priority, foods, photo, photos} = input;
     if (create) {
         if (!input.hasOwnProperty("name")) return "Name is required";
         if (!input.hasOwnProperty("address")) return "Address is required"
@@ -244,6 +246,7 @@ Restaurant.prototype.validateInput = function(input, create) {
     if (!!priority) return "Update priority directly is not allowed";
     if (!!foods && !Array.isArray(foods)) return "Foods must be an array of food";
     if (!!photo && (typeof photo) !== "string") return "Photo must be a link";
+    if (!!photos && !Array.isArray(photos)) return "Photo must be an array of link";
     if (!!foods) {
         for (let food of foods) {
             food.restaurant_id = "nonce";
@@ -275,7 +278,7 @@ Restaurant.prototype.searchDoc = function() {
     return {
         name : this.values.name,
         address : this.values.address || null,
-        photo : this.values.photo || null
+        photos : this.values.photos || []
     }
 };
 

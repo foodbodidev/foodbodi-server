@@ -22,6 +22,8 @@ const axios = require('axios');
 const ErrorHandler = require("../utils/response_handler");
 const ErrorCodes = require("../utils/error_codes");
 
+let logger = require("../environments/logger")();
+
 let createUserInfo = (input) => {
     let {sex, height, weight, target_weight, age, first_name, last_name} = input;
     let data = {
@@ -39,13 +41,13 @@ let createUserInfo = (input) => {
 };
 
 async function verify(token) {
-    console.info("Verify google token " + token);
+    logger.info("Verify google token " + token);
     const ticket = await client.verifyIdToken({
         idToken: token,
         audience: [iOS_CLIENT_ID, WEB_CLIENT_ID]
     });
     const payload = ticket.getPayload();
-    console.info("Google account " + JSON.stringify(payload));
+    logger.info("Google account " + JSON.stringify(payload));
     return payload;
 }
 
@@ -65,19 +67,19 @@ router.post('/login', function(req, res, next) {
                     const data = doc.data();
                     delete data.password;
                     if (hashPassword === savedHash) {
-                        console.info("User login " + JSON.stringify(doc.data()));
+                        logger.info("User login " + JSON.stringify(doc.data()));
                         ErrorHandler.success(res, {
                             user : data,
                             token : tokenHandler.createToken({email: doc.id})
                         });
                     } else {
-                        console.warn("Wrong password : " + email + "-" + password);
+                        logger.warn("Wrong password : " + email + "-" + password);
                         ErrorHandler.error(res, ErrorCodes.UNAUTHORIZED, "Wrong password");
                     }
                 }
             })
             .catch(err => {
-                console.error('Error getting document', err);
+                logger.error('Error getting document : ' + err);
                 ErrorHandler.error(res, ErrorCodes.LOGIN_EXCEPTION, "Login fail");
             });
 
@@ -111,7 +113,7 @@ router.post("/register", (req, res, next) => {
                 }
             })
             .catch(err => {
-                console.error('Error getting document', err);
+                logger.error('Error getting document ' + err);
                 ErrorHandler.error(res, ErrorCodes.ERROR, "Register fail");
             });
 

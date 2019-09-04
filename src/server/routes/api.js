@@ -214,7 +214,7 @@ router.post("/googleSignIn", (req, res, next) => {
                             userInfo.need_password = false;
                             userRef.set(userInfo).then(result => {
                                 ErrorHandler.success(res, {
-                                    data : result.data(),
+                                    data : userInfo,
                                     token : tokenHandler.createToken({email : email})
                                 });
                             });
@@ -251,6 +251,7 @@ router.post('/facebookSignIn', (req, res, next) => {
         axios.get(url)
             .then(response => {
                const json = response.data;
+               logger.info("Facebook token data " + JSON.stringify(json));
                if (json && json.email) {
                    let userRef = firestore.collection('users').doc(json.email);
                    let getDoc = userRef.get()
@@ -261,7 +262,7 @@ router.post('/facebookSignIn', (req, res, next) => {
                                userInfo.need_password = false;
                                userRef.set(userInfo).then(result => {
                                    ErrorHandler.success(res, {
-                                       data : result.data(),
+                                       data : userInfo,
                                        token : tokenHandler.createToken({email : json.email})
                                    });
                                });

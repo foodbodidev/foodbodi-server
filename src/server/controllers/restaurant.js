@@ -21,6 +21,7 @@ const SECRET_LENGTH = 6;
 
 exports.create = (req, res, next) => {
     const restaurant = new Restaurant(req.body);
+    restaurant.calculateNeighbour();
     const creator = TokenHandler.getEmail(req);
     restaurant.creator(creator);
     restaurant.created_date(new Date());
@@ -102,6 +103,7 @@ exports.update = (req, res, next) => {
     let {id} = req.params;
     if (id) {
         let update_data = new Restaurant(req.body);
+        update_data.calculateNeighbour();
         let oldData;
         let ref = firestore.collection(Restaurant.prototype.collectionName()).doc(id);
         ref.get().then(doc => {

@@ -29,6 +29,9 @@ function Restaurant(input, id) {
     if (input.geohash) {
         this.values.geohash = input.geohash;
     }
+    if (input.neighbour_geohash) {
+        this.values.neighbour_geohash = input.neighbour_geohash;
+    }
     else if (this.values.lat && this.values.lng){
       this.values.geohash = Geohash.encode(this.values.lat, this.values.lng, this.geo_hash_precision);
     }
@@ -166,6 +169,22 @@ Restaurant.prototype.id = function(value) {
         this.values.id = value
     }
     return this.values.id;
+};
+
+Restaurant.prototype.getNeighbours = function() {
+    return this.values.neighbour_geohash
+};
+
+Restaurant.prototype.calculateNeighbour = function() {
+    const neighbours  = Geohash.neighbours(this.values.geohash);
+    //reverse the map to get a map of : geohash -> true
+    let result = [];
+    result.push(this.values.geohash);
+    for (let direction of Object.keys(neighbours)) {
+        result.push(neighbours[direction])
+    }
+    this.values.neighbour_geohash = result;
+
 };
 
 Restaurant.prototype.collectionName = function() {

@@ -176,14 +176,17 @@ Restaurant.prototype.getNeighbours = function() {
 };
 
 Restaurant.prototype.calculateNeighbour = function() {
-    const neighbours  = Geohash.neighbours(this.values.geohash);
-    //reverse the map to get a map of : geohash -> true
-    let result = [];
-    result.push(this.values.geohash);
-    for (let direction of Object.keys(neighbours)) {
-        result.push(neighbours[direction])
+    if (this.values.geohash) {
+        const neighbours = Geohash.neighbours(this.values.geohash);
+        //reverse the map to get a map of : geohash -> true
+        let result = [];
+        result.push(this.values.geohash);
+        for (let direction of Object.keys(neighbours)) {
+            result.push(neighbours[direction])
+        }
+        this.values.neighbour_geohash = result;
     }
-    this.values.neighbour_geohash = result;
+    return this.values.neighbour_geohash;
 
 };
 

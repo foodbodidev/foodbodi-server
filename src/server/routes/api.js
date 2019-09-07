@@ -252,18 +252,18 @@ router.post('/facebookSignIn', (req, res, next) => {
             .then(response => {
                const json = response.data;
                logger.info("Facebook token data " + JSON.stringify(json));
-               if (json && json.email) {
-                   let userRef = firestore.collection('users').doc(json.email);
+               if (json && json.id) {
+                   let userRef = firestore.collection('users').doc(json.id);
                    let getDoc = userRef.get()
                        .then(doc => {
                            if (!doc.exists) {
-                               let docRef = firestore.collection("users").doc(json.email);
+                               let docRef = firestore.collection("users").doc(json.id);
                                let userInfo = createUserInfo(req.body);
                                userInfo.need_password = false;
                                userRef.set(userInfo).then(result => {
                                    ErrorHandler.success(res, {
                                        data : userInfo,
-                                       token : tokenHandler.createToken({email : json.email})
+                                       token : tokenHandler.createToken({email : json.id})
                                    });
                                });
                            } else {
@@ -279,7 +279,7 @@ router.post('/facebookSignIn', (req, res, next) => {
                        })
 
                } else {
-                   ErrorHandler.error(res, ErrorCodes.FACEBOOK_LOGIN_FAIL, "Missing email");
+                   ErrorHandler.error(res, ErrorCodes.FACEBOOK_LOGIN_FAIL, "Missing facebook id");
                }
             }).catch(error => {
                 console.warn(JSON.stringify(error));

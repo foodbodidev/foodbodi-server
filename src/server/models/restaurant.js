@@ -20,8 +20,14 @@ function Restaurant(input, id) {
     if (input.lat) this.values.lat = input.lat;
     if (input.lng) this.values.lng = input.lng;
 
-    if (input.type) this.values.type = input.type;
-    if (input.category) this.values.category = input.category;
+    if (input.type) {
+        this.values.type = input.type;
+        this.values.type_name = Type[input.type].name
+    }
+    if (input.category) {
+        this.values.category = input.category;
+        this.values.category_name = Category[input.category].name;
+    }
     if (input.open_hour) this.values.open_hour = input.open_hour;
     if (input.close_hour) this.values.close_hour = input.close_hour;
     if (id) this.values.id = id;
@@ -110,6 +116,7 @@ Restaurant.prototype.license = function(value) {
 Restaurant.prototype.type = function(value) {
     if (value) {
         this.values.type = value;
+        this.values.type_name = Type[value].name
     }
     return this.values.type;
 };
@@ -130,6 +137,7 @@ Restaurant.prototype.closeHour = function(value) {
 
 Restaurant.prototype.toJSON = function(includeSecret) {
     let result = ObjTool.clone(this.values);
+
 
     if (this._license) {
         result.license = this._license.toJSON(includeSecret);

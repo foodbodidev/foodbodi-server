@@ -11,7 +11,7 @@ const foodDb = firestore.collection(Food.prototype.collectionName());
 const restaurantDb = firestore.collection(Restaurant.prototype.collectionName());
 
 exports.create = function (req, res, next) {
-    let {foods, restaurant_id} = req.body;
+    let {foods, restaurant_id, date_string} = req.body;
 
     let restuarantRef = restaurantDb.doc(restaurant_id);
     let reservation = new Reservation({});
@@ -19,6 +19,7 @@ exports.create = function (req, res, next) {
     reservation.restaurant_id(restaurant_id);
     reservation.owner(TokenHandler.getEmail(req));
     reservation.create_date(new Date().getTime());
+    reservation.date_string(date_string);
 
     let amountMap = {};
     let id = Reservation.prototype.createId(restaurant_id, TokenHandler.getEmail(req));

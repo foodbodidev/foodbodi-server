@@ -25,7 +25,7 @@ const ErrorCodes = require("../utils/error_codes");
 let logger = require("../environments/logger")();
 
 let createUserInfo = (input) => {
-    let {sex, height, weight, target_weight, age, first_name, last_name} = input;
+    let {sex, height, weight, target_weight, age, first_name, last_name, email} = input;
     let data = {
         age : age || 0,
         sex : sex || "MALE",
@@ -34,7 +34,8 @@ let createUserInfo = (input) => {
         target_weight : target_weight || 0,
         first_name : first_name || "",
         last_name : last_name || "",
-        daily_calo : 2500
+        daily_calo : 2500,
+        email : email
     };
     return data;
 
@@ -211,6 +212,7 @@ router.post("/googleSignIn", (req, res, next) => {
                         if (!doc.exists) {
                             let docRef = firestore.collection("users").doc(email);
                             let userInfo = createUserInfo(req.body);
+                            userInfo.email = email;
                             userInfo.need_password = false;
                             userRef.set(userInfo).then(result => {
                                 ErrorHandler.success(res, {
@@ -259,6 +261,7 @@ router.post('/facebookSignIn', (req, res, next) => {
                            if (!doc.exists) {
                                let docRef = firestore.collection("users").doc(json.id);
                                let userInfo = createUserInfo(req.body);
+                               userInfo.email = json.id
                                userInfo.need_password = false;
                                userRef.set(userInfo).then(result => {
                                    ErrorHandler.success(res, {

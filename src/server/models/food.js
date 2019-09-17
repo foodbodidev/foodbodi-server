@@ -10,6 +10,7 @@ function Food(input, id) {
     }
     this._created_date = input.created_date || null;
     this._photo = input.photo || null;
+    this._trash = input.trash || false;
 }
 
 Food.prototype.name = function(value) {
@@ -63,7 +64,8 @@ Food.prototype.toJSON = function() {
         price: this._price,
         description: this._description,
         created_date : this._created_date,
-        photo : this._photo
+        photo : this._photo,
+        trash : this._trash
     };
     if (this._id) {
         result.id = this._id
@@ -77,6 +79,11 @@ Food.prototype.id = function(value) {
         this._id = value
     }
     return this._id;
+};
+
+Food.prototype.markAsTrash = function() {
+    this._trash = true;
+    return this;
 };
 
 Food.prototype.created_date = function(value) {

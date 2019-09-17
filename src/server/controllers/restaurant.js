@@ -172,6 +172,7 @@ exports.listFood = (req, res, next) => {
     if (id) {
         firestore.collection(Food.prototype.collectionName())
             .where("restaurant_id", "==", id)
+            .where("trash", "==", false)
             .get()
             .then(snapshot => {
                 let result = [];

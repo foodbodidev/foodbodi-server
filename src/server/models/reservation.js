@@ -32,7 +32,7 @@ Reservation.prototype.createDateString = function(year, month, day) {
 };
 
 Reservation.prototype.total = function(value) {
-    if (value) {
+    if (typeof value === "number") {
         this.values.total = value;
     }
     return this.values.total;

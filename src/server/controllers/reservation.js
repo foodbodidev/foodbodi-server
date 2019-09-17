@@ -118,8 +118,10 @@ exports.get = function(req, res, next) {
 
         }).then(snapshots => {
             for (let snapshot of snapshots) {
-                let f = new Food(snapshot.data(), snapshot.id);
-                foods[f.id()] = f.toJSON();
+                if (snapshot.exists) {
+                    let f = new Food(snapshot.data(), snapshot.id);
+                    foods[f.id()] = f.toJSON();
+                }
             }
 
             ErrorHandler.success(res, {

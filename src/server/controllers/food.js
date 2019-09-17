@@ -145,8 +145,9 @@ exports.delete = (req, res, next) => {
                         throw "Wrong return doc for food or restaurant"
                     }
                     let food = new __Food(docs[0].data(), docs[0].id);
+                    food.markAsTrash();
                     let restaurant = new Restaurant(docs[1].data(), docs[1].id);
-                    t.delete(foodDB.doc(id));
+                    t.update(foodDB.doc(id), food.toJSON());
                     restaurant.removeCalo(food.calo());
                     t.update(restaurantDB.doc(food.restaurant_id()), restaurant.getCaloValuesJSON())
 

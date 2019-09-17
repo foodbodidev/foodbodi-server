@@ -26,6 +26,7 @@ exports.get = (req, res, next) => {
                         let reser = new Reservation(doc.data(), doc.id);
                         result.push(reser.toJSON());
                         totalEat += !!reser.total() ? reser.total() : 0;
+
                     }
                     log.eat(totalEat);
                     log.reservations(result);

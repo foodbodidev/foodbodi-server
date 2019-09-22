@@ -34,13 +34,14 @@ function Restaurant(input, id) {
 
     if (input.geohash) {
         this.values.geohash = input.geohash;
+    } else if (this.values.lat && this.values.lng){
+        this.values.geohash = Geohash.encode(this.values.lat, this.values.lng, this.geo_hash_precision);
     }
+
     if (input.neighbour_geohash) {
         this.values.neighbour_geohash = input.neighbour_geohash;
     }
-    else if (this.values.lat && this.values.lng){
-      this.values.geohash = Geohash.encode(this.values.lat, this.values.lng, this.geo_hash_precision);
-    }
+
     this.values.priority = input.priority || 10;
 
     if (input.last_updater) this.values.last_updater = input.last_updater;

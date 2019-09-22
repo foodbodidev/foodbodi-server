@@ -216,7 +216,7 @@ router.post("/googleSignIn", (req, res, next) => {
                             userInfo.need_password = false;
                             userRef.set(userInfo).then(result => {
                                 ErrorHandler.success(res, {
-                                    data : userInfo,
+                                    user : userInfo,
                                     token : tokenHandler.createToken({email : email})
                                 });
                             });
@@ -224,7 +224,7 @@ router.post("/googleSignIn", (req, res, next) => {
                             let data = doc.data();
                             delete data.password;
                             ErrorHandler.success(res, {
-                                data : data,
+                                user : data,
                                 token : tokenHandler.createToken({email : doc.id})
                             });
                         }
@@ -265,7 +265,7 @@ router.post('/facebookSignIn', (req, res, next) => {
                                userInfo.need_password = false;
                                userRef.set(userInfo).then(result => {
                                    ErrorHandler.success(res, {
-                                       data : userInfo,
+                                       user : userInfo,
                                        token : tokenHandler.createToken({email : json.id})
                                    });
                                });
@@ -273,7 +273,7 @@ router.post('/facebookSignIn', (req, res, next) => {
                                let data = doc.data();
                                delete data.password;
                                ErrorHandler.success(res, {
-                                   data : data,
+                                   user : data,
                                    token : tokenHandler.createToken({email : doc.id})
                                });
                            }

@@ -11,7 +11,7 @@ exports.search = function(req, res, next) {
       const words = Stemmer.defaultStem(q);
       let promises = [];
       for (let word of words) {
-          promises.push(CatalogDb.where("word", ">=", word).where("word", "<", getSuccessor(word)).get())
+          promises.push(CatalogDb.where("word", ">=", word).where("word", "<", getSuccessor(word)).limit(100).get())
       }
       Promise.all(promises)
           .then(snapshots => {

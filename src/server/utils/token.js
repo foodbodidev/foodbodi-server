@@ -5,10 +5,10 @@ token_handler.createToken = (user) => {
     const salt = process.env.SALT || "secret";
     let {email} = user;
     let isAdmin = user.hasOwnProperty("is_admin") ? user.is_admin : false;
-    let payload = {
+    let payload = JSON.stringify({
         email : email,
         is_admin : isAdmin
-    }.toString();
+    });
     const hashMessage = payload + salt;
     const hashValue = hash(hashMessage);
     const tokenRaw = payload + "-" + hashValue;

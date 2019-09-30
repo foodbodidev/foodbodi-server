@@ -1,5 +1,6 @@
 {
-  "to" : "|duyy.uit@gmail.com",
+  "to" : "|dktjdqls125@naver.com",
+  "cc" : "|duyy.uit@gmail.com",
   "from" : "|foodbodidev95@gmail.com",
   "subject" : "|Foodbodi - License of #{restaurantInfo.name} need to be verified"
 }

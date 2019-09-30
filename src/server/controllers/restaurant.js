@@ -150,7 +150,8 @@ exports.update = (req, res, next) => {
 exports.delete = (req, res, next) => {
     let {id} = req.params;
     if (id) {
-        firestore.collection(Restaurant.prototype.collectionName()).doc(id).detete().then(() => {
+        firestore.collection(Restaurant.prototype.collectionName()).doc(id).delete()
+            .then(() => {
             //TODO : find cron op to delete foods
             ErrorHandler.success(res, {});
         }).catch(err => {

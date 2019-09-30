@@ -2,7 +2,7 @@ let CryptoJS = require("crypto-js");
 let {hash} = require("./password");
 let token_handler = {};
 token_handler.createToken = (user) => {
-    const salt = "secret"; //TODO : make this environment varible
+    const salt = process.env.SALT || "secret";
     let {email} = user;
     let isAdmin = user.hasOwnProperty("is_admin") ? user.is_admin : false;
     let payload = {
@@ -19,7 +19,7 @@ token_handler.createToken = (user) => {
 
 token_handler.verifyToken = (token) => {
     let result = {};
-    const salt = "secret"; //TODO : make this environment varible
+    const salt = process.env.SALT || "secret";
     const parsedWordArray = CryptoJS.enc.Base64.parse(token);
     const parsedStr = parsedWordArray.toString(CryptoJS.enc.Utf8);
     let parts = parsedStr.split("-");

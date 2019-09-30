@@ -35,7 +35,8 @@ let createUserInfo = (input) => {
         first_name : first_name || "",
         last_name : last_name || "",
         daily_calo : 2500,
-        email : email
+        email : email,
+        is_admin : false
     };
     return data;
 

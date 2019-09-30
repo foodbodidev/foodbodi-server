@@ -4,9 +4,14 @@ let token_handler = {};
 token_handler.createToken = (user) => {
     const salt = "secret"; //TODO : make this environment varible
     let {email} = user;
-    const hashMessage = email + salt;
+    let isAdmin = user.hasOwnProperty("is_admin") ? user.is_admin : false;
+    let payload = {
+        email : email,
+        is_admin : isAdmin
+    }.toString();
+    const hashMessage = payload + salt;
     const hashValue = hash(hashMessage);
-    const tokenRaw = email + "-" + hashValue;
+    const tokenRaw = payload + "-" + hashValue;
     const wordArray = CryptoJS.enc.Utf8.parse(tokenRaw);
     const base64 = CryptoJS.enc.Base64.stringify(wordArray);
     return base64;
@@ -19,12 +24,12 @@ token_handler.verifyToken = (token) => {
     const parsedStr = parsedWordArray.toString(CryptoJS.enc.Utf8);
     let parts = parsedStr.split("-");
     if (parts.length === 2) {
-        const email = parts[0];
+        const raw = parts[0];
         const hashValue = parts[1];
-        let hashMessage = email + salt;
+        let hashMessage = raw + salt;
         let hashValue2 = hash(hashMessage);
         if (hashValue === hashValue2) {
-            result.email = email;
+            result = JSON.parse(raw);
             return result;
         } else {
             return null;
@@ -36,6 +41,10 @@ token_handler.verifyToken = (token) => {
 
 token_handler.getEmail = (req) => {
     return req.token_data.email;
+};
+
+token_handler.isAdmin = (req) => {
+    return req.token_data.is_admin || false;
 };
 
 module.exports = token_handler;

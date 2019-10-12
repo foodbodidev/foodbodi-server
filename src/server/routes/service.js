@@ -2,10 +2,6 @@ var express = require('express');
 const path = require('path');
 const router = module.exports = express.Router()
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.sendFile(path.join(__dirname + "/../views/index.html"));
-});
 router.get('/contact', function(req, res, next) {
   res.sendFile(path.join(__dirname + "/../views/contact.html"));
 });
@@ -26,4 +22,8 @@ router.get("/login", (req, res, next) => {
 });
 router.get("/test-notification", (req, res, next) => {
   res.render("test_notification");
+});
+
+router.get("/admin_app", (req, res, next) => {
+  res.sendFile(path.join(__dirname + "/../views/admin_app.html"))
 });

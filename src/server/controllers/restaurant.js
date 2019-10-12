@@ -191,17 +191,40 @@ exports.listFood = (req, res, next) => {
 };
 
 exports.list = (req, res, next) => {
-    firestore.collection(Restaurant.prototype.collectionName())
-        .orderBy("priority").get()
-        .then(snapshot => {
-            let result = [];
-            snapshot.docs.forEach(item => {
-                let r = new Restaurant(item.data(), item.id);
-                result.push(r.toJSON(false));
-            });
-            ErrorHandler.success(res, {restaurants : result});
-        }).catch(err => {
-            ErrorHandler.error(res, ErrorCodes.ERROR, err.message);
+    let {nextPageToken} = req.query;
+    new Promise((resolve, reject) => {
+        if (!!nextPageToken) {
+            firestore.collection(Restaurant.prototype.collectionName()).doc(nextPageToken).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        resolve(doc)
+                    } else {
+                        resolve(null)
+                    }
+                })
+        } else {
+            resolve(null)
+        }
+    }).then(doc => {
+        let q = firestore.collection(Restaurant.prototype.collectionName());
+        if (doc !== null ) {
+            q = q.startAfter(doc)
+        }
+        q = q.limit(10);
+        return q.get()
+    }).then(snapshot => {
+        let result = [];
+        let nextPageToken = null;
+        snapshot.docs.forEach(item => {
+            let r = new Restaurant(item.data(), item.id);
+            result.push(r.toJSON(false));
+        });
+        if (snapshot.docs.length > 0) {
+            nextPageToken = snapshot.docs[snapshot.docs.length - 1].id;
+        }
+        ErrorHandler.success(res, {restaurants: result, nextPageToken : nextPageToken});
+    }).catch(err => {
+        ErrorHandler.error(res, ErrorCodes.ERROR, err.message);
     });
 };
 

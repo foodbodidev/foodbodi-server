@@ -1,0 +1,74 @@
+This document is to guide to partners who are going to help Foodbodi to collect data manually
+
+1. For each restaurant, please create a separate file. This file must ends with ".json".
+- For example, if your restaurant's name is GoodRestaurant, you should create a file name good_restaurant.json.
+
+2. Open that file, copy below code and paste to it. See sample.json for example
+{
+  "name" : "Restaurant name",
+  "address" : [
+    "Address 1",
+    "Address 2"
+  ],
+  "open_hour" : "8:00",
+  "close_hour" : "21:00",
+  "type" : "RESTAURANT",
+  "category" : "FAST_FOOD",
+  "photos" : [
+    "https://exmaple.image.jpg",
+    "https://exmaple.image2.png"
+  ],
+  "foods" : [
+    {
+      "name" : "Food name 1",
+      "price" : 10.5,
+      "kcalo" : 100,
+      "photo" : "https://example.image.png"
+    },
+    {
+      "name" : "Food name 2",
+      "price" : 7.75,
+      "kcalo" : 70,
+      "photo" : "https://example.image.png"
+    },
+    {
+      "name" : "Food name 3",
+      "price" : 11,
+      "kcalo" : 50,
+      "photo" : "https://example.image.png"
+    }
+  ]
+}
+3. Edit your restaurant name. For example, your restaurant's name is KFC, change field "name" to this : "name" : "KFC"
+
+4. Edit your restaurant addresses.
+- For example, if there is only 1 address :
+"address" : [
+    "Address here"
+]
+- For example, if there are 2 addresses :
+"address" : [
+    "Address here 1",
+    "Address here 2"
+]
+and so on
+
+5.Edit the open hour & close hour. Text must be in correct format like in the sample
+
+6.Edit the "type". There are 2 type : restaurant & food truct
+- If yours is a restaurant, edit the "type" to this :
+"type" : "RESTAURANT"
+- If yours is a food truct, edit it to this :
+"type" : "FOOD_TRUCK"
+
+7.Edit the "type". There are 3 category now: Fast food, Regular food and egetarian food
+  - If yours is a Fast food, edit the "category" to this :
+  "category" : "FAST_FOOD"
+  - If yours is Regular food, edit it to this :
+  "category" : "ORDINARY"
+   - If yours is egetarian food, edit it to this :
+    "category" : "VEGETARIAN"
+
+8.Add foods. Please look at the sample and do like the same. Each food will be include between "{" and "}".
+
+

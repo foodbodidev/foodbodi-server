@@ -1,0 +1,31 @@
+extends layout
+block content
+
+    script(src="https://www.gstatic.com/firebasejs/6.4.0/firebase-app.js")
+    script(src="https://www.gstatic.com/firebasejs/6.4.0/firebase-firestore.js")
+    script.
+        // Initialize Cloud Firestore through Firebase
+        firebase.initializeApp({
+            apiKey: 'AIzaSyD8HCDmfiqtqOxJXqlgDWqVoPZFae8tCFI',
+            authDomain: 'foodbodi.firebaseapp.com',
+            projectId: 'foodbodi'
+        });
+
+        var db = firebase.firestore();
+        db.collection("notifications").where("receiver", "==", "y@test.com").where("read", "==", false).onSnapshot(function(snapshot) {
+            var nots = [];
+            snapshot.forEach(function (doc) {
+                nots.push(doc.data().message);
+            });
+            console.log("Current notifications ", nots.join(", "));
+        })
+
+        db.collection("restaurants").where("neighbour_geohash", "array-contains", "w3gv7")
+        .onSnapshot(function(snapshot) {
+            var res = [];
+            snapshot.forEach(function (doc) {
+                res.push(doc.data().name + " - " + doc.data().geohash);
+            });
+            console.log("Current restaurants ", res.join(", "));
+        })
+

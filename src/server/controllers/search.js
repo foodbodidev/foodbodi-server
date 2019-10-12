@@ -9,9 +9,10 @@ exports.search = function(req, res, next) {
   let {q} = req.query;
   if (q) {
       const words = Stemmer.defaultStem(q);
+      let length = words.length;
       let promises = [];
       for (let word of words) {
-          promises.push(CatalogDb.where("word", ">=", word).where("word", "<", getSuccessor(word)).limit(100).get())
+          promises.push(CatalogDb.where("word", "==", word).limit(100).get())
       }
       Promise.all(promises)
           .then(snapshots => {
@@ -34,8 +35,9 @@ exports.search = function(req, res, next) {
                   }
 
                   let arr = Object.values(map);
-                  let sorted = arr.sort((a, b) => {
-                      return a.count > b.count
+                  let sorted = arr.filter(item => item.count === length)
+                      .sort((a, b) => {
+                      return a.count < b.count
                   });
 
                   ErrorHandler.success(res, sorted);

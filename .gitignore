@@ -1,3 +1,4 @@
 /src/server/node_modules
 *.iml
 /credentials
+/src/server/views/homepage

@@ -296,12 +296,8 @@ Restaurant.prototype.validateInput = function(input, create) {
 };
 
 Restaurant.prototype.searchText = function() {
-    if (ObjTool.isValue(this.name()) && ObjTool.isValue(this.address())) {
-        return this.name() + " " + this.address();
-    } else if (ObjTool.isValue(this.name())) {
+    if (ObjTool.isValue(this.name())) {
         return this.name();
-    } else if (ObjTool.isValue(this.address())) {
-        return this.address();
     } else return null;
 };
 

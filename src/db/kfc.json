@@ -1,0 +1,93 @@
+{
+  "name" : "KFC",
+  "address" : [
+    "Address 1",
+    "Address 2",
+    "Address 1",
+    "Address 2",
+    "Address 1",
+    "Address 2"
+  ],
+  "open_hour" : "8:00",
+  "close_hour" : "21:00",
+  "type" : "RESTAURANT",
+  "category" : "FAST_FOOD",
+  "photos" : [
+    "https://exmaple.image.jpg",
+    "https://exmaple.image2.png"
+  ],
+  "foods" : [
+    {
+      "name" : "Food name 1",
+      "price" : 10.5,
+      "kcalo" : 100,
+      "photo" : "https://example.image.png"
+    },
+    {
+      "name" : "Food name 2",
+      "price" : 7.75,
+      "kcalo" : 70,
+      "photo" : "https://example.image.png"
+    },
+    {
+      "name" : "Food name 3",
+      "price" : 11,
+      "kcalo" : 50,
+      "photo" : "https://example.image.png"
+    },
+    {
+      "name" : "Food name 1",
+      "price" : 10.5,
+      "kcalo" : 100,
+      "photo" : "https://example.image.png"
+    },
+    {
+      "name" : "Food name 2",
+      "price" : 7.75,
+      "kcalo" : 70,
+      "photo" : "https://example.image.png"
+    },
+    {
+      "name" : "Food name 3",
+      "price" : 11,
+      "kcalo" : 50,
+      "photo" : "https://example.image.png"
+    },
+    {
+      "name" : "Food name 1",
+      "price" : 10.5,
+      "kcalo" : 100,
+      "photo" : "https://example.image.png"
+    },
+    {
+      "name" : "Food name 2",
+      "price" : 7.75,
+      "kcalo" : 70,
+      "photo" : "https://example.image.png"
+    },
+    {
+      "name" : "Food name 3",
+      "price" : 11,
+      "kcalo" : 50,
+      "photo" : "https://example.image.png"
+    },
+    {
+      "name" : "Food name 1",
+      "price" : 10.5,
+      "kcalo" : 100,
+      "photo" : "https://example.image.png"
+    },
+    {
+      "name" : "Food name 2",
+      "price" : 7.75,
+      "kcalo" : 70,
+      "photo" : "https://example.image.png"
+    },
+    {
+      "name" : "Food name 3",
+      "price" : 11,
+      "kcalo" : 50,
+      "photo" : "https://example.image.png"
+    }
+  ]
+}

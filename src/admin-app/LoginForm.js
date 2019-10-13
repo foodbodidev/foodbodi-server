@@ -13,13 +13,34 @@ class LoginForm extends React.Component {
             username : null,
             password : null
         }
+
+        this.style = {
+            container: {
+                display: 'flex',
+                flexWrap: 'wrap',
+                marginTop: "100px",
+            },
+            textField: {
+                marginLeft: "10px",
+                marginRight: "10px",
+                marginTop: "10px"
+            },
+            centerBox: {
+                marginRight: "auto",
+                marginLeft: "auto",
+                width : "fit-content"
+            },
+            error : {
+                color : "red"
+            }
+        }
     }
 
     render() {
         return (
-            <div>
-                <Container>
-                    <Paper>
+            <div >
+                <Container style={this.style.container}>
+                    <Paper style={this.style.centerBox}>
                         <Typography variant="h5">Login</Typography>
                         <TextField
                             id="username"
@@ -28,6 +49,7 @@ class LoginForm extends React.Component {
                             onChange={this.handleChange('username')}
                             margin="normal"
                             variant="outlined"
+                            style={this.style.textField}
                         />
                         <TextField
                             id="password"
@@ -36,11 +58,12 @@ class LoginForm extends React.Component {
                             onChange={this.handleChange('password')}
                             margin="normal"
                             variant="outlined"
+                            style={this.style.textField}
                         />
                         <div>
-                        {!!this.state.error ? (<Typography variant="caption">{this.state.error}</Typography>) : null}
+                        {!!this.state.error ? (<Typography variant="caption" style={this.style.error}>{this.state.error}</Typography>) : null}
                         </div>
-                        <Button onClick={this.login}> Submit </Button>
+                        <Button onClick={this.login} variant="contained" color="primary"> Submit </Button>
                     </Paper>
 
                 </Container>

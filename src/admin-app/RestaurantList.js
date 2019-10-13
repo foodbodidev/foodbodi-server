@@ -16,18 +16,35 @@ import Button from '@material-ui/core/Button';
 import {Typography} from "@material-ui/core";
 import EditRestaurantView from "./EditRestaurantView";
 import Modal from '@material-ui/core/Modal';
+import AddBranchView from "./AddBranchView";
+import FoodsView from "./FoodsView";
+import Restaurant from ".././server/models/restaurant"
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 
 class RestaurantList extends React.Component{
     constructor(props) {
         super(props);
 
+        this.action = {
+            ADD : 0,
+            EDIT : 1,
+            CLONE : 2,
+            SHOW_FOOD : 3,
+            NONE : -1,
+        };
+
         this.state = {
             items : [],
             error : null,
             pageTokens : [],
-            isEditing : false,
-            editing_id : null
+            action : this.action.NONE,
+            editing_id : null,
+            restaurant : null
         };
 
        // this.delete = this.delete.bind(this);
@@ -35,6 +52,14 @@ class RestaurantList extends React.Component{
         this.backPage = this.backPage.bind(this);
         this.add = this.add.bind(this);
         this.modalClose = this.modalClose.bind(this);
+        this.onSubmitted = this.onSubmitted.bind(this);
+
+        this.modalStyles = {
+            paper: {
+                border: '2px solid #000',
+                marginTop : "100px"
+            },
+        }
 
     }
 
@@ -55,18 +80,22 @@ class RestaurantList extends React.Component{
             <div>
 
                 {this.state.error !== null ? this.renderError() : ""}
+
                 <Modal
                     aria-labelledby="simple-modal-title"
                     aria-describedby="simple-modal-description"
-                    open={this.state.isEditing}
+                    open={this.state.action !== this.action.NONE}
                     onClose={this.modalClose}
                 >
-                    <div>
-                       <EditRestaurantView restaurant_id={this.state.editing_id} onSubmitted={this.onSubmitted} onCancelled={this.modalClose}></EditRestaurantView>
+                    <div style={this.modalStyles.paper}>
+                        {this.action.CLONE === this.state.action ? (<AddBranchView restaurant_id={this.state.editing_id} onSubmitted={this.onSubmitted} onCancelled={this.modalClose}/>)
+                            : this.action.SHOW_FOOD === this.state.action ? (<FoodsView restaurant={this.state.restaurant} onCancelled={this.modalClose}/>)
+                                : (<EditRestaurantView restaurant_id={this.state.editing_id} onSubmitted={this.onSubmitted} onCancelled={this.modalClose}/>)}
                     </div>
                 </Modal>
+                <Typography variant="h6"> Restaurants </Typography>
                 <div>
-                    <Button onClick={this.add}>Add</Button>
+                    <Button onClick={this.add} variant="outlined" color="primary">Add</Button>
                 </div>
                 {this.renderRows()}
             </div>
@@ -90,19 +119,25 @@ class RestaurantList extends React.Component{
             <TableRow>
                 <TableCell>
                     {item.name}
+                    <div>
+                    <Button onClick={this.showFoods(item.id)} variant="contained" color="primary">Foods</Button>
+                        <Button onClick={this.edit(item.id)} data={item.id} variant="outlined" color="default">
+                            Edit
+                        </Button>
+                    </div>
                 </TableCell>
-                <TableCell>{item.address}</TableCell>
+                <TableCell>{item.address}
+                <div>
+                    <Button onClick={this.addBranch(item.id)} data={item.id} variant="outlined" color="primary">
+                        Add Branch
+                    </Button>
+                </div>
+                </TableCell>
                 <TableCell>{item.type}</TableCell>
                 <TableCell>{item.category}</TableCell>
                 <TableCell>{item.open_hour} ~ {item.close_hour}</TableCell>
                 <TableCell>
-                    <Button onClick={this.edit(item.id)} data={item.id}>
-                        Edit
-                    </Button>
-                    <Button onClick={this.edit(item.id)} data={item.id}>
-                        Add Branch
-                    </Button>
-                    <Button onClick={this.delete(item.id)} data={item.id}> Delete </Button>
+                    <Button onClick={this.delete(item.id)} data={item.id} variant="outlined" color="secondary"> Delete </Button>
                 </TableCell>
             </TableRow>
 
@@ -112,7 +147,6 @@ class RestaurantList extends React.Component{
         return (
             <Paper>
                 <div>
-                    <Typography variant="h6"> Restaurants </Typography>
                     <Table>
                         <TableBody>
                             {rows}
@@ -219,7 +253,7 @@ class RestaurantList extends React.Component{
     edit(id) {
         return (e) => {
             this.setState({
-                isEditing: true,
+                action : this.action.EDIT,
                 editing_id: id
             })
         }
@@ -228,30 +262,72 @@ class RestaurantList extends React.Component{
 
     delete(id) {
         return () => {
-
+            new RemoteCall("/api/restaurant/" + id)
+                .useJson()
+                .useDELETE()
+                .onJsonResponse(json => {
+                    if (0 === json.status_code) {
+                        this.refresh()
+                    } else {
+                        this.showError(json.message)
+                    }
+                }).onError(error => {
+                    this.showError(error.message)
+            }).execute()
         }
     }
 
     add(e) {
         this.setState({
-            isEditing : true,
+            action : this.action.ADD,
             editing_id : null
         })
     }
 
+    addBranch(id) {
+        return (e) => {
+            this.setState({
+                action : this.action.CLONE,
+                editing_id : id,
+
+            })
+        }
+    }
+
+    showFoods(id) {
+        return (e) => {
+            let r = this.findItem(id);
+            this.setState({
+                action : this.action.SHOW_FOOD,
+                editing_id : id,
+                restaurant : r
+            })
+        }
+    }
+
     modalClose() {
         this.setState({
-            isEditing : false,
+            action : this.action.NONE,
             editing_id : null
         })
     }
 
     onSubmitted(json) {
         this.setState({
-            isEditing : false,
+           action : this.action.NONE,
             editing_id : null
         });
+        this.refresh();
 
+    }
+
+    findItem(id) {
+        for (let item of this.state.items) {
+            if (item.id === id) {
+                return new Restaurant(item, id)
+            }
+        }
+        return null;
     }
 
 }

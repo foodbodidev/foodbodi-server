@@ -53,6 +53,8 @@ function Restaurant(input, id) {
 
     if (input.calo_values) this.values.calo_values = input.calo_values;
 
+    if (input.is_branch_of) this.values.is_branch_of = input.is_branch_of;
+
 }
 
 /*
@@ -81,7 +83,7 @@ Restaurant.prototype.category = function(value) {
 
 
 Restaurant.prototype.address = function(value) {
-    if (value) {
+    if (typeof value === "string" && value.length > 0) {
         this.values.address = value;
     }
     return this.values.address;
@@ -180,6 +182,13 @@ Restaurant.prototype.id = function(value) {
     return this.values.id;
 };
 
+Restaurant.prototype.isBranchOf = function(restaurant_id) {
+    if (restaurant_id) {
+        this.values.is_branch_of = restaurant_id
+    }
+    return this.values.is_branch_of;
+}
+
 Restaurant.prototype.getNeighbours = function() {
     return this.values.neighbour_geohash
 };
@@ -255,8 +264,13 @@ Restaurant.prototype.changeCalo = function(oldValue, newValue) {
     return this.values.calo_values;
 };
 
+Restaurant.prototype.getFoodRestaurantId = function() {
+    if (!!this.isBranchOf()) return this.isBranchOf();
+    else return this.id();
+};
+
 Restaurant.prototype.validateInput = function(input, create) {
-    let {name, address, category, type, lat, lng, open_hour, close_hour, priority, foods, photo, photos} = input;
+    let {name, address, category, type, lat, lng, open_hour, close_hour, foods, photo, photos} = input;
     if (create) {
         if (!input.hasOwnProperty("name")) return "Name is required";
         if (!input.hasOwnProperty("address")) return "Address is required"
@@ -274,7 +288,6 @@ Restaurant.prototype.validateInput = function(input, create) {
         return "Open hour must be a HH:mm";
     }
     if (!!close_hour && !hourRegex.test(close_hour)) return "Close hour must be HH:mm";
-    if (!!priority) return "Update priority directly is not allowed";
     if (!!foods && !Array.isArray(foods)) return "Foods must be an array of food";
     if (!!photo && (typeof photo) !== "string") return "Photo must be a link";
     if (!!photos && !Array.isArray(photos)) return "Photo must be an array of link";

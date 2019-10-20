@@ -54,7 +54,7 @@ class FoodsView extends React.Component{
     renderRow(item) {
         return (
                 <TableRow key={item.id}>
-                    <TableCell>
+                    <TableCell component="th" scope="row">
                         {item.name}
                     </TableCell>
                     <TableCell>
@@ -129,7 +129,7 @@ class FoodsView extends React.Component{
                     </div>
                     <Typography variant="h5"> List of dishes </Typography>
 
-                    <Table>
+                    <Table >
                         <TableBody>
                             {this.renderRows()}
                         </TableBody>

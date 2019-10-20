@@ -54,6 +54,7 @@ class LoginForm extends React.Component {
                         <TextField
                             id="password"
                             label="Password"
+                            type="password"
                             value={this.state.password}
                             onChange={this.handleChange('password')}
                             margin="normal"

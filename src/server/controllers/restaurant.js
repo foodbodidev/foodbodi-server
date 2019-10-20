@@ -18,6 +18,7 @@ let validator = require("validator");
 let ObjectTool = require("../utils/object_tools");
 let {notifyManager} = require("../controllers/license");
 const SECRET_LENGTH = 6;
+let Axios = require("axios");
 
 exports.create = (req, res, next) => {
     const restaurant = new Restaurant(req.body);

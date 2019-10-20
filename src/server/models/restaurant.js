@@ -102,6 +102,7 @@ Restaurant.prototype.creator = function(value) {
 Restaurant.prototype.location = function(lat, lng)  {
     if (!!lat && !!lng) {
         this.values.lng = lng;
+        this.values.lat = lat;
     }
     return {
         lat : this.values.lat,
@@ -320,6 +321,10 @@ Restaurant.prototype.searchDoc = function() {
         address : this.values.address || null,
         photos : this.values.photos || []
     }
+};
+
+Restaurant.prototype.hasLatLng = function() {
+    return this.values.lat !== null && this.values.lng !== null
 };
 
 module.exports = Restaurant;

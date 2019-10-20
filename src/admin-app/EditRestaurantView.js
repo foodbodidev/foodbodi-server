@@ -10,7 +10,7 @@ import { TextField } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Container from "@material-ui/core/Container";
 import License from "../../src/server/models/license";
-
+import PlacesAutocomplete, {geocodeByAddress, getLatLng} from "react-places-autocomplete";
 
 
 class EditRestaurantView extends React.Component {
@@ -24,6 +24,8 @@ class EditRestaurantView extends React.Component {
         this.handleChange = this.handleChange.bind(this);
         this.submit = this.submit.bind(this);
         this.cancel = this.cancel.bind(this);
+        this.handleSelectAddress = this.handleSelectAddress.bind(this);
+        this.handleChangeAddress = this.handleChangeAddress.bind(this);
 
         this.style = {
             container: {
@@ -42,6 +44,21 @@ class EditRestaurantView extends React.Component {
             },
             error : {
                 color : "red"
+            },
+            autoCompleteDropDownContainer : {
+                paddingLeft : "10px",
+                paddingRight : "10px"
+            },
+            suggestionItem : {
+                backgroundColor: '#ffffff',
+                cursor: 'pointer'
+            },
+            suggestionItemActive : {
+                backgroundColor: '#fafafa',
+                cursor: 'pointer'
+            },
+            addressInputContainer : {
+                width: "90%"
             }
         }
 
@@ -86,45 +103,81 @@ class EditRestaurantView extends React.Component {
                     <TextField
                         id="name"
                         style={this.style.textField}
+                        InputLabelProps={{ shrink: true }}
+                        fullWidth
                         label="Name"
                         value={this.state.restaurant.name()}
                         onChange={this.handleChange('name')}
                         margin="normal"
-                        variant="filled"
+                        variant="outlined"
+                        placeholder="Name"
                     />
-                    <TextField
-                        id="address"
-                        style={this.style.textField}
-                        label="Address"
+                    <PlacesAutocomplete
                         value={this.state.restaurant.address()}
-                        onChange={this.handleChange('address')}
-                        margin="normal"
-                        variant="filled"
-                    />
+                        onChange={this.handleChangeAddress}
+                        onSelect={this.handleSelectAddress}
+                    >
+                        {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
+                            <div style={this.style.addressInputContainer}>
+                                <TextField
+                                    {...getInputProps({})}
+                                    id="address"
+                                    InputLabelProps={{ shrink: true }}
+                                    style={this.style.textField}
+                                    fullWidth
+                                    label="Address"
+                                    margin="normal"
+                                    variant="outlined"
+                                    placeholder="Address"
+
+                                />
+                                <div style={this.style.autoCompleteDropDownContainer}>
+                                    {loading && <div>Loading...</div>}
+                                    {suggestions.map(suggestion => {
+
+                                        const style = suggestion.active
+                                            ? this.style.suggestionItemActive
+                                            : this.style.suggestionItem
+                                        return (
+                                            <div
+                                                {...getSuggestionItemProps(suggestion, {
+                                                    style,
+                                                })}
+                                            >
+                                                <span>{suggestion.description}</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+                    </PlacesAutocomplete>
                     <TextField
                         id="open_hour"
+                        InputLabelProps={{ shrink: true }}
                         style={this.style.textField}
-
+                        placeholder="HH:mm"
                         label="Open hour"
                         value={this.state.restaurant.openHour()}
                         onChange={this.handleChange('open_hour')}
                         margin="normal"
-                        variant="filled"
+                        variant="outlined"
                     />
                     <TextField
                         id="close_hour"
+                        InputLabelProps={{ shrink: true }}
                         style={this.style.textField}
-
+                        placeholder="HH:mm"
                         label="Close hour"
                         value={this.state.restaurant.closeHour()}
                         onChange={this.handleChange('close_hour')}
                         margin="normal"
-                        variant="filled"
+                        variant="outlined"
                     />
                     <TextField
                         id="type"
+                        InputLabelProps={{ shrink: true }}
                         style={this.style.textField}
-
                         select
                         label="Type"
                         value={this.state.restaurant.type()}
@@ -134,7 +187,7 @@ class EditRestaurantView extends React.Component {
                         }}
                         helperText="Restaurant type"
                         margin="normal"
-                        variant="filled"
+                        variant="outlined"
                     >
                         {Object.values(RestaraurantType).map(option => (
                             <option key={option.key} value={option.key}>
@@ -145,7 +198,7 @@ class EditRestaurantView extends React.Component {
                     <TextField
                         id="category"
                         style={this.style.textField}
-
+                        InputLabelProps={{ shrink: true }}
                         select
                         label="Category"
                         value={this.state.restaurant.category()}
@@ -155,7 +208,7 @@ class EditRestaurantView extends React.Component {
                         }}
                         helperText="Restaurant category"
                         margin="normal"
-                        variant="filled"
+                        variant="outlined"
                     >
                         {Object.values(RestaraurantCategory).map(option => (
                             <option key={option.key} value={option.key}>
@@ -243,6 +296,28 @@ class EditRestaurantView extends React.Component {
         if (this.props.onCancelled) {
             this.props.onCancelled()
         }
+    }
+
+    handleSelectAddress(address) {
+        geocodeByAddress(address)
+            .then(results => getLatLng(results[0]))
+            .then(latLng => {
+                let restaurant = this.state.restaurant;
+                restaurant.address(address);
+                restaurant.location(latLng.lat, latLng.lng);
+                this.setState({
+                    restaurant : restaurant
+                });
+                console.log('Success', latLng)})
+            .catch(error => console.error('Error', error));
+    };
+
+    handleChangeAddress(address) {
+        let restaurant =  this.state.restaurant;
+        restaurant.address(address)
+        this.setState({
+            restaurant : restaurant
+        });
     }
 
 }

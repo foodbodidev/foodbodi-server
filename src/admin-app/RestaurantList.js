@@ -53,10 +53,10 @@ class RestaurantList extends React.Component{
         this.add = this.add.bind(this);
         this.modalClose = this.modalClose.bind(this);
         this.onSubmitted = this.onSubmitted.bind(this);
+        this.refreshFromBeginning = this.refreshFromBeginning.bind(this);
 
         this.modalStyles = {
             paper: {
-                border: '2px solid #000',
                 marginTop : "100px"
             },
         }
@@ -96,6 +96,7 @@ class RestaurantList extends React.Component{
                 <Typography variant="h6"> Restaurants </Typography>
                 <div>
                     <Button onClick={this.add} variant="outlined" color="primary">Add</Button>
+                    <Button onClick={this.refreshFromBeginning} variant="outlined"> Refresh</Button>
                 </div>
                 {this.renderRows()}
             </div>
@@ -234,6 +235,10 @@ class RestaurantList extends React.Component{
         }).execute()
     }
 
+    refreshFromBeginning() {
+        this.state.pageTokens = [];
+        this.refresh();
+    }
     updateRestaurantList(items, nextPageToken) {
         if (!!nextPageToken) {
             this.state.pageTokens.push(nextPageToken)

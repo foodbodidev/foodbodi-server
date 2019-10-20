@@ -32,8 +32,8 @@ router.post("/photo", multer.single("file"), (req, res, next) => {
 
 
     // Create a new blob in the bucket and upload the file data.
-    const bucketName = "foodbodi-photo";
-    let filenamePrefix = req.query.filename || "";
+    const bucketName = "foodbodi-photos";
+    let filenamePrefix = req.query.filename || "photo";
     let filename = filenamePrefix + "-" + new Date().getTime();
     console.log("Prepare upload " + filename);
 

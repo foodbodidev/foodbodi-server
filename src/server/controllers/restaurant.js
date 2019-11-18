@@ -29,6 +29,8 @@ exports.create = (req, res, next) => {
     let license = restaurant.license();
     license.secretApprove(Random.randomString(SECRET_LENGTH));
     license.secretDeny(Random.randomString(SECRET_LENGTH));
+    //TODO : auto approve for now
+    license.approve();
 
     if (req.body.foods) {
         const caloValues = req.body.foods.map((food, index) => food.calo || 0);
@@ -67,11 +69,11 @@ exports.create = (req, res, next) => {
             restaurant.searchDoc(),
             (result) => console.log(result),
             error => console.log(error));
-        notifyManager(restaurant.id(), (result) => {
+        /*notifyManager(restaurant.id(), (result) => {
             console.log("Send notify new restaurant success : " + restaurant.id())
         }, error => {
             console.log("Send notify new restaurant fail : " + restaurant.id())
-        })
+        })*/
     }).catch(error => {
         console.log(error);
         ErrorHandler.error(res, ErrorCodes.RESTAURANT_CREATE_FAIL, error.message);

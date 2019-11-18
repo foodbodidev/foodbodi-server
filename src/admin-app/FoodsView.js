@@ -88,7 +88,7 @@ class FoodsView extends React.Component{
     render() {
         return (
             <Container fixed>
-                <Paper>
+                <Paper style={{height: "800px", overflowY : "scroll"}}>
                     <Typography variant="h5"> Dishes of {this.props.restaurant.name()}</Typography>
                     <div>
                         <Typography variant="h6"> Add new dishes</Typography>

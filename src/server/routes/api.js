@@ -13,9 +13,10 @@ let {hash} = require("../utils/password");
 let tokenVerifier = require("../middlewares/verify_token");
 
 const {OAuth2Client} = require('google-auth-library');
-const iOS_CLIENT_ID = "513844011252-2qlodmja1av20n55vro79uv0jc5vj3ck.apps.googleusercontent.com";
-const WEB_CLIENT_ID = "513844011252-0220ffhr75mivnrv0jub2ue1kkkgckfr.apps.googleusercontent.com";
-const client = new OAuth2Client(iOS_CLIENT_ID);
+const WEB_CLIENT_ID = "367920415756-os0qdcn3mirkrqlklgj02u9bb96gb5nj.apps.googleusercontent.com";
+const ANDROID_CLIENT_ID = "367920415756-pelugd377o02aq3v4pk1e796leu5smpu.apps.googleusercontent.com";
+const IOS_CLIENT_ID = "367920415756-85nal9alv15oqtp6qlheir821t8bmra4.apps.googleusercontent.com";
+const client = new OAuth2Client(IOS_CLIENT_ID);
 
 const axios = require('axios');
 
@@ -46,7 +47,7 @@ async function verify(token) {
     logger.info("Verify google token " + token);
     const ticket = await client.verifyIdToken({
         idToken: token,
-        audience: [iOS_CLIENT_ID, WEB_CLIENT_ID]
+        audience: [WEB_CLIENT_ID, IOS_CLIENT_ID, ANDROID_CLIENT_ID]
     });
     const payload = ticket.getPayload();
     logger.info("Google account " + JSON.stringify(payload));

@@ -81,6 +81,7 @@ class RestaurantList extends React.Component{
 
                 {this.state.error !== null ? this.renderError() : ""}
 
+
                 <Modal
                     aria-labelledby="simple-modal-title"
                     aria-describedby="simple-modal-description"
@@ -121,6 +122,9 @@ class RestaurantList extends React.Component{
                 <TableCell>
                     {item.name}
                     <div>
+                        {!!item.is_branch_of ? (<h6>Branch</h6>) : ""}
+                    </div>
+                    <div>
                     <Button onClick={this.showFoods(item.id)} variant="contained" color="primary">Foods</Button>
                         <Button onClick={this.edit(item.id)} data={item.id} variant="outlined" color="default">
                             Edit
@@ -128,6 +132,12 @@ class RestaurantList extends React.Component{
                     </div>
                 </TableCell>
                 <TableCell>{item.address}
+                    <div>
+                        LatLng : {item.lat}:{item.lng}
+                    </div>
+                    <div>
+                        Geohash : {item.geohash}
+                    </div>
                 <div>
                     <Button onClick={this.addBranch(item.id)} data={item.id} variant="outlined" color="primary">
                         Add Branch

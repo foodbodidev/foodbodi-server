@@ -25,7 +25,7 @@ class App extends React.Component {
 
     renderApp() {
         return (
-            <div>
+            <div style={{backgroundColor : "whitesmoke"}}>
                 <Container fixed>
                     <RestaurantList></RestaurantList>
                 </Container>

@@ -17,7 +17,7 @@ class EditRestaurantView extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            restaurant: new Restaurant({}),
+            restaurant: new Restaurant({category : RestaraurantCategory.ORDINARY.key, type : RestaraurantType.RESTAURANT.key}),
             error: null,
             restaurant_id : this.props.restaurant_id
         };

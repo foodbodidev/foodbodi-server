@@ -42,6 +42,7 @@ class ImageGallery extends React.Component{
         return (
             <Container>
                 <Paper style={{height: "800px", overflowY : "scroll"}}>
+                    <Button onClick={this.cancel} style={{float : "right"}}>Close</Button>
                     {this.renderUploader()}
                     <Box p={2} borderBottom={1} >
                         <Typography variant="h5">Preview</Typography>
@@ -56,7 +57,6 @@ class ImageGallery extends React.Component{
                             {this.renderRow()}
                         </div>
                     </Box>
-                    <Button onClick={this.cancel}>Cancel</Button>
                 </Paper>
             </Container>
         );

@@ -158,8 +158,8 @@ class FoodsView extends React.Component{
                         <div>
                             {this.state.error !== null ? this.renderError() : ""}
                         </div>
-                        <Button onClick={this.add} variant="contained" color="primary">Add</Button>
-                        <Button onClick={this.cancel} variant="contained" color="default">Cancel</Button>
+                        <Button onClick={this.add}  color="primary">Add</Button>
+                        <Button onClick={this.cancel} color="default">Cancel</Button>
 
                     </div>
                     <Typography variant="h5"> List of dishes </Typography>

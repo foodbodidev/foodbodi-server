@@ -3,13 +3,14 @@ import RestaurantList from "./RestaurantList";
 import {Container} from "@material-ui/core";
 import LoginForm from "./LoginForm";
 import RemoteCall from "./utils/RemoteCall";
+import firebase from "firebase";
 
 class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             token : null
-        }
+        };
 
         this.onLogin = this.onLogin.bind(this);
     }
@@ -45,6 +46,19 @@ class App extends React.Component {
         RemoteCall.setApiToken(token);
         this.setState({
             token : token
+        });
+    }
+
+    componentDidMount() {
+        firebase.initializeApp({
+            apiKey: "AIzaSyByO24envfd_yrRrT-HNhMf2gNrkBQBJbk",
+            authDomain: "foodbodi-prod.firebaseapp.com",
+            databaseURL: "https://foodbodi-prod.firebaseio.com",
+            projectId: "foodbodi-prod",
+            storageBucket: "foodbodi-prod.appspot.com",
+            messagingSenderId: "367920415756",
+            appId: "1:367920415756:web:76bc8490eb028873c39a29",
+            measurementId: "G-2W09WZ3P4R"
         });
     }
 }

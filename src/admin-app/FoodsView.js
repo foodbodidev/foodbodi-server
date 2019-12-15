@@ -10,6 +10,8 @@ import Button from '@material-ui/core/Button';
 import {Typography} from "@material-ui/core";
 import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
+import Modal from "@material-ui/core/Modal";
+import ImageGallery from "./ImageGallery";
 
 
 class FoodsView extends React.Component{
@@ -18,14 +20,25 @@ class FoodsView extends React.Component{
 
         this.restaurant_id = this.props.restaurant.getFoodRestaurantId();
 
+        this.actions = {
+            UPLOAD_FOOD_PHOTO : 1,
+            NONE : 0
+        };
         this.state = {
             items : [],
             error : null,
-            food: new Food({})
+            food: new Food({}),
+            openModal : false,
+            editing_id : null,
+            action : this.actions.NONE
         };
 
         this.add = this.add.bind(this);
         this.cancel = this.cancel.bind(this);
+        this.cancelUploadPhoto = this.cancelUploadPhoto.bind(this);
+        this.updateFoodPhoto = this.updateFoodPhoto.bind(this);
+        this.uploadFoodPhoto = this.uploadFoodPhoto.bind(this);
+
     }
 
     componentDidMount() {
@@ -64,6 +77,9 @@ class FoodsView extends React.Component{
                         {item.calo} kcalo
                     </TableCell>
                     <TableCell>
+                        <img onClick={this.updateFoodPhoto(item.id)} src={item.photo || "https://via.placeholder.com/50x50"} style={{height : "50px", width : "50"}}/>
+                    </TableCell>
+                    <TableCell>
                         <Button onClick={this.delete(item.id)}>Delete</Button>
                     </TableCell>
                 </TableRow>
@@ -85,9 +101,28 @@ class FoodsView extends React.Component{
         )
     }
 
+    getEditingFood() {
+        return this.state.items.find(item => item.id === this.state.editing_id);
+    }
+
     render() {
+        let popup = null;
+        let editingFood = this.getEditingFood();
+        if (this.state.action === this.actions.UPLOAD_FOOD_PHOTO) {
+            popup = (<ImageGallery onUploaded={this.uploadFoodPhoto} onCancelled={this.cancelUploadPhoto} image_urls={[editingFood.photo]} selected_image={editingFood.photo} />)
+        }
         return (
             <Container fixed>
+                <Modal
+                    aria-labelledby="simple-modal-title"
+                    aria-describedby="simple-modal-description"
+                    open={this.state.action !== this.actions.NONE}
+                    onClose={this.modalClose}
+                >
+                    <div>
+                        {popup}
+                    </div>
+                </Modal>
                 <Paper style={{height: "800px", overflowY : "scroll"}}>
                     <Typography variant="h5"> Dishes of {this.props.restaurant.name()}</Typography>
                     <div>
@@ -182,6 +217,13 @@ class FoodsView extends React.Component{
         this.props.onCancelled()
     }
 
+    cancelUploadPhoto() {
+        this.setState({
+            editing_id : null,
+            action : this.actions.NONE
+        })
+    }
+
     delete(id) {
         return (e) => {
             new RemoteCall("/api/food/" + id + "?restaurant_id=" + this.restaurant_id)
@@ -224,6 +266,34 @@ class FoodsView extends React.Component{
             this.setState({
                 error : error.message
             })
+        }).execute()
+    }
+
+    updateFoodPhoto(id) {
+        return (e) => {
+            this.setState({
+                editing_id : id,
+                action : this.actions.UPLOAD_FOOD_PHOTO
+            })
+        }
+    }
+
+    uploadFoodPhoto(data) {
+        const link = data.mediaLink;
+        new RemoteCall("/api/food/" + this.state.editing_id)
+            .usePUT()
+            .useJson()
+            .setBody({photo : link, restaurant_id : this.restaurant_id})
+            .onJsonResponse(json => {
+                if (0 === json.status_code) {
+                    let editingFood = this.getEditingFood();
+                    editingFood.photo = link;
+                    this.setState(this.state)
+                } else {
+                    this.setState({error : json.message})
+                }
+            }).onError(error => {
+                this.setState({error : error.message})
         }).execute()
     }
 

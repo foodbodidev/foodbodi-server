@@ -24,6 +24,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import ImageGallery from "./ImageGallery";
 
 
 class RestaurantList extends React.Component{
@@ -35,6 +36,7 @@ class RestaurantList extends React.Component{
             EDIT : 1,
             CLONE : 2,
             SHOW_FOOD : 3,
+            PHOTO : 4,
             NONE : -1,
         };
 
@@ -54,6 +56,8 @@ class RestaurantList extends React.Component{
         this.modalClose = this.modalClose.bind(this);
         this.onSubmitted = this.onSubmitted.bind(this);
         this.refreshFromBeginning = this.refreshFromBeginning.bind(this);
+        this.openPhotoView = this.openPhotoView.bind(this);
+        this.uploadPhoto = this.uploadPhoto.bind(this);
 
         this.modalStyles = {
             paper: {
@@ -75,7 +79,17 @@ class RestaurantList extends React.Component{
         }).execute()
     }
 
+    getEditingRestaurant() {
+        return this.state.items.find(item => item.id === this.state.editing_id);
+    }
     render() {
+        let popup = null;
+        let editing = this.getEditingRestaurant();
+        let photo = !!editing && Array.isArray(editing.photos) ? editing.photos[0] : null
+        if (this.action.CLONE === this.state.action) popup = (<AddBranchView restaurant_id={this.state.editing_id} onSubmitted={this.onSubmitted} onCancelled={this.modalClose}/>)
+        else if (this.action.SHOW_FOOD === this.state.action) popup = (<FoodsView restaurant={this.state.restaurant} onCancelled={this.modalClose}/>);
+        else if (this.action.EDIT === this.state.action) popup = (<EditRestaurantView restaurant_id={this.state.editing_id} onSubmitted={this.onSubmitted} onCancelled={this.modalClose}/>)
+        else if (this.action.PHOTO === this.state.action) popup =(<ImageGallery onUploaded={this.uploadPhoto} onCancelled={this.modalClose} image_urls={this.getEditingRestaurant().photos} selected_image={photo}/>);
         return (
             <div>
 
@@ -89,9 +103,7 @@ class RestaurantList extends React.Component{
                     onClose={this.modalClose}
                 >
                     <div style={this.modalStyles.paper}>
-                        {this.action.CLONE === this.state.action ? (<AddBranchView restaurant_id={this.state.editing_id} onSubmitted={this.onSubmitted} onCancelled={this.modalClose}/>)
-                            : this.action.SHOW_FOOD === this.state.action ? (<FoodsView restaurant={this.state.restaurant} onCancelled={this.modalClose}/>)
-                                : (<EditRestaurantView restaurant_id={this.state.editing_id} onSubmitted={this.onSubmitted} onCancelled={this.modalClose}/>)}
+                        {popup}
                     </div>
                 </Modal>
                 <Typography variant="h6"> Restaurants </Typography>
@@ -142,6 +154,7 @@ class RestaurantList extends React.Component{
                     <Button onClick={this.addBranch(item.id)} data={item.id} variant="outlined" color="primary">
                         Add Branch
                     </Button>
+                    <Button onClick={this.openPhotoView(item.id)}>Photos</Button>
                 </div>
                 </TableCell>
                 <TableCell>{item.type}</TableCell>
@@ -307,6 +320,39 @@ class RestaurantList extends React.Component{
 
             })
         }
+    }
+
+    openPhotoView(id) {
+        return (e) => {
+            this.setState({
+                editing_id : id,
+                action : this.action.PHOTO
+            })
+        }
+    }
+
+    uploadPhoto(data) {
+            let r = this.state.items.find(item => item.id === this.state.editing_id);
+            if (r) {
+                if (Array.isArray(r.photos)) r.photos.push(data.mediaLink);
+                else r.photos = [data.mediaLink];
+                new RemoteCall("/api/restaurant/" + r.id)
+                    .usePUT()
+                    .useJson()
+                    .setBody({photos : r.photos})
+                    .onJsonResponse(json => {
+                        if (0 === json.status_code) {
+                            this.setState(this.state)
+                        } else {
+                            this.setState({error : json.message})
+                        }
+                    }).onError(error => {
+                        this.setState({error : error.message})
+                }).execute()
+            } else {
+                this.setState({error : "Can not found restaurant " + this.state.editing_id})
+            }
+
     }
 
     showFoods(id) {

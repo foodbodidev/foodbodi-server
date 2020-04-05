@@ -49,7 +49,8 @@ class RestaurantList extends React.Component{
             editing_id : null,
             restaurant : null,
             search_phrase : "",
-            search_data : []
+            search_data : [],
+            contributor : props.contributor || {}
         };
 
        // this.delete = this.delete.bind(this);
@@ -76,7 +77,7 @@ class RestaurantList extends React.Component{
     }
 
     componentDidMount() {
-        new RemoteCall("/api/restaurant/list")
+        new RemoteCall("/api/restaurant/list" + this.getQueryParam(null))
             .useJson()
             .useGET()
             .onJsonResponse(json => {
@@ -145,25 +146,28 @@ class RestaurantList extends React.Component{
                 </Modal>
 
                 <Typography variant="h6"> Restaurants </Typography>
+                {!!this.state.contributor._id ? (<Typography variant={"caption"}>Contributor : {this.state.contributor.email}</Typography>) : ""}
                 <Paper style={{marginBottom : "10px"}}>
                     <Button onClick={this.add} color="primary">Add</Button>
                     <Button onClick={this.refreshFromBeginning} > Refresh</Button>
                 </Paper>
-                <Paper style={{marginBottom : "10px"}}>
-                    <TextField
-                        id="q"
-                        fullWidth
-                        InputLabelProps={{ shrink: true }}
-                        placeholder="Restaurant name or food name ..."
-                        label="Search phrase"
-                        value={this.state.search_phrase}
-                        onChange={this.updateSearchPhrase}
-                        margin="normal"
-                        variant="outlined"
-                    />
-                    <Button onClick={this.search}>Search</Button>
-                    <Button onClick={this.closeSearch}>Close</Button>
-                    {this.renderSearchResult()}
+                <Paper>
+                    <Box p={1}>
+                        <TextField
+                            id="q"
+                            fullWidth
+                            InputLabelProps={{ shrink: true }}
+                            placeholder="Restaurant name or food name ..."
+                            label="Search phrase"
+                            value={this.state.search_phrase}
+                            onChange={this.updateSearchPhrase}
+                            margin="normal"
+                            variant="outlined"
+                        />
+                        <Button onClick={this.search}>Search</Button>
+                        <Button onClick={this.closeSearch}>Close</Button>
+                        {this.renderSearchResult()}
+                    </Box>
                 </Paper>
                 {this.renderRows()}
             </div>
@@ -296,8 +300,17 @@ class RestaurantList extends React.Component{
         return null;
     }
 
+    getQueryParam(pageToken) {
+        let urlParam = new URLSearchParams();
+        urlParam.set("nextPageToken", pageToken);
+        if (!!this.state.contributor._id) {
+            urlParam.set("contributor",  this.state.contributor._id);
+        }
+        return "?" + urlParam.toString();
+    }
+
     nextPage() {
-        new RemoteCall("/api/restaurant/list?nextPageToken=" + this.getLastPageToken())
+        new RemoteCall("/api/restaurant/list" + this.getQueryParam(this.getLastPageToken()))
             .useJson()
             .useGET()
             .onJsonResponse(json => {
@@ -309,7 +322,7 @@ class RestaurantList extends React.Component{
         }).execute()
     };
     backPage() {
-        new RemoteCall("/api/restaurant/list?nextPageToken=" + this.getPreviousPageToken())
+        new RemoteCall("/api/restaurant/list" + this.getQueryParam(this.getPreviousPageToken()))
             .useJson()
             .useGET()
             .onJsonResponse(json => {
@@ -322,7 +335,7 @@ class RestaurantList extends React.Component{
     }
 
     refresh() {
-        new RemoteCall("/api/restaurant/list?nextPageToken=" + this.getCurrentPageToken())
+        new RemoteCall("/api/restaurant/list" + this.getQueryParam(this.getCurrentPageToken()))
             .useJson()
             .useGET()
             .onJsonResponse(json => {

@@ -4,15 +4,25 @@ import {Container} from "@material-ui/core";
 import LoginForm from "./LoginForm";
 import RemoteCall from "./utils/RemoteCall";
 import firebase from "firebase";
+import AppSections from "./AppSections";
+import ContributorForm from "./ContributorForm";
+import AppController from "./AppController";
+import Appbar from "./Appbar";
+import ContributorList from "./ContributorList";
 
 class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            token : null
+            token : null,
+            section : null,
+            section_data : {}
         };
 
         this.onLogin = this.onLogin.bind(this);
+
+        AppController.setInstance(this);
+
     }
 
     render() {
@@ -24,10 +34,25 @@ class App extends React.Component {
     }
 
     renderApp() {
+        let section = (<RestaurantList/>);
+        if (AppSections.ADD_CONTRIBUTOR === this.state.section) {
+            section = (<ContributorForm/>)
+        } else if (AppSections.EDIT_CONTRIBUTOR === this.state.section) {
+            section = (<ContributorForm data={this.state.section_data}/>)
+        } else if (AppSections.LIST_CONTRIBUTORS === this.state.section) {
+            section = (<ContributorList/>)
+        } else if (AppSections.CONTRIBUTIONS === this.state.section) {
+            section = (<RestaurantList contributor={this.state.section_data}/>)
+        }
+        else if (AppSections.PROFILE === this.state.section) {
+            //...
+        }
+
         return (
-            <div style={{backgroundColor : "whitesmoke"}}>
+            <div style={{backgroundColor : "whitesmoke", height : "max-content", minHeight : "100%"}}>
+                <Appbar/>
                 <Container fixed>
-                    <RestaurantList></RestaurantList>
+                    {section}
                 </Container>
             </div>
         );

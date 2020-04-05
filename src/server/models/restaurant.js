@@ -319,7 +319,8 @@ Restaurant.prototype.searchDoc = function() {
     return {
         name : this.values.name,
         address : this.values.address || null,
-        photos : this.values.photos || []
+        photos : this.values.photos || [],
+        is_branch_of : this.values.is_branch_of || null
     }
 };
 

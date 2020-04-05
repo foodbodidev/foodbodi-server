@@ -37,7 +37,8 @@ let createUserInfo = (input) => {
         last_name : last_name || "",
         daily_calo : 2500,
         email : email,
-        is_admin : false
+        is_admin : false,
+        is_contributor : false
     };
     return data;
 
@@ -124,6 +125,75 @@ router.post("/register", (req, res, next) => {
         ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Invalid email or password");
     }
 
+});
+
+router.post("/add_contributor", tokenVerifier, (req, res, next) => {
+    let {email, password, first_name, last_name} = req.body;
+    if (!!email && !!password) {
+        let profile = {email, password, first_name, last_name};
+        profile.password = hash(password);
+        profile.is_contributor = true;
+        profile.is_admin = false;
+
+        let userRef = firestore.collection('users').doc(email);
+        let getDoc = userRef.get()
+            .then(doc => {
+                if (!doc.exists) {
+                    let docRef = firestore.collection("users").doc(email);
+                    docRef.set(profile).then(result => {
+                        ErrorHandler.success(res, profile);
+                    });
+                } else {
+                    ErrorHandler.error(res, ErrorCodes.USER_EXISTS, "User already exists");
+                }
+            })
+            .catch(err => {
+                logger.error('Error getting document ' + err);
+                ErrorHandler.error(res, ErrorCodes.ERROR, "Register fail");
+            });
+
+    } else {
+        ErrorHandler.error(res, ErrorCodes.WRONG_FORMAT, "Invalid email or password");
+    }
+});
+
+router.post("/update_contributor", tokenVerifier, (req, res, next) => {
+    let {first_name, last_name} = req.body;
+    let {id} = req.query;
+        let profile = {first_name, last_name};
+        let userRef = firestore.collection('users').doc(id);
+        let getDoc = userRef.get()
+            .then(doc => {
+                if (doc.exists) {
+                    let docRef = firestore.collection("users").doc(id);
+                    docRef.update(profile).then(result => {
+                        ErrorHandler.success(res, profile);
+                    });
+                } else {
+                    ErrorHandler.error(res, ErrorCodes.USER_EXISTS, "User not exists");
+                }
+            })
+            .catch(err => {
+                logger.error('Error getting document ' + err);
+                ErrorHandler.error(res, ErrorCodes.ERROR, "Register fail");
+            });
+});
+
+router.get("/contributors", tokenVerifier, (req, res, next) => {
+   firestore.collection("users").where("is_contributor", "==", true)
+       .get()
+       .then(snapshot => {
+           let result = [];
+           snapshot.docs.forEach(item => {
+               //TODO : make user entity
+               let json = item.data();
+               json._id = item.id;
+               result.push(json);
+           });
+           ErrorHandler.success(res, {users : result});
+       }).catch(err => {
+       ErrorHandler.error(res, ErrorCodes.ERROR, err.message);
+   })
 });
 
 router.post("/profile", tokenVerifier, (req, res, next) => {

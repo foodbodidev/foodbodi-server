@@ -9,6 +9,7 @@ class LoginForm extends React.Component {
     constructor(props) {
         super(props);
         this.login = this.login.bind(this);
+        this.register = this.register.bind(this);
         this.state = {
             username : null,
             password : null
@@ -21,14 +22,13 @@ class LoginForm extends React.Component {
                 marginTop: "100px",
             },
             textField: {
-                marginLeft: "10px",
-                marginRight: "10px",
                 marginTop: "10px"
             },
             centerBox: {
                 marginRight: "auto",
                 marginLeft: "auto",
-                width : "fit-content"
+                width : "fit-content",
+                padding : "2em"
             },
             error : {
                 color : "red"
@@ -64,7 +64,7 @@ class LoginForm extends React.Component {
                         <div>
                         {!!this.state.error ? (<Typography variant="caption" style={this.style.error}>{this.state.error}</Typography>) : null}
                         </div>
-                        <Button onClick={this.login} variant="contained" color="primary"> Submit </Button>
+                        <Button onClick={this.login} variant="contained" color="primary"> Sign in as admin</Button>
                     </Paper>
 
                 </Container>
@@ -95,6 +95,10 @@ class LoginForm extends React.Component {
                 })
         })
             .execute()
+    }
+
+    register() {
+
     }
 
     handleChange(field) {

@@ -194,7 +194,7 @@ exports.listFood = (req, res, next) => {
 };
 
 exports.list = (req, res, next) => {
-    let {nextPageToken} = req.query;
+    let {nextPageToken, contributor} = req.query;
     new Promise((resolve, reject) => {
         if (!!nextPageToken) {
             firestore.collection(Restaurant.prototype.collectionName()).doc(nextPageToken).get()
@@ -210,6 +210,10 @@ exports.list = (req, res, next) => {
         }
     }).then(doc => {
         let q = firestore.collection(Restaurant.prototype.collectionName());
+
+        if (!!contributor) {
+            q = q.where("creator", "==", contributor);
+        }
         if (doc !== null ) {
             q = q.startAfter(doc)
         }

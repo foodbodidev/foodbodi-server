@@ -151,7 +151,7 @@ class RestaurantList extends React.Component{
                     <Button onClick={this.add} color="primary">Add</Button>
                     <Button onClick={this.refreshFromBeginning} > Refresh</Button>
                 </Paper>
-                <Paper>
+                <Paper hidden={!!this.state.contributor._id}>
                     <Box p={1}>
                         <TextField
                             id="q"

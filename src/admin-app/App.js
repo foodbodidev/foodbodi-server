@@ -15,6 +15,7 @@ class App extends React.Component {
         super(props);
         this.state = {
             token : null,
+            userData : {},
             section : null,
             section_data : {}
         };
@@ -35,22 +36,25 @@ class App extends React.Component {
 
     renderApp() {
         let section = (<RestaurantList/>);
-        if (AppSections.ADD_CONTRIBUTOR === this.state.section) {
-            section = (<ContributorForm/>)
-        } else if (AppSections.EDIT_CONTRIBUTOR === this.state.section) {
-            section = (<ContributorForm data={this.state.section_data}/>)
-        } else if (AppSections.LIST_CONTRIBUTORS === this.state.section) {
-            section = (<ContributorList/>)
-        } else if (AppSections.CONTRIBUTIONS === this.state.section) {
-            section = (<RestaurantList contributor={this.state.section_data}/>)
-        }
-        else if (AppSections.PROFILE === this.state.section) {
-            //...
+        if (this.state.userData.is_admin) {
+            if (AppSections.ADD_CONTRIBUTOR === this.state.section) {
+                section = (<ContributorForm/>)
+            } else if (AppSections.EDIT_CONTRIBUTOR === this.state.section) {
+                section = (<ContributorForm data={this.state.section_data}/>)
+            } else if (AppSections.LIST_CONTRIBUTORS === this.state.section) {
+                section = (<ContributorList/>)
+            } else if (AppSections.CONTRIBUTIONS === this.state.section) {
+                section = (<RestaurantList contributor={this.state.section_data}/>)
+            } else if (AppSections.PROFILE === this.state.section) {
+                //...
+            }
+        } else if (this.state.userData.is_contributor) {
+            section = (<RestaurantList contributor={this.state.userData}/>)
         }
 
         return (
             <div style={{backgroundColor : "whitesmoke", height : "max-content", minHeight : "100%"}}>
-                <Appbar/>
+                {this.state.userData.is_admin ? (<Appbar/>) : ""}
                 <Container fixed>
                     {section}
                 </Container>
@@ -68,9 +72,11 @@ class App extends React.Component {
 
     onLogin(json) {
         const token = json.data.token;
+        const userData = json.data.user || {};
         RemoteCall.setApiToken(token);
         this.setState({
-            token : token
+            token : token,
+            userData : userData
         });
     }
 
@@ -85,6 +91,10 @@ class App extends React.Component {
             appId: "1:367920415756:web:76bc8490eb028873c39a29",
             measurementId: "G-2W09WZ3P4R"
         });
+    }
+
+    getCurrentSection() {
+        return this.state.section;
     }
 }
 

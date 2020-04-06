@@ -15,4 +15,9 @@ AppController.setSection = (sectionName, sectionData) => {
     instance.setState({});
 };
 
+AppController.getCurrentSection = () => {
+    let instance = AppController.getInstance();
+    return instance.getCurrentSection();
+};
+
 module.exports = AppController;

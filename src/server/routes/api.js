@@ -69,6 +69,7 @@ router.post('/login', function(req, res, next) {
                     const hashPassword = hash(password);
                     const savedHash = doc.data().password;
                     const data = doc.data();
+                    data._id = doc.id;
                     delete data.password;
                     if (hashPassword === savedHash) {
                         logger.info("User login " + JSON.stringify(doc.data()));

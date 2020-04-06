@@ -112,9 +112,14 @@ exports.update = (req, res, next) => {
         ref.get().then(doc => {
                if (doc.exists) {
                    oldData = new Restaurant(doc.data(), doc.id);
-                   return ref.update(update_data.toJSON(false))
+                   let currentUser = TokenHandler.getEmail(req);
+                   if (currentUser === oldData.creator()) {
+                       return ref.update(update_data.toJSON(false))
+                   } else {
+                       throw "This entity is created by another one, can't update";
+                   }
                } else {
-                   ErrorHandler.error(res, ErrorCodes.ERROR, "Restaurant " + id + " not found");
+                  throw "Restaurant " + id + " not found";
                }
             }).then(result => {
                 ErrorHandler.success(res, {});
@@ -153,7 +158,20 @@ exports.update = (req, res, next) => {
 exports.delete = (req, res, next) => {
     let {id} = req.params;
     if (id) {
-        firestore.collection(Restaurant.prototype.collectionName()).doc(id).delete()
+        firestore.collection(Restaurant.prototype.collectionName()).doc(id)
+            .get()
+            .then((doc) => {
+                if (doc.exists) {
+                    let oldData = new Restaurant(doc.data(), doc.id);
+                    let currentUser = TokenHandler.getEmail(req);
+                    if (currentUser !== oldData.creator()) throw "This entity is created by another one, can't delete";
+                    else {
+                        return firestore.collection(Restaurant.prototype.collectionName()).doc(id).delete();
+                    }
+                } else {
+                    throw "Restaurant " + id + " not found";
+                }
+            })
             .then(() => {
             //TODO : find cron op to delete foods
             ErrorHandler.success(res, {});

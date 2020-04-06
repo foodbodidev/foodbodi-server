@@ -103,6 +103,10 @@ exports.update = (req, res, next) => {
                     }
                     food = new __Food(docs[0].data(), docs[0].id);
                     restaurant = new Restaurant(docs[1].data(), docs[1].id);
+
+                    let currentUser = TokenHandler.getEmail(req);
+                    if (currentUser !== food.creator()) throw "This entity is created by another one, can't update";
+
                     t.update(foodDB.doc(id), req.body);
                     if (req.body.calo) {
                         restaurant.changeCalo(food.calo(), req.body.calo);
@@ -145,6 +149,10 @@ exports.delete = (req, res, next) => {
                         throw "Wrong return doc for food or restaurant"
                     }
                     let food = new __Food(docs[0].data(), docs[0].id);
+
+                    let currentUser = TokenHandler.getEmail(req);
+                    if (currentUser !== food.creator()) throw "This entity is created by another one, can't update";
+
                     food.markAsTrash();
                     let restaurant = new Restaurant(docs[1].data(), docs[1].id);
                     t.update(foodDB.doc(id), food.toJSON());
